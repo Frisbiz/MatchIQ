@@ -1148,10 +1148,14 @@
                     // Update badges
                     const homeBadge = document.getElementById('homeBadge');
                     const awayBadge = document.getElementById('awayBadge');
-                    homeBadge.style.background = TEAM_COLORS[homeTeam] || '#666';
-                    homeBadge.textContent = homeTeam.charAt(0);
-                    awayBadge.style.background = TEAM_COLORS[awayTeam] || '#666';
-                    awayBadge.textContent = awayTeam.charAt(0);
+                    if (TEAM_DATA[homeTeam]) {
+                        homeBadge.style.background = '#fff';
+                        homeBadge.innerHTML = `<img src="${TEAM_DATA[homeTeam].badge}" alt="${homeTeam}" style="width:50px;height:50px;object-fit:contain">`;
+                    }
+                    if (TEAM_DATA[awayTeam]) {
+                        awayBadge.style.background = '#fff';
+                        awayBadge.innerHTML = `<img src="${TEAM_DATA[awayTeam].badge}" alt="${awayTeam}" style="width:50px;height:50px;object-fit:contain">`;
+                    }
                     
                     result.classList.add('show');
                     result.scrollIntoView({ behavior: 'smooth' });
