@@ -1,4 +1,5 @@
 from flask import Flask, render_template, jsonify, request
+from flask_cors import CORS
 import pandas as pd
 import numpy as np
 from scipy.stats import poisson
@@ -9,6 +10,7 @@ import warnings
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
+CORS(app)
 
 # ==================== ENHANCED POISSON MODEL ====================
 
@@ -227,10 +229,9 @@ def fetch_data(league="Premier League"):
     code = league_info["code"]
     
     seasons = [
-        ("1415", "2014-15", "14"), ("1516", "2015-16", "15"), ("1617", "2016-17", "16"),
-        ("1718", "2017-18", "17"), ("1819", "2018-19", "18"), ("1920", "2019-20", "19"),
-        ("2021", "2020-21", "20"), ("2122", "2021-22", "21"), ("2223", "2022-23", "22"),
-        ("2324", "2023-24", "23"), ("2425", "2024-25", "24"),
+        # Only last 5 seasons for faster loading
+        ("2021", "2020-21", "20"), ("2122", "2021-22", "21"), 
+        ("2223", "2022-23", "22"), ("2324", "2023-24", "23"), ("2425", "2024-25", "24"),
     ]
     
     all_data = []
