@@ -401,16 +401,32 @@ def get_cached_data(league):
     # Simple predicted standings based on team strength
     standings = []
     if model and team_stats:
-        # Rank by expected strength (attack * home advantage factor)
+        # Rank by expected strength - use full season projection (38 games)
         team_strength = []
-        for team in available_teams[:10]:
+        for team in available_teams:
             if team in team_stats:
                 stats = team_stats[team]
-                strength = (stats.get('home_gs', 1.5) + stats.get('away_gs', 1.2)) / 2
-                team_strength.append({'team': team, 'points': strength * 30, 'gd': stats.get('home_gs', 1.5) - stats.get('home_gc', 1.3)})
+                # Calculate expected points per game
+                home_xg = stats.get('home_gs', 1.4)
+                away_xg = stats.get('away_gs', 1.1)
+                home_xga = stats.get('home_gc', 1.3)
+                away_xga = stats.get('away_gc', 1.4)
+                
+                # Rough estimate: goals scored vs conceded
+                home_strength = home_xg - home_xga
+                away_strength = away_xg - away_xga
+                
+                # Expected points (very rough)
+                expected_pts = 38 * (1.5 + home_strength * 0.3 + away_strength * 0.2)
+                
+                team_strength.append({
+                    'team': team, 
+                    'points': max(0, expected_pts), 
+                    'gd': (home_xg + away_xg) - (home_xga + away_xga)
+                })
         
         team_strength.sort(key=lambda x: (-x['points'], -x['gd']))
-        standings = team_strength[:10]
+        standings = team_strength[:20]  # All 20 teams
     
     data = {'model': model, 'df': df, 'teams': available_teams, 'team_stats': team_stats, 'standings': standings}
     
