@@ -149,17 +149,18 @@
         }
 
         .team-badge {
-            width: 60px;
-            height: 60px;
+            width: 70px;
+            height: 70px;
             border-radius: 50%;
             margin: 0 auto 10px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.5em;
+            font-size: 1.8em;
             font-weight: bold;
             color: white;
             box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            border: 3px solid white;
         }
 
         select {
@@ -825,15 +826,65 @@
     </div>
 
     <script>
-        const TEAM_COLORS = {
-            "Arsenal": "#EF0107", "Aston Villa": "#95BWE5", "Bournemouth": "#B50127",
-            "Brentford": "#E30613", "Brighton": "#0057B8", "Chelsea": "#034694",
-            "Crystal Palace": "#1B458F", "Everton": "#003399", "Fulham": "#CC0000",
-            "Ipswich": "#00A650", "Leicester": "#00308F", "Liverpool": "#C8102E",
-            "Man City": "#6CABDD", "Man United": "#DA291C", "Newcastle": "#241F20",
-            "Nottingham Forest": "#DD0000", "Southampton": "#D70027", "Tottenham": "#132257",
-            "West Ham": "#7A263A", "Wolves": "#FDB912"
+        const TEAM_DATA = {
+            // Premier League
+            "Arsenal": {"color": "#EF0107", "emoji": "🔴"},
+            "Aston Villa": {"color": "#95BWE5", "emoji": "🔵"},
+            "Bournemouth": {"color": "#B50127", "emoji": "🍒"},
+            "Brentford": {"color": "#E30613", "emoji": "🐝"},
+            "Brighton": {"color": "#0057B8", "emoji": "🌊"},
+            "Chelsea": {"color": "#034694", "emoji": "💙"},
+            "Crystal Palace": {"color": "#1B458F", "emoji": "🦅"},
+            "Everton": {"color": "#003399", "emoji": "🔵"},
+            "Fulham": {"color": "#CC0000", "emoji": "⚫"},
+            "Ipswich": {"color": "#00A650", "emoji": "🐴"},
+            "Leicester": {"color": "#00308F", "emoji": "🦊"},
+            "Liverpool": {"color": "#C8102E", "emoji": "🔴"},
+            "Man City": {"color": "#6CABDD", "emoji": "🔵"},
+            "Man United": {"color": "#DA291C", "emoji": "🔴"},
+            "Newcastle": {"color": "#241F20", "emoji": "⚫"},
+            "Nottingham Forest": {"color": "#DD0000", "emoji": "🌲"},
+            "Southampton": {"color": "#D70027", "emoji": "🦅"},
+            "Tottenham": {"color": "#132257", "emoji": "🐓"},
+            "West Ham": {"color": "#7A263A", "emoji": "⚒️"},
+            "Wolves": {"color": "#FDB912", "emoji": "🐺"},
+            // La Liga
+            "Barcelona": {"color": "#A50044", "emoji": "🔵🔴"},
+            "Real Madrid": {"color": "#FFFFFF", "emoji": "⚪"},
+            "Atletico Madrid": {"color": "#CB3524", "emoji": "🔴"},
+            "Sevilla": {"color": "#D6001C", "emoji": "🟠"},
+            "Valencia": {"color": "#FF0000", "emoji": "⚪"},
+            "Real Sociedad": {"color": "#0000FF", "emoji": "🔵"},
+            "Athletic Bilbao": {"color": "#FF0000", "emoji": "🔴"},
+            "Betis": {"color": "#009150", "emoji": "🟢"},
+            "Villarreal": {"color": "#FFDD00", "emoji": "🟡"},
+            "Girona": {"color": "#DA291C", "emoji": "🔴"},
+            // Serie A
+            "Juventus": {"color": "#000000", "emoji": "⚫⚪"},
+            "Milan": {"color": "#FB090B", "emoji": "🔴⚫"},
+            "Inter Milan": {"color": "#010E80", "emoji": "🔵⚫"},
+            "Roma": {"color": "#9d0000", "emoji": "🔴"},
+            "Napoli": {"color": "#0073CF", "emoji": "🔵"},
+            "Lazio": {"color": "#87CEEB", "emoji": "⚪"},
+            "Atalanta": {"color": "#010E80", "emoji": "🔵⚫"},
+            "Fiorentina": {"color": "#6B2EBF", "emoji": "🟣"},
+            // Bundesliga
+            "Bayern Munich": {"color": "#DC052D", "emoji": "🔴"},
+            "Dortmund": {"color": "#FDE100", "emoji": "🟡"},
+            "Leverkusen": {"color": "#FF0000", "emoji": "🔴"},
+            "RB Leipzig": {"color": "#DD0741", "emoji": "🔴"},
+            "Eintracht Frankfurt": {"color": "#D40421", "emoji": "🔴"},
+            "Stuttgart": {"color": "#D30515", "emoji": "🔴⚪"},
+            // Ligue 1
+            "Paris SG": {"color": "#004170", "emoji": "🔵🔴"},
+            "Marseille": {"color": "#0099CB", "emoji": "🔵⚪"},
+            "Lyon": {"color": "#DA291C", "emoji": "🔴⚪"},
+            "Lille": {"color": "#0000AA", "emoji": "🔵⚪"},
+            "Monaco": {"color": "#DA291C", "emoji": "🔴⚪"},
+            "Nice": {"color": "#000000", "emoji": "⚫🟠"}
         };
+        
+        const TEAM_COLORS = Object.fromEntries(Object.entries(TEAM_DATA).map(([k,v]) => [k, v.color]));
 
         let teams = [];
         let currentLeague = 'Premier League';
@@ -929,17 +980,17 @@
             const homeBadge = document.getElementById('homeBadge');
             const awayBadge = document.getElementById('awayBadge');
             
-            if (homeTeam && TEAM_COLORS[homeTeam]) {
-                homeBadge.style.background = TEAM_COLORS[homeTeam];
-                homeBadge.textContent = homeTeam.charAt(0);
+            if (homeTeam && TEAM_DATA[homeTeam]) {
+                homeBadge.style.background = TEAM_DATA[homeTeam].color;
+                homeBadge.innerHTML = TEAM_DATA[homeTeam].emoji;
             } else {
                 homeBadge.style.background = '#ccc';
                 homeBadge.textContent = '?';
             }
             
-            if (awayTeam && TEAM_COLORS[awayTeam]) {
-                awayBadge.style.background = TEAM_COLORS[awayTeam];
-                awayBadge.textContent = awayTeam.charAt(0);
+            if (awayTeam && TEAM_DATA[awayTeam]) {
+                awayBadge.style.background = TEAM_DATA[awayTeam].color;
+                awayBadge.innerHTML = TEAM_DATA[awayTeam].emoji;
             } else {
                 awayBadge.style.background = '#ccc';
                 awayBadge.textContent = '?';
