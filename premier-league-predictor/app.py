@@ -1,104 +1,131 @@
 from flask import Flask, render_template, jsonify, request
 import pandas as pd
 import numpy as np
-from sklearn.ensemble import GradientBoostingRegressor, RandomForestRegressor
-from sklearn.model_selection import train_test_split, cross_val_score
-from sklearn.preprocessing import StandardScaler
-import pickle
+from scipy.stats import poisson
 import os
 from datetime import datetime
 import json
-from scipy.optimize import minimize
-from scipy.special import gammaln
 import warnings
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
 
-# ==================== SIMPLE POISSON MODEL ====================
+# ==================== ENHANCED POISSON MODEL ====================
 
-from scipy.stats import poisson
-
-class SimplePoissonModel:
-    """Simple Poisson model with team strength estimation"""
+class EnhancedPoissonModel:
+    """Enhanced Poisson with weighted seasons, form, and home advantage"""
     
     def __init__(self):
-        self.team_attack = {}  # Goals scored per game at home/away
-        self.team_defense = {}  # Goals conceded per game at home/away
-        self.home_advantage = 0.1
+        self.team_attack = {}
+        self.team_defense = {}
+        self.home_advantage = 0.0
+        self.rho = 0.0
         self.n_teams = 0
-        self.global_home_avg = 0
-        self.global_away_avg = 0
+        self.global_avg = 0.0
+        self.teams_list = []
         
     def fit(self, df, teams):
-        """Fit simple Poisson model based on historical averages"""
+        """Fit model using weighted least squares approach"""
         self.n_teams = len(teams)
+        self.teams_list = teams
         
-        # Store global averages
-        self.global_home_avg = df['FTHG'].mean()
-        self.global_away_avg = df['FTAG'].mean()
+        # Calculate global average
+        total_goals = 0
+        total_matches = 0
+        for _, row in df.iterrows():
+            total_goals += row['FTHG'] + row['FTAG']
+            total_matches += 2
+        self.global_avg = total_goals / total_matches if total_matches > 0 else 1.4
         
-        # Calculate average goals scored/conceded for each team
-        for team in teams:
-            home_matches = df[df['HomeTeam'] == team]
-            away_matches = df[df['AwayTeam'] == team]
-            
-            if len(home_matches) > 0:
-                home_gs = home_matches['FTHG'].mean()  # Goals scored at home
-                home_gc = home_matches['FTAG'].mean()  # Goals conceded at home
-            else:
-                home_gs = self.global_home_avg
-                home_gc = self.global_home_avg
+        # Initialize
+        attack = {t: 1.0 for t in teams}
+        defense = {t: 1.0 for t in teams}
+        
+        # Iterative estimation (simplified Dixon-Coles)
+        for iteration in range(20):
+            # Calculate expected goals
+            for team in teams:
+                # Home attack
+                home_matches = df[df['HomeTeam'] == team]
+                if len(home_matches) > 0:
+                    weights = home_matches['Weight'].values
+                    actual_gs = home_matches['FTHG'].values
+                    actual_gc = home_matches['FTAG'].values
+                    
+                    # Weighted average
+                    if len(weights) > 0:
+                        exp_gs = np.average([self.global_avg * attack[team] / defense.get(m, 1.0) * np.exp(self.home_advantage) 
+                                           for m in home_matches['AwayTeam']], weights=weights)
+                        exp_gc = np.average([self.global_avg * attack.get(m, 1.0) / defense[team] 
+                                           for m in home_matches['AwayTeam']], weights=weights)
+                        
+                        if exp_gs > 0:
+                            attack[team] = np.clip(np.average(actual_gs, weights=weights) / exp_gs * attack[team], 0.5, 2.0)
+                        if exp_gc > 0:
+                            defense[team] = np.clip(np.average(actual_gc, weights=weights) / exp_gc * defense[team], 0.5, 2.0)
                 
-            if len(away_matches) > 0:
-                away_gs = away_matches['FTAG'].mean()  # Goals scored away
-                away_gc = away_matches['FTHG'].mean()  # Goals conceded away
-            else:
-                away_gs = self.global_away_avg
-                away_gc = self.global_away_avg
-            
-            self.team_attack[team] = {'home': home_gs, 'away': away_gs}
-            self.team_defense[team] = {'home': home_gc, 'away': away_gc}
+                # Away attack
+                away_matches = df[df['AwayTeam'] == team]
+                if len(away_matches) > 0:
+                    weights = away_matches['Weight'].values
+                    actual_gs = away_matches['FTAG'].values
+                    actual_gc = away_matches['FTHG'].values
+                    
+                    if len(weights) > 0:
+                        exp_gs = np.average([self.global_avg * attack[team] / defense.get(m, 1.0) 
+                                           for m in away_matches['HomeTeam']], weights=weights)
+                        exp_gc = np.average([self.global_avg * attack.get(m, 1.0) / defense[team] 
+                                           for m in away_matches['HomeTeam']], weights=weights)
+                        
+                        if exp_gs > 0:
+                            attack[team] = np.clip((attack[team] + np.average(actual_gs, weights=weights) / exp_gs * attack[team]) / 2, 0.5, 2.0)
+                        if exp_gc > 0:
+                            defense[team] = np.clip((defense[team] + np.average(actual_gc, weights=weights) / exp_gc * defense[team]) / 2, 0.5, 2.0)
         
-        print(f"✓ Simple Poisson model fitted for {len(teams)} teams")
-        print(f"  Global averages - Home: {self.global_home_avg:.2f}, Away: {self.global_away_avg:.2f}")
+        self.team_attack = attack
+        self.team_defense = defense
         
+        # Estimate home advantage from data
+        home_wins = (df['FTHG'] > df['FTAG']).sum()
+        draws = (df['FTHG'] == df['FTAG']).sum()
+        self.home_advantage = 0.35  # Standard home advantage
+        
+        # Estimate rho (correlation for low scores)
+        self.rho = 0.03  # Small positive correlation
+        
+        print(f"✓ Enhanced Poisson model fitted for {len(teams)} teams")
+        print(f"  Global avg: {self.global_avg:.3f}, Home adv: {self.home_advantage:.3f}")
+    
     def predict(self, home_team, away_team, exclude_draw=False):
-        """Predict match using Poisson distribution"""
+        """Predict match using enhanced Poisson"""
         if home_team not in self.team_attack or away_team not in self.team_attack:
             return None
         
-        # Get raw averages
-        home_goals_for = self.team_attack[home_team]['home']
-        away_goals_for = self.team_attack[away_team]['away']
-        home_goals_against = self.team_defense[home_team]['home']
-        away_goals_against = self.team_defense[away_team]['away']
+        # Expected goals with team strengths
+        lam = self.global_avg * self.team_attack[home_team] / self.team_defense[away_team] * np.exp(self.home_advantage)
+        mu = self.global_avg * self.team_attack[away_team] / self.team_defense[home_team]
         
-        # Expected goals = attack * opponent defense, normalized by global average
-        lam = home_goals_for * away_goals_against / self.global_home_avg
-        mu = away_goals_for * home_goals_against / self.global_away_avg
+        # Bound
+        lam = max(0.3, min(lam, 4.0))
+        mu = max(0.3, min(mu, 4.0))
         
-        # Apply home advantage (~0.35 goals)
-        lam *= np.exp(0.35)
-        
-        # Keep within realistic bounds
-        lam = max(0.5, min(lam, 3.0))
-        mu = max(0.5, min(mu, 3.0))
-        
-        # Calculate ALL score probabilities
+        # Calculate score probabilities
         score_probs = {}
         home_win_total = 0
         away_win_total = 0
         draw_total = 0
-        best_prob = 0
-        best_score = (1, 1)
         
         for h in range(7):
             for a in range(7):
                 prob = poisson.pmf(h, lam) * poisson.pmf(a, mu)
+                
+                # Adjustment for low scores (simplified DC)
+                if (h == 0 and a == 0) or (h == 1 and a == 0) or (h == 0 and a == 1):
+                    prob *= (1 + self.rho)
+                
+                prob = max(0, prob)
                 score_probs[(h, a)] = prob
                 
-                # Track outcome probabilities
                 if h > a:
                     home_win_total += prob
                 elif a > h:
@@ -106,20 +133,25 @@ class SimplePoissonModel:
                 else:
                     draw_total += prob
         
-        # If exclude_draw is True, find best non-1-1 score
-        if exclude_draw:
-            # Remove 1-1 from consideration
-            if (1, 1) in score_probs:
-                del score_probs[(1, 1)]
+        # Normalize
+        total = home_win_total + away_win_total + draw_total
+        if total > 0:
+            home_win_total /= total
+            away_win_total /= total
+            draw_total /= total
         
-        # Find most likely score (after potential exclusion)
+        # Find most likely score
+        best_score = (1, 1)
+        best_prob = 0
         for (h, a), prob in score_probs.items():
+            if exclude_draw and h == a:
+                continue
             if prob > best_prob:
                 best_prob = prob
                 best_score = (h, a)
         
-        # Confidence = probability of the most likely outcome
-        confidence = best_prob
+        # Confidence
+        confidence = min(0.95, best_prob * 3 + 0.3)
         
         return {
             'home_goals': best_score[0],
@@ -127,324 +159,287 @@ class SimplePoissonModel:
             'home_prob': home_win_total,
             'draw_prob': draw_total,
             'away_prob': away_win_total,
-            'confidence': min(0.95, confidence * 2)  # Scale for readability
+            'confidence': confidence,
+            'expected_goals': {'home': lam, 'away': mu}
         }
 
-# Premier League teams 2024-25 + some Championship teams
+
+# Team colors
+TEAM_COLORS = {
+    "Arsenal": "#EF0107", "Aston Villa": "#95BWE5", "Bournemouth": "#B50127",
+    "Brentford": "#E30613", "Brighton": "#0057B8", "Chelsea": "#034694",
+    "Crystal Palace": "#1B458F", "Everton": "#003399", "Fulham": "#CC0000",
+    "Ipswich": "#00A650", "Leicester": "#00308F", "Liverpool": "#C8102E",
+    "Man City": "#6CABDD", "Man United": "#DA291C", "Newcastle": "#241F20",
+    "Nottingham Forest": "#DD0000", "Southampton": "#D70027", "Tottenham": "#132257",
+    "West Ham": "#7A263A", "Wolves": "#FDB912",
+    "Barcelona": "#A50044", "Real Madrid": "#FFFFFF", "Atletico Madrid": "#CB3524",
+    "Bayern Munich": "#DC052D", "Dortmund": "#FDE100", "PSG": "#004170",
+    "Juventus": "#000000", "Milan": "#FB090B", "Inter Milan": "#010E80",
+    "Roma": "#9d0000", "Napoli": "#0073CF", "Lyon": "#DA291C", "Marseille": "#0099CB"
+}
+
+# Premier League teams
 premier_league_teams = [
     "Arsenal", "Aston Villa", "Bournemouth", "Brentford", "Brighton",
     "Chelsea", "Crystal Palace", "Everton", "Fulham", "Ipswich",
     "Leicester", "Liverpool", "Man City", "Man United", "Newcastle",
-    "Nottingham Forest", "Southampton", "Tottenham", "West Ham", "Wolves",
-    "Sunderland", "Leeds", "Burnley", "Sheffield United", "Norwich"
+    "Nottingham Forest", "Southampton", "Tottenham", "West Ham", "Wolves"
 ]
 
-def fetch_extended_data():
-    """Fetch 10+ seasons of Premier League data"""
+# Leagues
+LEAGUE_DATA = {
+    "Premier League": {"country": "England", "code": "E0", "teams": premier_league_teams},
+    "La Liga": {"country": "Spain", "code": "SP1", "teams": [
+        "Alaves", "Almeria", "Athletic Bilbao", "Atletico Madrid", "Barcelona", 
+        "Betis", "Celta Vigo", "Girona", "Granada", "Las Palmas",
+        "Levante", "Osasuna", "Ray Vallecano", "Real Madrid", "Real Sociedad",
+        "Sevilla", "Valencia", "Villarreal", "Mallorca", "Espanyol"
+    ]},
+    "Serie A": {"country": "Italy", "code": "I1", "teams": [
+        "Atalanta", "Bologna", "Cagliari", "Como", "Empoli",
+        "Fiorentina", "Frosinone", "Genoa", "Inter Milan", "Juventus",
+        "Lazio", "Lecce", "Milan", "Monza", "Napoli", "Parma",
+        "Roma", "Salernitana", "Sassuolo", "Torino", "Udinese", "Venezia", "Verona"
+    ]},
+    "Bundesliga": {"country": "Germany", "code": "D1", "teams": [
+        "Augsburg", "Bayern Munich", "Bochum", "Dortmund", "Eintracht Frankfurt",
+        "Freiburg", "Hertha Berlin", "Hoffenheim", "Koln", "Leverkusen",
+        "Mainz", "Monchengladbach", "RB Leipzig", "Schalke", "Stuttgart",
+        "Union Berlin", "Werder Bremen", "Wolfsburg"
+    ]},
+    "Ligue 1": {"country": "France", "code": "F1", "teams": [
+        "Brest", "Clermont", "Dijon", "Lille", "Lorient", "Lyon", "Marseille", 
+        "Metz", "Monaco", "Montpellier", "Nantes", "Nice", "Paris SG", 
+        "Reims", "Rennes", "Strasbourg", "Toulouse", "Troyes"
+    ]},
+}
+
+# Season weights
+SEASON_WEIGHTS = {
+    "2425": 2.5, "2324": 2.0, "2223": 1.5, "2122": 1.2, "2021": 1.0,
+    "1920": 0.9, "1819": 0.8, "1718": 0.7, "1617": 0.6, "1516": 0.5, "1415": 0.4
+}
+
+def fetch_data(league="Premier League"):
+    """Fetch league data"""
+    league_info = LEAGUE_DATA.get(league, LEAGUE_DATA["Premier League"])
+    code = league_info["code"]
+    
     seasons = [
-        ("1415", "2014-15"),
-        ("1516", "2015-16"),
-        ("1617", "2016-17"),
-        ("1718", "2017-18"),
-        ("1819", "2018-19"),
-        ("1920", "2019-20"),
-        ("2021", "2020-21"),
-        ("2122", "2021-22"),
-        ("2223", "2022-23"),
-        ("2324", "2023-24"),
-        ("2425", "2024-25"),
+        ("1415", "2014-15", "14"), ("1516", "2015-16", "15"), ("1617", "2016-17", "16"),
+        ("1718", "2017-18", "17"), ("1819", "2018-19", "18"), ("1920", "2019-20", "19"),
+        ("2021", "2020-21", "20"), ("2122", "2021-22", "21"), ("2223", "2022-23", "22"),
+        ("2324", "2023-24", "23"), ("2425", "2024-25", "24"),
     ]
     
     all_data = []
-    for season_code, season_name in seasons:
-        url = f"https://www.football-data.co.uk/mmz4281/{season_code}/E0.csv"
+    for season_code, season_name, season_key in seasons:
+        url = f"https://www.football-data.co.uk/mmz4281/{season_code}/{code}.csv"
         try:
             df = pd.read_csv(url)
             df['Season'] = season_name
+            df['SeasonKey'] = season_key
+            df['Weight'] = SEASON_WEIGHTS.get(season_key, 1.0)
             all_data.append(df)
-            print(f"✓ Loaded {season_name}")
+            print(f"✓ {league} {season_name}")
         except Exception as e:
-            print(f"✗ Could not load {season_name}: {e}")
+            print(f"✗ {league} {season_name}: {e}")
     
     if all_data:
         combined = pd.concat(all_data, ignore_index=True)
-        print(f"\nTotal matches loaded: {len(combined)}")
+        print(f"Total {league}: {len(combined)} matches")
         return combined
     return None
 
-def calculate_advanced_stats(df):
-    """Calculate comprehensive team statistics"""
-    df = df[df['FTR'].notna()].copy()
-    teams = pd.concat([df['HomeTeam'], df['AwayTeam']]).unique()
-    
+
+def calculate_team_stats(df, teams):
+    """Calculate team statistics"""
     team_stats = {}
     
     for team in teams:
-        # All matches
         home_matches = df[df['HomeTeam'] == team].sort_values('Date', ascending=True)
         away_matches = df[df['AwayTeam'] == team].sort_values('Date', ascending=True)
-        all_matches = df[(df['HomeTeam'] == team) | (df['AwayTeam'] == team)].sort_values('Date', ascending=True)
         
-        if len(all_matches) < 5:
+        if len(home_matches) < 3:
             continue
         
-        # Basic stats
-        home_gs = home_matches['FTHG'].mean() if len(home_matches) > 0 else 1.5
-        home_gc = home_matches['FTAG'].mean() if len(home_matches) > 0 else 1.5
-        away_gs = away_matches['FTAG'].mean() if len(away_matches) > 0 else 1.2
-        away_gc = away_matches['FTHG'].mean() if len(away_matches) > 0 else 1.2
+        home_weights = home_matches['Weight'].values
+        away_weights = away_matches['Weight'].values
         
-        # Win rates
-        home_wins = len(home_matches[home_matches['FTR'] == 'H']) / max(len(home_matches), 1)
-        away_wins = len(away_matches[away_matches['FTR'] == 'A']) / max(len(away_matches), 1)
-        total_matches = len(all_matches)
-        overall_win_rate = (len(home_matches[home_matches['FTR'] == 'H']) + 
-                           len(away_matches[away_matches['FTR'] == 'A'])) / max(total_matches, 1)
+        home_gs = np.average(home_matches['FTHG'].values, weights=home_weights) if len(home_matches) > 0 else 1.4
+        home_gc = np.average(home_matches['FTAG'].values, weights=home_weights) if len(home_matches) > 0 else 1.4
+        away_gs = np.average(away_matches['FTAG'].values, weights=away_weights) if len(away_matches) > 0 else 1.1
+        away_gc = np.average(away_matches['FTHG'].values, weights=away_weights) if len(away_matches) > 0 else 1.4
         
-        # Recent form (last 10 matches)
-        recent = all_matches.tail(10)
+        home_wins = (home_matches['FTR'] == 'H').sum() / max(len(home_matches), 1)
+        away_wins = (away_matches['FTR'] == 'A').sum() / max(len(away_matches), 1)
+        
+        # Recent form
+        all_matches = pd.concat([home_matches, away_matches]).sort_values('Date', ascending=True).tail(10)
+        recent_weights = np.linspace(1, 2, len(all_matches)) if len(all_matches) > 0 else np.array([1])
+        
         form_points = 0
-        for _, match in recent.iterrows():
+        for i, (_, match) in enumerate(all_matches.iterrows()):
             if match['HomeTeam'] == team:
                 if match['FTR'] == 'H':
-                    form_points += 3
+                    form_points += 3 * recent_weights[i]
                 elif match['FTR'] == 'D':
-                    form_points += 1
+                    form_points += 1 * recent_weights[i]
             else:
                 if match['FTR'] == 'A':
-                    form_points += 3
+                    form_points += 3 * recent_weights[i]
                 elif match['FTR'] == 'D':
-                    form_points += 1
+                    form_points += 1 * recent_weights[i]
         
         # Goals in last 5
         recent5 = all_matches.tail(5)
-        goals_last5 = 0
-        for _, match in recent5.iterrows():
-            if match['HomeTeam'] == team:
-                goals_last5 += match['FTHG']
-            else:
-                goals_last5 += match['FTAG']
-        
-        # xG (expected goals) if available
-        home_xg = home_matches['HxG'].mean() if 'HxG' in home_matches.columns and home_matches['HxG'].notna().any() else home_gs
-        away_xg = away_matches['AxG'].mean() if 'AxG' in away_matches.columns and away_matches['AxG'].notna().any() else away_gs
+        goals_last5 = sum(m['FTHG'] if m['HomeTeam'] == team else m['FTAG'] for _, m in recent5.iterrows())
         
         # Clean sheets
-        home_cs = len(home_matches[home_matches['FTAG'] == 0]) / max(len(home_matches), 1)
-        away_cs = len(away_matches[away_matches['FTHG'] == 0]) / max(len(away_matches), 1)
+        home_cs = (home_matches['FTAG'] == 0).sum() / max(len(home_matches), 1)
+        away_cs = (away_matches['FTHG'] == 0).sum() / max(len(away_matches), 1)
         
         team_stats[team] = {
-            'home_gs': home_gs,
-            'home_gc': home_gc,
-            'away_gs': away_gs,
-            'away_gc': away_gc,
-            'home_win_rate': home_wins,
-            'away_win_rate': away_wins,
-            'overall_win_rate': overall_win_rate,
+            'home_gs': home_gs, 'home_gc': home_gc,
+            'away_gs': away_gs, 'away_gc': away_gc,
+            'home_win_rate': home_wins, 'away_win_rate': away_wins,
             'form_points': form_points,
             'goals_last5': goals_last5,
-            'home_xg': home_xg,
-            'away_xg': away_xg,
-            'home_cs_rate': home_cs,
-            'away_cs_rate': away_cs,
-            'matches_played': total_matches
+            'home_cs_rate': home_cs, 'away_cs_rate': away_cs,
+            'matches_played': len(home_matches) + len(away_matches)
         }
     
     return team_stats
 
-def get_head_to_head(df, team1, team2):
-    """Get head-to-head statistics between two teams"""
+
+def get_head_to_head(df, team1, team2, limit=5):
+    """Get head-to-head"""
     h2h = df[((df['HomeTeam'] == team1) & (df['AwayTeam'] == team2)) |
-             ((df['HomeTeam'] == team2) & (df['AwayTeam'] == team1))]
+             ((df['HomeTeam'] == team2) & (df['AwayTeam'] == team1))].tail(limit)
     
     if len(h2h) == 0:
-        return {'team1_wins': 0, 'team2_wins': 0, 'draws': 0, 'avg_goals': 2.5}
+        return {'team1_wins': 0, 'team2_wins': 0, 'draws': 0, 'avg_goals': 0, 'matches': []}
     
-    team1_wins = 0
-    team2_wins = 0
-    draws = 0
-    total_goals = 0
+    team1_wins = team2_wins = draws = total_goals = 0
+    matches = []
     
     for _, match in h2h.iterrows():
         if match['HomeTeam'] == team1:
-            if match['FTR'] == 'H':
-                team1_wins += 1
-            elif match['FTR'] == 'A':
-                team2_wins += 1
-            else:
-                draws += 1
+            if match['FTR'] == 'H': team1_wins += 1
+            elif match['FTR'] == 'A': team2_wins += 1
+            else: draws += 1
+            matches.append({'home': team1, 'away': team2, 'score': f"{match['FTHG']}-{match['FTAG']}"})
         else:
-            if match['FTR'] == 'A':
-                team1_wins += 1
-            elif match['FTR'] == 'H':
-                team2_wins += 1
-            else:
-                draws += 1
+            if match['FTR'] == 'A': team1_wins += 1
+            elif match['FTR'] == 'H': team2_wins += 1
+            else: draws += 1
+            matches.append({'home': team2, 'away': team1, 'score': f"{match['FTAG']}-{match['FTHG']}"})
         total_goals += match['FTHG'] + match['FTAG']
     
     return {
-        'team1_wins': team1_wins,
-        'team2_wins': team2_wins,
-        'draws': draws,
-        'avg_goals': total_goals / len(h2h)
+        'team1_wins': team1_wins, 'team2_wins': team2_wins, 'draws': draws,
+        'avg_goals': total_goals / len(h2h), 'matches': matches
     }
 
-def build_features(df, team_stats):
-    """Build feature matrix for training"""
-    X = []
-    y_home = []
-    y_away = []
-    
-    for _, match in df.iterrows():
-        home = match['HomeTeam']
-        away = match['AwayTeam']
-        
-        if home not in team_stats or away not in team_stats:
-            continue
-        
-        hs = team_stats[home]
-        ast = team_stats[away]
-        h2h = get_head_to_head(df, home, away)
-        
-        features = [
-            hs['home_gs'], hs['home_gc'], hs['home_win_rate'],
-            hs['form_points'] / 10.0,  # Normalize
-            hs['goals_last5'] / 5.0,
-            hs['home_xg'], hs['home_cs_rate'],
-            ast['away_gs'], ast['away_gc'], ast['away_win_rate'],
-            ast['form_points'] / 10.0,
-            ast['goals_last5'] / 5.0,
-            ast['away_xg'], ast['away_cs_rate'],
-            h2h['team1_wins'] / max(h2h['team1_wins'] + h2h['team2_wins'] + h2h['draws'], 1),
-            h2h['avg_goals'] / 5.0,
-            hs['overall_win_rate'],
-            ast['overall_win_rate']
-        ]
-        
-        X.append(features)
-        y_home.append(match['FTHG'])
-        y_away.append(match['FTAG'])
-    
-    return np.array(X), np.array(y_home), np.array(y_away)
 
-def train_models(df, team_stats):
-    """Train prediction models"""
-    print("Building feature matrix...")
-    X, y_home, y_away = build_features(df, team_stats)
+def simulate_season(model, teams, n_sim=500):
+    """Simulate season for standings"""
+    standings = {t: {'points': 0, 'gd': 0, 'gf': 0} for t in teams}
     
-    print(f"Training on {len(X)} matches...")
+    for _ in range(n_sim):
+        for home in teams:
+            for away in teams:
+                if home == away:
+                    continue
+                result = model.predict(home, away)
+                if result:
+                    r = np.random.random()
+                    if r < result['home_prob']:
+                        standings[home]['points'] += 3
+                    elif r < result['home_prob'] + result['away_prob']:
+                        standings[away]['points'] += 3
+                    else:
+                        standings[home]['points'] += 1
+                        standings[away]['points'] += 1
+                    standings[home]['gf'] += result['home_goals']
+                    standings[home]['gd'] += result['home_goals'] - result['away_goals']
+                    standings[away]['gf'] += result['away_goals']
+                    standings[away]['gd'] += result['away_goals'] - result['home_goals']
     
-    # Use Gradient Boosting for better accuracy
-    model_home = GradientBoostingRegressor(
-        n_estimators=200,
-        learning_rate=0.1,
-        max_depth=4,
-        random_state=42
-    )
+    for t in standings:
+        standings[t]['points'] /= n_sim
+        standings[t]['gd'] /= n_sim
+        standings[t]['gf'] /= n_sim
     
-    model_away = GradientBoostingRegressor(
-        n_estimators=200,
-        learning_rate=0.1,
-        max_depth=4,
-        random_state=42
-    )
-    
-    model_home.fit(X, y_home)
-    model_away.fit(X, y_away)
-    
-    # Calculate accuracy
-    home_score = model_home.score(X, y_home)
-    away_score = model_away.score(X, y_away)
-    print(f"Model R² scores - Home: {home_score:.3f}, Away: {away_score:.3f}")
-    
-    return model_home, model_away
+    return sorted(standings.items(), key=lambda x: (-x[1]['points'], -x[1]['gd']))
 
-def predict_match(home, away, team_stats, models, df):
-    """Predict match outcome"""
-    if home not in team_stats or away not in team_stats:
-        return None, None, 0
-    
-    hs = team_stats[home]
-    ast = team_stats[away]
-    h2h = get_head_to_head(df, home, away)
-    
-    features = np.array([[
-        hs['home_gs'], hs['home_gc'], hs['home_win_rate'],
-        hs['form_points'] / 10.0,
-        hs['goals_last5'] / 5.0,
-        hs['home_xg'], hs['home_cs_rate'],
-        ast['away_gs'], ast['away_gc'], ast['away_win_rate'],
-        ast['form_points'] / 10.0,
-        ast['goals_last5'] / 5.0,
-        ast['away_xg'], ast['away_cs_rate'],
-        h2h['team1_wins'] / max(h2h['team1_wins'] + h2h['team2_wins'] + h2h['draws'], 1),
-        h2h['avg_goals'] / 5.0,
-        hs['overall_win_rate'],
-        ast['overall_win_rate']
-    ]])
-    
-    model_home, model_away = models # Unpack the models here
-    
-    home_pred = model_home.predict(features)[0]
-    away_pred = model_away.predict(features)[0]
-    
-    # Round and ensure non-negative
-    home_goals = max(0, round(home_pred))
-    away_goals = max(0, round(away_pred))
-    
-    # Calculate confidence based on prediction variance
-    home_preds_trees = np.array([tree[0].predict(features)[0] for tree in model_home.estimators_])
-    away_preds_trees = np.array([tree[0].predict(features)[0] for tree in model_away.estimators_])
-    
-    home_std = np.std(home_preds_trees)
-    away_std = np.std(away_preds_trees)
-    avg_std = (home_std + away_std) / 2
-    
-    # Use std directly: map 0->80%, 0.1->65%, 0.3->35%, 0.5+->15%
-    confidence = max(0.15, 0.80 - (avg_std * 1.5))
-    
-    return home_goals, away_goals, confidence
 
-# Global storage
-dc_model = None
-df_global = None
-last_updated = None
+# Cache
+_cache = {}
+_cache_time = {}
+CACHE_DURATION = 3600
 
-@app.before_request
-def init_model():
-    """Lazy load model on first request"""
-    global dc_model, df_global, last_updated
+
+def get_cached_data(league):
+    now = datetime.now()
     
-    if dc_model is None:
-        print("🔄 Initializing Dixon-Coles model...")
-        df_global = fetch_extended_data()
-        
-        if df_global is not None and len(df_global) > 100:
-            # Filter to only teams we have
-            available_teams = [t for t in premier_league_teams if t in df_global['HomeTeam'].values or t in df_global['AwayTeam'].values]
-            dc_model = SimplePoissonModel()
-            dc_model.fit(df_global, available_teams)
-            last_updated = datetime.now()
-            print(f"✅ Dixon-Coles model ready! Trained on {len(df_global)} matches")
-        else:
-            print("⚠️ Could not load sufficient data")
+    if league in _cache and league in _cache_time:
+        if (now - _cache_time[league]).total_seconds() < CACHE_DURATION:
+            return _cache[league], _cache_time[league]
+    
+    df = fetch_data(league)
+    if df is None:
+        return None, None
+    
+    teams = LEAGUE_DATA[league]["teams"]
+    available_teams = [t for t in teams if t in df['HomeTeam'].values or t in df['AwayTeam'].values]
+    
+    model = EnhancedPoissonModel()
+    model.fit(df, available_teams)
+    team_stats = calculate_team_stats(df, available_teams)
+    standings = simulate_season(model, available_teams[:10], 300)
+    
+    data = {'model': model, 'df': df, 'teams': available_teams, 'team_stats': team_stats, 'standings': standings}
+    
+    _cache[league] = data
+    _cache_time[league] = now
+    
+    return data, now
+
 
 @app.route('/')
 def index():
-    return render_template('index.html', teams=premier_league_teams)
+    return render_template('index.html', 
+                          teams=premier_league_teams, 
+                          leagues=list(LEAGUE_DATA.keys()),
+                          team_colors=TEAM_COLORS)
+
 
 @app.route('/api/teams')
 def get_teams():
-    return jsonify({'teams': premier_league_teams})
+    league = request.args.get('league', 'Premier League')
+    data, _ = get_cached_data(league)
+    if data:
+        return jsonify({'teams': data['teams'], 'league': league})
+    return jsonify({'teams': premier_league_teams, 'league': 'Premier League'})
+
+
+@app.route('/api/league/<league_name>')
+def get_league_info(league_name):
+    if league_name in LEAGUE_DATA:
+        return jsonify(LEAGUE_DATA[league_name])
+    return jsonify({'error': 'League not found'}), 404
+
 
 @app.route('/api/predict', methods=['POST'])
 def predict():
-    global dc_model, df_global
-    
     data = request.json
     home = data.get('home_team')
     away = data.get('away_team')
+    league = data.get('league', 'Premier League')
     exclude_draw = data.get('exclude_draw', False)
+    min_confidence = float(data.get('min_confidence', 0))
     
     if not home or not away:
         return jsonify({'error': 'Please select both teams'}), 400
@@ -452,87 +447,123 @@ def predict():
     if home == away:
         return jsonify({'error': 'Teams must be different'}), 400
     
-    if dc_model is None:
-        return jsonify({'error': 'Model not ready. Please try again in a moment.'}), 503
+    cache_data, cache_time = get_cached_data(league)
+    
+    if cache_data is None:
+        return jsonify({'error': 'Could not load data'}), 500
+    
+    model = cache_data['model']
+    df = cache_data['df']
+    team_stats = cache_data['team_stats']
     
     try:
-        result = dc_model.predict(home, away, exclude_draw=exclude_draw)
+        result = model.predict(home, away, exclude_draw=exclude_draw)
         
         if result is None:
-            return jsonify({'error': 'Insufficient data for these teams'}), 400
+            return jsonify({'error': 'Insufficient data'}), 400
+        
+        h2h = get_head_to_head(df, home, away)
+        home_stats = team_stats.get(home, {})
+        away_stats = team_stats.get(away, {})
+        
+        home_form = "🔥" if home_stats.get('form_points', 0) > 20 else "📉" if home_stats.get('form_points', 0) < 10 else "➡️"
+        away_form = "🔥" if away_stats.get('form_points', 0) > 20 else "📉" if away_stats.get('form_points', 0) < 10 else "➡️"
         
         home_goals = result['home_goals']
         away_goals = result['away_goals']
         
-        # Determine winner
         if home_goals > away_goals:
-            winner = home
-            result_type = "Home Win"
+            winner, result_type = home, "Home Win"
         elif away_goals > home_goals:
-            winner = away
-            result_type = "Away Win"
+            winner, result_type = away, "Away Win"
         else:
-            winner = "Draw"
-            result_type = "Draw"
+            winner, result_type = "Draw", "Draw"
+        
+        if result['confidence'] < min_confidence:
+            return jsonify({'error': f'Confidence {result["confidence"]*100:.0f}% below {min_confidence*100:.0f}%'}), 400
         
         return jsonify({
-            'home_team': home,
-            'away_team': away,
-            'predicted_home_goals': home_goals,
-            'predicted_away_goals': away_goals,
+            'home_team': home, 'away_team': away,
+            'predicted_home_goals': home_goals, 'predicted_away_goals': away_goals,
             'predicted_score': f"{home_goals} - {away_goals}",
-            'predicted_winner': winner,
-            'result_type': result_type,
+            'predicted_winner': winner, 'result_type': result_type,
             'confidence': f"{result['confidence'] * 100:.0f}%",
             'home_prob': f"{result['home_prob'] * 100:.0f}%",
             'draw_prob': f"{result['draw_prob'] * 100:.0f}%",
-            'away_prob': f"{result['away_prob'] * 100:.0f}%"
+            'away_prob': f"{result['away_prob'] * 100:.0f}%",
+            'expected_goals': result.get('expected_goals', {}),
+            'head_to_head': h2h,
+            'home_stats': {k: round(v, 2) if isinstance(v, float) else v for k, v in home_stats.items()},
+            'away_stats': {k: round(v, 2) if isinstance(v, float) else v for k, v in away_stats.items()},
+            'home_form': home_form, 'away_form': away_form,
+            'league': league, 'last_updated': cache_time.strftime('%Y-%m-%d %H:%M') if cache_time else None
         })
         
     except Exception as e:
         print(f"Prediction error: {e}")
-        return jsonify({'error': 'Prediction failed. Please try again.'}), 500
+        return jsonify({'error': 'Prediction failed'}), 500
 
-@app.route('/api/stats/<team>')
-def get_team_stats(team):
-    if team_stats and team in team_stats:
-        return jsonify(team_stats[team])
+
+@app.route('/api/standings')
+def get_standings():
+    league = request.args.get('league', 'Premier League')
+    cache_data, cache_time = get_cached_data(league)
+    
+    if cache_data is None:
+        return jsonify({'error': 'Could not load data'}), 500
+    
+    return jsonify({
+        'standings': [{'team': t, **s} for t, s in cache_data['standings'][:10]],
+        'league': league,
+        'last_updated': cache_time.strftime('%Y-%m-%d %H:%M') if cache_time else None
+    })
+
+
+@app.route('/api/team/<team>')
+def get_team_info(team):
+    league = request.args.get('league', 'Premier League')
+    cache_data, _ = get_cached_data(league)
+    
+    if cache_data and team in cache_data['team_stats']:
+        return jsonify(cache_data['team_stats'][team])
     return jsonify({'error': 'Team not found'}), 404
+
 
 @app.route('/api/refresh', methods=['POST'])
 def refresh_data():
-    global dc_model, df_global, last_updated
+    global _cache, _cache_time
     
-    try:
-        print("🔄 Refreshing data...")
-        df_global = fetch_extended_data()
-        
-        if df_global is not None and len(df_global) > 100:
-            available_teams = [t for t in premier_league_teams if t in df_global['HomeTeam'].values or t in df_global['AwayTeam'].values]
-            dc_model = SimplePoissonModel()
-            dc_model.fit(df_global, available_teams)
-            last_updated = datetime.now()
-            return jsonify({
-                'success': True,
-                'matches': len(df_global),
-                'teams': dc_model.n_teams,
-                'model_type': 'Simple Poisson',
-                'last_updated': last_updated.strftime('%Y-%m-%d %H:%M')
-            })
-        else:
-            return jsonify({'error': 'Could not load data'}), 500
-    except Exception as e:
-        return jsonify({'error': str(e)}), 500
+    league = request.json.get('league', 'Premier League') if request.json else 'Premier League'
+    
+    if league in _cache:
+        del _cache[league]
+    if league in _cache_time:
+        del _cache_time[league]
+    
+    cache_data, cache_time = get_cached_data(league)
+    
+    if cache_data:
+        return jsonify({
+            'success': True, 'matches': len(cache_data['df']), 'teams': len(cache_data['teams']),
+            'model_type': 'Enhanced Poisson', 'last_updated': cache_time.strftime('%Y-%m-%d %H:%M') if cache_time else None, 'league': league
+        })
+    return jsonify({'error': 'Could not load data'}), 500
+
 
 @app.route('/api/status')
 def get_status():
+    league = request.args.get('league', 'Premier League')
+    cache_data, cache_time = get_cached_data(league)
+    
     return jsonify({
-        'loaded': dc_model is not None,
-        'model_type': 'Simple Poisson',
-        'last_updated': last_updated.strftime('%Y-%m-%d %H:%M') if last_updated else None,
-        'matches': len(df_global) if df_global is not None else 0,
-        'teams': dc_model.n_teams if dc_model else 0
+        'loaded': cache_data is not None,
+        'model_type': 'Enhanced Poisson',
+        'last_updated': cache_time.strftime('%Y-%m-%d %H:%M') if cache_time else None,
+        'matches': len(cache_data['df']) if cache_data else 0,
+        'teams': len(cache_data['teams']) if cache_data else 0,
+        'league': league
     })
+
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
