@@ -33,62 +33,37 @@ class EnhancedPoissonModel:
         self.teams_list = []
         
     def fit(self, df, teams):
-        """Fit model using weighted least squares approach"""
+        """Fit model using simple weighted averages - fast version"""
         self.n_teams = len(teams)
         self.teams_list = teams
         
-        # Calculate global average
-        total_goals = 0
-        total_matches = 0
-        for _, row in df.iterrows():
-            total_goals += row['FTHG'] + row['FTAG']
-            total_matches += 2
-        self.global_avg = total_goals / total_matches if total_matches > 0 else 1.4
+        # Calculate global average (fast vectorized)
+        self.global_avg = (df['FTHG'].sum() + df['FTAG'].sum()) / (len(df) * 2)
         
-        # Initialize
-        attack = {t: 1.0 for t in teams}
-        defense = {t: 1.0 for t in teams}
+        # Simple attack/defense based on weighted averages
+        attack = {}
+        defense = {}
         
-        # Iterative estimation (simplified Dixon-Coles)
-        for iteration in range(20):
-            # Calculate expected goals
-            for team in teams:
-                # Home attack
-                home_matches = df[df['HomeTeam'] == team]
-                if len(home_matches) > 0:
-                    weights = home_matches['Weight'].values
-                    actual_gs = home_matches['FTHG'].values
-                    actual_gc = home_matches['FTAG'].values
-                    
-                    # Weighted average
-                    if len(weights) > 0:
-                        exp_gs = np.average([self.global_avg * attack[team] / defense.get(m, 1.0) * np.exp(self.home_advantage) 
-                                           for m in home_matches['AwayTeam']], weights=weights)
-                        exp_gc = np.average([self.global_avg * attack.get(m, 1.0) / defense[team] 
-                                           for m in home_matches['AwayTeam']], weights=weights)
-                        
-                        if exp_gs > 0:
-                            attack[team] = np.clip(np.average(actual_gs, weights=weights) / exp_gs * attack[team], 0.5, 2.0)
-                        if exp_gc > 0:
-                            defense[team] = np.clip(np.average(actual_gc, weights=weights) / exp_gc * defense[team], 0.5, 2.0)
+        for team in teams:
+            home_df = df[df['HomeTeam'] == team]
+            away_df = df[df['AwayTeam'] == team]
+            
+            if len(home_df) > 0:
+                home_gs = np.average(home_df['FTHG'].values, weights=home_df['Weight'].values)
+                home_gc = np.average(home_df['FTAG'].values, weights=home_df['Weight'].values)
+            else:
+                home_gs = home_gc = self.global_avg
                 
-                # Away attack
-                away_matches = df[df['AwayTeam'] == team]
-                if len(away_matches) > 0:
-                    weights = away_matches['Weight'].values
-                    actual_gs = away_matches['FTAG'].values
-                    actual_gc = away_matches['FTHG'].values
-                    
-                    if len(weights) > 0:
-                        exp_gs = np.average([self.global_avg * attack[team] / defense.get(m, 1.0) 
-                                           for m in away_matches['HomeTeam']], weights=weights)
-                        exp_gc = np.average([self.global_avg * attack.get(m, 1.0) / defense[team] 
-                                           for m in away_matches['HomeTeam']], weights=weights)
-                        
-                        if exp_gs > 0:
-                            attack[team] = np.clip((attack[team] + np.average(actual_gs, weights=weights) / exp_gs * attack[team]) / 2, 0.5, 2.0)
-                        if exp_gc > 0:
-                            defense[team] = np.clip((defense[team] + np.average(actual_gc, weights=weights) / exp_gc * defense[team]) / 2, 0.5, 2.0)
+            if len(away_df) > 0:
+                away_gs = np.average(away_df['FTAG'].values, weights=away_df['Weight'].values)
+                away_gc = np.average(away_df['FTHG'].values, weights=away_df['Weight'].values)
+            else:
+                away_gs = away_gc = self.global_avg
+            
+            # Attack = goals scored / global avg
+            # Defense = goals conceded / global avg
+            attack[team] = (home_gs + away_gs) / (2 * self.global_avg)
+            defense[team] = (home_gc + away_gc) / (2 * self.global_avg)
         
         self.team_attack = attack
         self.team_defense = defense
@@ -110,8 +85,8 @@ class EnhancedPoissonModel:
             return None
         
         # Expected goals with team strengths
-        lam = self.global_avg * self.team_attack[home_team] / self.team_defense[away_team] * np.exp(self.home_advantage)
-        mu = self.global_avg * self.team_attack[away_team] / self.team_defense[home_team]
+        lam = float(self.global_avg * self.team_attack[home_team] / self.team_defense[away_team] * np.exp(self.home_advantage))
+        mu = float(self.global_avg * self.team_attack[away_team] / self.team_defense[home_team])
         
         # Bound
         lam = max(0.3, min(lam, 4.0))
@@ -350,13 +325,16 @@ def get_head_to_head(df, team1, team2, limit=5):
     }
 
 
-def simulate_season(model, teams, n_sim=500):
-    """Simulate season for standings"""
+def simulate_season(model, teams, n_sim=100):
+    """Simulate season for standings - simplified for speed"""
     standings = {t: {'points': 0, 'gd': 0, 'gf': 0} for t in teams}
     
+    # Only simulate a subset for speed
+    teams_subset = teams[:8]
+    
     for _ in range(n_sim):
-        for home in teams:
-            for away in teams:
+        for home in teams_subset:
+            for away in teams_subset:
                 if home == away:
                     continue
                 result = model.predict(home, away)
@@ -405,7 +383,8 @@ def get_cached_data(league):
     model = EnhancedPoissonModel()
     model.fit(df, available_teams)
     team_stats = calculate_team_stats(df, available_teams)
-    standings = simulate_season(model, available_teams[:10], 300)
+    # Skip standings for now - too slow
+    standings = []
     
     data = {'model': model, 'df': df, 'teams': available_teams, 'team_stats': team_stats, 'standings': standings}
     
