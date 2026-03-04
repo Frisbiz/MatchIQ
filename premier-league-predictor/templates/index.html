@@ -933,7 +933,7 @@
                 const tbody = document.getElementById('standingsBody');
                 tbody.innerHTML = '';
                 
-                data.standings.slice(0, 10).forEach((s, i) => {
+                data.standings.forEach((s, i) => {
                     const color = TEAM_COLORS[s.team] || '#666';
                     tbody.innerHTML += `
                         <tr>
