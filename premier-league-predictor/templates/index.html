@@ -65,6 +65,20 @@
         }
         .logo img { height: 75px; width: auto; margin-bottom: 4px; }
         header p { color: var(--text-sub); font-size: 0.85em; font-weight: 300; letter-spacing: 0.3px; }
+        .theme-toggle {
+            position: absolute;
+            top: 14px; right: 14px;
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            border: 1px solid var(--border-bright);
+            background: var(--bg-elevated);
+            color: var(--text-sub);
+            cursor: pointer;
+            font-size: 1.1em;
+            display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s;
+        }
+        .theme-toggle:hover { border-color: var(--accent); color: var(--accent-bright); }
 
         .header-controls {
             display: flex;
@@ -443,31 +457,24 @@
         footer a { color: var(--accent); text-decoration: none; }
         footer a:hover { color: var(--accent-bright); }
 
-        /* ── LIGHT MODE ── */
+        /* ── LIGHT MODE ── OS preference + manual override */
         @media (prefers-color-scheme: light) {
-            :root {
-                --bg: #f0f4f8;
-                --bg-card: #ffffff;
-                --bg-elevated: #e8edf3;
-                --bg-hover: #d8e2ed;
-                --border: rgba(0,0,0,0.08);
-                --border-bright: rgba(0,0,0,0.15);
-                --accent: #2563eb;
-                --accent-bright: #1d4ed8;
-                --accent-glow: rgba(37,99,235,0.2);
-                --green: #059669;
-                --orange: #d97706;
-                --red: #dc2626;
-                --text: #0f172a;
-                --text-sub: #475569;
-                --text-muted: #94a3b8;
+            :root:not([data-theme="dark"]) {
+                --bg: #f0f4f8; --bg-card: #ffffff; --bg-elevated: #e8edf3;
+                --bg-hover: #d8e2ed; --border: rgba(0,0,0,0.08);
+                --border-bright: rgba(0,0,0,0.15); --accent: #2563eb;
+                --accent-bright: #1d4ed8; --accent-glow: rgba(37,99,235,0.2);
+                --green: #059669; --orange: #d97706; --red: #dc2626;
+                --text: #0f172a; --text-sub: #475569; --text-muted: #94a3b8;
             }
-            body {
-                background-image:
-                    radial-gradient(ellipse at 15% 0%, rgba(37,99,235,0.05) 0%, transparent 55%),
-                    radial-gradient(ellipse at 85% 100%, rgba(5,150,105,0.03) 0%, transparent 55%);
-            }
-            .predict-btn:hover { background: #1d4ed8; }
+        }
+        :root[data-theme="light"] {
+            --bg: #f0f4f8; --bg-card: #ffffff; --bg-elevated: #e8edf3;
+            --bg-hover: #d8e2ed; --border: rgba(0,0,0,0.08);
+            --border-bright: rgba(0,0,0,0.15); --accent: #2563eb;
+            --accent-bright: #1d4ed8; --accent-glow: rgba(37,99,235,0.2);
+            --green: #059669; --orange: #d97706; --red: #dc2626;
+            --text: #0f172a; --text-sub: #475569; --text-muted: #94a3b8;
         }
 
         /* ── MOBILE ── */
@@ -502,11 +509,9 @@
 <body>
     <div class="container">
         <header>
+            <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle light/dark mode">🌙</button>
             <div class="logo">
-                <picture>
-                    <source srcset="/static/images/MatchIQ2N.png" media="(prefers-color-scheme: dark)">
-                    <img src="/static/images/MatchIQ2.png" alt="MatchIQ">
-                </picture>
+                <img id="logoImg" src="/static/images/MatchIQ2N.png" alt="MatchIQ">
             </div>
             <p>AI Football Predictor • Dixon-Coles Model</p>
             
@@ -1082,6 +1087,38 @@
                 alert('Link copied to clipboard!');
             });
         }
+
+        // ── THEME TOGGLE ──
+        function applyTheme(theme) {
+            document.documentElement.setAttribute('data-theme', theme);
+            document.getElementById('themeToggle').textContent = theme === 'light' ? '🌙' : '☀️';
+            document.getElementById('logoImg').src = theme === 'light'
+                ? '/static/images/MatchIQ2.png'
+                : '/static/images/MatchIQ2N.png';
+            localStorage.setItem('theme', theme);
+        }
+
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            // If no explicit theme set, detect effective theme from OS
+            const effective = current || (window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+            applyTheme(effective === 'light' ? 'dark' : 'light');
+        }
+
+        // Apply saved theme on load
+        (function() {
+            const saved = localStorage.getItem('theme');
+            const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const effectiveDark = saved ? saved === 'dark' : prefersDark;
+            if (saved) {
+                applyTheme(saved);
+            } else {
+                document.getElementById('themeToggle').textContent = effectiveDark ? '☀️' : '🌙';
+                document.getElementById('logoImg').src = effectiveDark
+                    ? '/static/images/MatchIQ2N.png'
+                    : '/static/images/MatchIQ2.png';
+            }
+        })();
 
         // Initialize
         loadTeams();
