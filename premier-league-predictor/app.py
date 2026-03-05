@@ -598,16 +598,18 @@ def get_status():
     })
 
 
-def _preload():
-    """Preload Premier League data on startup so it's ready before first request."""
-    try:
-        print("🔄 Preloading Premier League data...")
-        get_cached_data("Premier League")
-        print("✅ Premier League data ready")
-    except Exception as e:
-        print(f"❌ Preload failed: {e}")
+def _preload_all():
+    """Preload all leagues on startup so switching is instant."""
+    leagues = list(LEAGUE_DATA.keys())
+    for league in leagues:
+        try:
+            print(f"🔄 Preloading {league}...")
+            get_cached_data(league)
+            print(f"✅ {league} ready")
+        except Exception as e:
+            print(f"❌ Preload failed for {league}: {e}")
 
-threading.Thread(target=_preload, daemon=True).start()
+threading.Thread(target=_preload_all, daemon=True).start()
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
