@@ -237,6 +237,9 @@ def fetch_data(league="Premier League"):
         name_map = {
             "Nott'm Forest": "Nottingham Forest",
             "Nottingham": "Nottingham Forest",
+            "Leeds United": "Leeds",
+            "Sunderland AFC": "Sunderland",
+            "Burnley FC": "Burnley",
         }
         combined['HomeTeam'] = combined['HomeTeam'].replace(name_map)
         combined['AwayTeam'] = combined['AwayTeam'].replace(name_map)
@@ -394,35 +397,61 @@ def get_cached_data(league):
     model = EnhancedPoissonModel()
     model.fit(df, available_teams)
     team_stats = calculate_team_stats(df, available_teams)
-    # Simple predicted standings based on team strength
+    # Build standings: actual current season results + predicted remaining fixtures
     standings = []
-    if model and team_stats:
-        # Rank by expected strength - use full season projection (38 games)
-        team_strength = []
-        for team in available_teams:
-            if team in team_stats:
-                stats = team_stats[team]
-                # Calculate expected points per game
-                home_xg = stats.get('home_gs', 1.4)
-                away_xg = stats.get('away_gs', 1.1)
-                home_xga = stats.get('home_gc', 1.3)
-                away_xga = stats.get('away_gc', 1.4)
-                
-                # Rough estimate: goals scored vs conceded
-                home_strength = home_xg - home_xga
-                away_strength = away_xg - away_xga
-                
-                # Expected points (very rough)
-                expected_pts = 38 * (1.5 + home_strength * 0.3 + away_strength * 0.2)
-                
-                team_strength.append({
-                    'team': team, 
-                    'points': max(0, expected_pts), 
-                    'gd': (home_xg + away_xg) - (home_xga + away_xga)
-                })
-        
-        team_strength.sort(key=lambda x: (-x['points'], -x['gd']))
-        standings = team_strength[:20]  # All 20 teams
+    if model:
+        # Get current season data, fall back to previous if sparse
+        current_df = df[df['SeasonKey'] == '25']
+        if len(current_df) < 10:
+            current_df = df[df['SeasonKey'] == '24']
+
+        # Teams actually competing this season that the model knows
+        current_teams = sorted(set(current_df['HomeTeam'].tolist() + current_df['AwayTeam'].tolist()))
+        current_teams = [t for t in current_teams if t in model.team_attack]
+
+        if current_teams:
+            # Accumulate real results from played matches
+            actual = {t: {'pts': 0, 'gd': 0} for t in current_teams}
+            played = set()
+            for _, row in current_df.iterrows():
+                h, a = row['HomeTeam'], row['AwayTeam']
+                if h not in actual or a not in actual:
+                    continue
+                try:
+                    hg, ag, ftr = int(row['FTHG']), int(row['FTAG']), row['FTR']
+                except (ValueError, KeyError):
+                    continue
+                played.add((h, a))
+                actual[h]['gd'] += hg - ag
+                actual[a]['gd'] += ag - hg
+                if ftr == 'H':
+                    actual[h]['pts'] += 3
+                elif ftr == 'A':
+                    actual[a]['pts'] += 3
+                else:
+                    actual[h]['pts'] += 1
+                    actual[a]['pts'] += 1
+
+            # Add expected points/GD from every remaining unplayed fixture
+            final = {t: dict(actual[t]) for t in current_teams}
+            for home in current_teams:
+                for away in current_teams:
+                    if home == away or (home, away) in played:
+                        continue
+                    result = model.predict(home, away)
+                    if result:
+                        xg_h = result['expected_goals']['home']
+                        xg_a = result['expected_goals']['away']
+                        final[home]['pts'] += result['home_prob'] * 3 + result['draw_prob']
+                        final[away]['pts'] += result['away_prob'] * 3 + result['draw_prob']
+                        final[home]['gd'] += xg_h - xg_a
+                        final[away]['gd'] += xg_a - xg_h
+
+            standings = sorted(
+                [{'team': t, 'points': round(final[t]['pts'], 1), 'gd': round(final[t]['gd'], 1)}
+                 for t in current_teams],
+                key=lambda x: (-x['points'], -x['gd'])
+            )
     
     data = {'model': model, 'df': df, 'teams': available_teams, 'team_stats': team_stats, 'standings': standings}
     
