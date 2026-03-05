@@ -8,7 +8,8 @@
     <link rel="shortcut icon" href="/static/images/favicon.ico">
     <link rel="apple-touch-icon" sizes="180x180" href="/static/images/apple-touch-icon.png">
     <link rel="manifest" href="/static/images/site.webmanifest">
-    <meta name="theme-color" content="#080c14">
+    <meta name="theme-color" content="#080c14" media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f0f4f8" media="(prefers-color-scheme: light)">
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -442,6 +443,33 @@
         footer a { color: var(--accent); text-decoration: none; }
         footer a:hover { color: var(--accent-bright); }
 
+        /* ── LIGHT MODE ── */
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg: #f0f4f8;
+                --bg-card: #ffffff;
+                --bg-elevated: #e8edf3;
+                --bg-hover: #d8e2ed;
+                --border: rgba(0,0,0,0.08);
+                --border-bright: rgba(0,0,0,0.15);
+                --accent: #2563eb;
+                --accent-bright: #1d4ed8;
+                --accent-glow: rgba(37,99,235,0.2);
+                --green: #059669;
+                --orange: #d97706;
+                --red: #dc2626;
+                --text: #0f172a;
+                --text-sub: #475569;
+                --text-muted: #94a3b8;
+            }
+            body {
+                background-image:
+                    radial-gradient(ellipse at 15% 0%, rgba(37,99,235,0.05) 0%, transparent 55%),
+                    radial-gradient(ellipse at 85% 100%, rgba(5,150,105,0.03) 0%, transparent 55%);
+            }
+            .predict-btn:hover { background: #1d4ed8; }
+        }
+
         /* ── MOBILE ── */
         @media (max-width: 700px) {
             .container { padding: 8px; }
@@ -475,7 +503,10 @@
     <div class="container">
         <header>
             <div class="logo">
-                <img src="/static/images/MatchIQ2.png" alt="MatchIQ">
+                <picture>
+                    <source srcset="/static/images/MatchIQ2N.png" media="(prefers-color-scheme: dark)">
+                    <img src="/static/images/MatchIQ2.png" alt="MatchIQ">
+                </picture>
             </div>
             <p>AI Football Predictor • Dixon-Coles Model</p>
             
