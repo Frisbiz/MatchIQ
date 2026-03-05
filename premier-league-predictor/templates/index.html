@@ -13,6 +13,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         :root {
+            color-scheme: dark;
             --bg: #080c14;
             --bg-card: #0f1623;
             --bg-elevated: #162033;
@@ -28,6 +29,8 @@
             --text: #e2e8f0;
             --text-sub: #94a3b8;
             --text-muted: #4a5568;
+            --body-gradient-1: rgba(59,130,246,0.07);
+            --body-gradient-2: rgba(16,185,129,0.04);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -39,8 +42,8 @@
             color: var(--text);
             line-height: 1.6;
             background-image:
-                radial-gradient(ellipse at 15% 0%, rgba(59,130,246,0.07) 0%, transparent 55%),
-                radial-gradient(ellipse at 85% 100%, rgba(16,185,129,0.04) 0%, transparent 55%);
+                radial-gradient(ellipse at 15% 0%, var(--body-gradient-1) 0%, transparent 55%),
+                radial-gradient(ellipse at 85% 100%, var(--body-gradient-2) 0%, transparent 55%);
         }
 
         .container { max-width: 860px; margin: 0 auto; padding: 20px 16px; }
@@ -356,7 +359,7 @@
         .score-display::before {
             content: '';
             position: absolute; inset: 0;
-            background: radial-gradient(ellipse at center, rgba(59,130,246,0.05) 0%, transparent 70%);
+            background: radial-gradient(ellipse at center, var(--accent-glow) 0%, transparent 70%);
         }
         .team-box { text-align: center; flex: 1; }
         .team-box h3 {
@@ -460,21 +463,27 @@
         /* ── LIGHT MODE ── OS preference + manual override */
         @media (prefers-color-scheme: light) {
             :root:not([data-theme="dark"]) {
+                color-scheme: light;
                 --bg: #f0f4f8; --bg-card: #ffffff; --bg-elevated: #e8edf3;
                 --bg-hover: #d8e2ed; --border: rgba(0,0,0,0.08);
                 --border-bright: rgba(0,0,0,0.15); --accent: #2563eb;
                 --accent-bright: #1d4ed8; --accent-glow: rgba(37,99,235,0.2);
                 --green: #059669; --orange: #d97706; --red: #dc2626;
                 --text: #0f172a; --text-sub: #475569; --text-muted: #94a3b8;
+                --body-gradient-1: rgba(37,99,235,0.05);
+                --body-gradient-2: rgba(5,150,105,0.03);
             }
         }
         :root[data-theme="light"] {
+            color-scheme: light;
             --bg: #f0f4f8; --bg-card: #ffffff; --bg-elevated: #e8edf3;
             --bg-hover: #d8e2ed; --border: rgba(0,0,0,0.08);
             --border-bright: rgba(0,0,0,0.15); --accent: #2563eb;
             --accent-bright: #1d4ed8; --accent-glow: rgba(37,99,235,0.2);
             --green: #059669; --orange: #d97706; --red: #dc2626;
             --text: #0f172a; --text-sub: #475569; --text-muted: #94a3b8;
+            --body-gradient-1: rgba(37,99,235,0.05);
+            --body-gradient-2: rgba(5,150,105,0.03);
         }
 
         /* ── MOBILE ── */
