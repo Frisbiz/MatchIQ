@@ -72,7 +72,7 @@ premier-league-predictor/
 
 The app is deployed on Render's free tier. The `render.yaml` in this repo is all you need. Fork it, connect your repo on [render.com](https://render.com), and it'll deploy automatically.
 
-One caveat with the free tier: the service spins down after 15 minutes of inactivity, so the first request after idle will be slow. Upgrade to a paid instance if you want it always-on.
+One caveat with the free tier: the service spins down after 15 minutes of inactivity, so the first request after idle will be slow. If you want to try keeping it warm, MatchIQ now exposes a `GET /healthz` endpoint you can ping from an external monitor such as UptimeRobot every 5 minutes. Upgrade to a paid instance if you want a cleaner always-on setup.
 
 ## Limitations worth knowing
 
