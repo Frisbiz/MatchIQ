@@ -858,6 +858,25 @@
             document.querySelector('.standings-card').classList.toggle('collapsed');
         });
 
+        function teamInitials(team) {
+            if (!team) return '?';
+            const parts = team.split(' ').filter(Boolean);
+            if (parts.length === 1) return parts[0].slice(0, 2).toUpperCase();
+            return (parts[0][0] + parts[parts.length - 1][0]).toUpperCase();
+        }
+
+        function renderBadgeMarkup(team, size = 20) {
+            const badgeUrl = TEAM_DATA[team]?.badge;
+            const color = TEAM_DATA[team]?.color || 'var(--bg-elevated)';
+            const initials = teamInitials(team);
+
+            if (badgeUrl) {
+                return `<img src="${badgeUrl}" alt="" style="width:${size}px;height:${size}px;object-fit:contain" onerror="this.outerHTML='<span style=\'display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;border-radius:50%;background:${color};color:white;font-size:${Math.max(10, Math.floor(size * 0.45))}px;font-weight:700;flex-shrink:0;\'>${initials}</span>'">`;
+            }
+
+            return `<span style="display:inline-flex;align-items:center;justify-content:center;width:${size}px;height:${size}px;border-radius:50%;background:${color};color:white;font-size:${Math.max(10, Math.floor(size * 0.45))}px;font-weight:700;flex-shrink:0;">${initials}</span>`;
+        }
+
         async function loadStandings() {
             try {
                 const response = await fetch(`/api/standings?league=${currentLeague}&t=${Date.now()}`);
@@ -876,9 +895,7 @@
                     else if (pos === 7) zone = 'zone-conference';
                     else if (pos > total - 3) zone = 'zone-rel';
 
-                    const badge = TEAM_DATA[s.team]?.badge
-                        ? `<img src="${TEAM_DATA[s.team].badge}" alt="" onerror="this.style.display='none'">`
-                        : '';
+                    const badge = renderBadgeMarkup(s.team, 20);
                     tbody.innerHTML += `
                         <tr class="${zone}">
                             <td class="pos-cell">${pos}</td>
@@ -937,23 +954,17 @@
             const homeBadge = document.getElementById('homeBadge');
             const awayBadge = document.getElementById('awayBadge');
             
-            if (homeTeam && TEAM_DATA[homeTeam] && TEAM_DATA[homeTeam].badge) {
+            if (homeTeam) {
                 homeBadge.style.background = 'var(--bg-elevated)';
-                homeBadge.innerHTML = `<img src="${TEAM_DATA[homeTeam].badge}" style="width:44px;height:44px;object-fit:contain">`;
-            } else if (homeTeam && TEAM_DATA[homeTeam]) {
-                homeBadge.style.background = TEAM_DATA[homeTeam].color || 'var(--bg-elevated)';
-                homeBadge.innerHTML = homeTeam.charAt(0);
+                homeBadge.innerHTML = renderBadgeMarkup(homeTeam, 44);
             } else {
                 homeBadge.style.background = 'var(--bg-elevated)';
                 homeBadge.innerHTML = '?';
             }
 
-            if (awayTeam && TEAM_DATA[awayTeam] && TEAM_DATA[awayTeam].badge) {
+            if (awayTeam) {
                 awayBadge.style.background = 'var(--bg-elevated)';
-                awayBadge.innerHTML = `<img src="${TEAM_DATA[awayTeam].badge}" style="width:44px;height:44px;object-fit:contain">`;
-            } else if (awayTeam && TEAM_DATA[awayTeam]) {
-                awayBadge.style.background = TEAM_DATA[awayTeam].color || 'var(--bg-elevated)';
-                awayBadge.innerHTML = awayTeam.charAt(0);
+                awayBadge.innerHTML = renderBadgeMarkup(awayTeam, 44);
             } else {
                 awayBadge.style.background = 'var(--bg-elevated)';
                 awayBadge.innerHTML = '?';
