@@ -663,40 +663,23 @@ def get_status():
 
 @app.route('/healthz')
 def healthz():
-    default_league = request.args.get('league', 'Premier League')
+    cache_summary = {}
+    for league in LEAGUE_DATA.keys():
+        league_cache = _cache.get(league)
+        league_time = _cache_time.get(league)
+        cache_summary[league] = {
+            'loaded': league_cache is not None,
+            'last_updated': league_time.strftime('%Y-%m-%d %H:%M') if league_time else None,
+            'teams': len(league_cache['teams']) if league_cache else 0,
+            'matches': len(league_cache['df']) if league_cache else 0,
+        }
 
-    try:
-        cache_data, cache_time = get_cached_data(default_league)
-        cache_summary = {}
-        for league in LEAGUE_DATA.keys():
-            league_cache = _cache.get(league)
-            league_time = _cache_time.get(league)
-            cache_summary[league] = {
-                'loaded': league_cache is not None,
-                'last_updated': league_time.strftime('%Y-%m-%d %H:%M') if league_time else None,
-                'teams': len(league_cache['teams']) if league_cache else 0,
-                'matches': len(league_cache['df']) if league_cache else 0,
-            }
-
-        return jsonify({
-            'status': 'ok',
-            'service': 'matchiq',
-            'league_checked': default_league,
-            'model_type': 'Enhanced Poisson',
-            'loaded': cache_data is not None,
-            'last_updated': cache_time.strftime('%Y-%m-%d %H:%M') if cache_time else None,
-            'matches': len(cache_data['df']) if cache_data else 0,
-            'teams': len(cache_data['teams']) if cache_data else 0,
-            'cached_leagues': cache_summary,
-        }), 200
-    except Exception as e:
-        return jsonify({
-            'status': 'error',
-            'service': 'matchiq',
-            'league_checked': default_league,
-            'message': 'Health check failed',
-            'error': str(e),
-        }), 500
+    return jsonify({
+        'status': 'ok',
+        'service': 'matchiq',
+        'model_type': 'Enhanced Poisson',
+        'cached_leagues': cache_summary,
+    }), 200
 
 
 def _preload_all():
