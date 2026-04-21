@@ -163,7 +163,7 @@ TEAM_COLORS = {
     "Roma": "#9d0000", "Napoli": "#0073CF", "Lyon": "#DA291C", "Marseille": "#0099CB"
 }
 
-# Premier League teams
+# Current teams by league
 premier_league_teams = [
     "Arsenal", "Aston Villa", "Bournemouth", "Brentford", "Brighton",
     "Burnley", "Chelsea", "Crystal Palace", "Everton", "Fulham",
@@ -171,32 +171,40 @@ premier_league_teams = [
     "Nottingham Forest", "Sunderland", "Tottenham", "West Ham", "Wolves"
 ]
 
+la_liga_teams = [
+    "Alaves", "Athletic Bilbao", "Atletico Madrid", "Barcelona", "Celta Vigo",
+    "Elche", "Espanyol", "Getafe", "Girona", "Levante",
+    "Mallorca", "Osasuna", "Oviedo", "Rayo Vallecano", "Betis",
+    "Real Madrid", "Real Sociedad", "Sevilla", "Valencia", "Villarreal"
+]
+
+serie_a_teams = [
+    "Atalanta", "Bologna", "Cagliari", "Como", "Cremonese",
+    "Fiorentina", "Genoa", "Verona", "Inter Milan", "Juventus",
+    "Lazio", "Lecce", "Milan", "Napoli", "Parma",
+    "Pisa", "Roma", "Sassuolo", "Torino", "Udinese"
+]
+
+bundesliga_teams = [
+    "Augsburg", "Union Berlin", "Werder Bremen", "Dortmund", "Eintracht Frankfurt",
+    "Freiburg", "Hamburg", "Heidenheim", "Hoffenheim", "Koln",
+    "RB Leipzig", "Leverkusen", "Mainz", "Monchengladbach", "Bayern Munich",
+    "St Pauli", "Stuttgart", "Wolfsburg"
+]
+
+ligue_1_teams = [
+    "Angers", "Auxerre", "Brest", "Le Havre", "Lens", "Lille",
+    "Lorient", "Lyon", "Marseille", "Metz", "Monaco", "Nantes",
+    "Nice", "Paris FC", "Paris SG", "Rennes", "Strasbourg", "Toulouse"
+]
+
 # Leagues
 LEAGUE_DATA = {
     "Premier League": {"country": "England", "code": "E0", "teams": premier_league_teams},
-    "La Liga": {"country": "Spain", "code": "SP1", "teams": [
-        "Alaves", "Almeria", "Athletic Bilbao", "Atletico Madrid", "Barcelona", 
-        "Betis", "Celta Vigo", "Girona", "Granada", "Las Palmas",
-        "Levante", "Osasuna", "Ray Vallecano", "Real Madrid", "Real Sociedad",
-        "Sevilla", "Valencia", "Villarreal", "Mallorca", "Espanyol"
-    ]},
-    "Serie A": {"country": "Italy", "code": "I1", "teams": [
-        "Atalanta", "Bologna", "Cagliari", "Como", "Empoli",
-        "Fiorentina", "Frosinone", "Genoa", "Inter Milan", "Juventus",
-        "Lazio", "Lecce", "Milan", "Monza", "Napoli", "Parma",
-        "Roma", "Salernitana", "Sassuolo", "Torino", "Udinese", "Venezia", "Verona"
-    ]},
-    "Bundesliga": {"country": "Germany", "code": "D1", "teams": [
-        "Augsburg", "Bayern Munich", "Bochum", "Dortmund", "Eintracht Frankfurt",
-        "Freiburg", "Hertha Berlin", "Hoffenheim", "Koln", "Leverkusen",
-        "Mainz", "Monchengladbach", "RB Leipzig", "Schalke", "Stuttgart",
-        "Union Berlin", "Werder Bremen", "Wolfsburg"
-    ]},
-    "Ligue 1": {"country": "France", "code": "F1", "teams": [
-        "Brest", "Clermont", "Dijon", "Lille", "Lorient", "Lyon", "Marseille", 
-        "Metz", "Monaco", "Montpellier", "Nantes", "Nice", "Paris SG", 
-        "Reims", "Rennes", "Strasbourg", "Toulouse", "Troyes"
-    ]},
+    "La Liga": {"country": "Spain", "code": "SP1", "teams": la_liga_teams},
+    "Serie A": {"country": "Italy", "code": "I1", "teams": serie_a_teams},
+    "Bundesliga": {"country": "Germany", "code": "D1", "teams": bundesliga_teams},
+    "Ligue 1": {"country": "France", "code": "F1", "teams": ligue_1_teams},
 }
 
 # Season weights
@@ -240,6 +248,32 @@ def fetch_data(league="Premier League"):
             "Leeds United": "Leeds",
             "Sunderland AFC": "Sunderland",
             "Burnley FC": "Burnley",
+            "Brighton & Hove Albion": "Brighton",
+            "Manchester City": "Man City",
+            "Manchester United": "Man United",
+            "Newcastle United": "Newcastle",
+            "Tottenham Hotspur": "Tottenham",
+            "West Ham United": "West Ham",
+            "Wolverhampton Wanderers": "Wolves",
+            "Atlético Madrid": "Atletico Madrid",
+            "Deportivo Alavés": "Alaves",
+            "Real Betis": "Betis",
+            "Rayo Vallecano": "Rayo Vallecano",
+            "AC Milan": "Milan",
+            "Hellas Verona": "Verona",
+            "1. FC Heidenheim": "Heidenheim",
+            "1. FC Köln": "Koln",
+            "FC Augsburg": "Augsburg",
+            "FC St. Pauli": "St Pauli",
+            "Hamburger SV": "Hamburg",
+            "SC Freiburg": "Freiburg",
+            "TSG Hoffenheim": "Hoffenheim",
+            "VfB Stuttgart": "Stuttgart",
+            "VfL Wolfsburg": "Wolfsburg",
+            "Bayer Leverkusen": "Leverkusen",
+            "Borussia Dortmund": "Dortmund",
+            "Borussia Mönchengladbach": "Monchengladbach",
+            "Paris Saint-Germain": "Paris SG",
         }
         combined['HomeTeam'] = combined['HomeTeam'].replace(name_map)
         combined['AwayTeam'] = combined['AwayTeam'].replace(name_map)
