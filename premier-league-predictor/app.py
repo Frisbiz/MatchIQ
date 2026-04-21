@@ -441,7 +441,7 @@ def get_cached_data(league):
 
         # Start from the full configured league list, not just teams present in the current CSV.
         # Some current-season files can be incomplete or use inconsistent naming mid-season.
-        current_teams = [t for t in teams if t in model.team_attack]
+        current_teams = list(teams)
 
         if current_teams:
             # Accumulate real results from played matches
