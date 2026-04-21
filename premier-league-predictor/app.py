@@ -661,6 +661,27 @@ def get_status():
     })
 
 
+@app.route('/healthz')
+def healthz():
+    cache_summary = {}
+    for league in LEAGUE_DATA.keys():
+        cache_data = _cache.get(league)
+        cache_time = _cache_time.get(league)
+        cache_summary[league] = {
+            'loaded': cache_data is not None,
+            'last_updated': cache_time.strftime('%Y-%m-%d %H:%M') if cache_time else None,
+            'teams': len(cache_data['teams']) if cache_data else 0,
+            'matches': len(cache_data['df']) if cache_data else 0,
+        }
+
+    return jsonify({
+        'status': 'ok',
+        'service': 'matchiq',
+        'model_type': 'Enhanced Poisson',
+        'cached_leagues': cache_summary,
+    }), 200
+
+
 def _preload_all():
     """Preload all leagues on startup so switching is instant."""
     leagues = list(LEAGUE_DATA.keys())
