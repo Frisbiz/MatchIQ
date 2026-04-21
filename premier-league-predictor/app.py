@@ -439,9 +439,9 @@ def get_cached_data(league):
         if len(current_df) < 10:
             current_df = df[df['SeasonKey'] == '24']
 
-        # Teams actually competing this season that the model knows
-        current_teams = sorted(set(current_df['HomeTeam'].tolist() + current_df['AwayTeam'].tolist()))
-        current_teams = [t for t in current_teams if t in model.team_attack]
+        # Start from the full configured league list, not just teams present in the current CSV.
+        # Some current-season files can be incomplete or use inconsistent naming mid-season.
+        current_teams = [t for t in teams if t in model.team_attack]
 
         if current_teams:
             # Accumulate real results from played matches
