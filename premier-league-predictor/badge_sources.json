@@ -1,0 +1,968 @@
+{
+  "source_preference": "Wikimedia Commons direct SVG/PNG preferred; this pass uses stable raw GitHub PNG badges from luukhopman/football-logos where current-season league directories are maintained.",
+  "teams": {
+    "Arsenal": {
+      "league": "Premier League",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/England%20-%20Premier%20League/Arsenal%20FC.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Arsenal FC.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Aston Villa": {
+      "league": "Premier League",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/England%20-%20Premier%20League/Aston%20Villa.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Aston Villa.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Bournemouth": {
+      "league": "Premier League",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/England%20-%20Premier%20League/AFC%20Bournemouth.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "AFC Bournemouth.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Brentford": {
+      "league": "Premier League",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/England%20-%20Premier%20League/Brentford%20FC.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Brentford FC.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Brighton": {
+      "league": "Premier League",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/England%20-%20Premier%20League/Brighton%20%26%20Hove%20Albion.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Brighton & Hove Albion.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Burnley": {
+      "league": "Premier League",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/England%20-%20Premier%20League/Burnley%20FC.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Burnley FC.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Chelsea": {
+      "league": "Premier League",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/England%20-%20Premier%20League/Chelsea%20FC.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Chelsea FC.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Crystal Palace": {
+      "league": "Premier League",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/England%20-%20Premier%20League/Crystal%20Palace.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Crystal Palace.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Everton": {
+      "league": "Premier League",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/England%20-%20Premier%20League/Everton%20FC.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Everton FC.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Fulham": {
+      "league": "Premier League",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/England%20-%20Premier%20League/Fulham%20FC.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Fulham FC.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Leeds": {
+      "league": "Premier League",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/England%20-%20Premier%20League/Leeds%20United.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Leeds United.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Liverpool": {
+      "league": "Premier League",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/England%20-%20Premier%20League/Liverpool%20FC.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Liverpool FC.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Man City": {
+      "league": "Premier League",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/England%20-%20Premier%20League/Manchester%20City.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Manchester City.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Man United": {
+      "league": "Premier League",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/England%20-%20Premier%20League/Manchester%20United.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Manchester United.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Newcastle": {
+      "league": "Premier League",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/England%20-%20Premier%20League/Newcastle%20United.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Newcastle United.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Nottingham Forest": {
+      "league": "Premier League",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/England%20-%20Premier%20League/Nottingham%20Forest.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Nottingham Forest.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Sunderland": {
+      "league": "Premier League",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/England%20-%20Premier%20League/Sunderland%20AFC.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Sunderland AFC.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Tottenham": {
+      "league": "Premier League",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/England%20-%20Premier%20League/Tottenham%20Hotspur.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Tottenham Hotspur.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "West Ham": {
+      "league": "Premier League",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/England%20-%20Premier%20League/West%20Ham%20United.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "West Ham United.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Wolves": {
+      "league": "Premier League",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/England%20-%20Premier%20League/Wolverhampton%20Wanderers.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Wolverhampton Wanderers.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Alaves": {
+      "league": "La Liga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Spain%20-%20LaLiga/Deportivo%20Alav%C3%A9s.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Deportivo Alavés.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Athletic Bilbao": {
+      "league": "La Liga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Spain%20-%20LaLiga/Athletic%20Bilbao.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Athletic Bilbao.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Atletico Madrid": {
+      "league": "La Liga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Spain%20-%20LaLiga/Atl%C3%A9tico%20de%20Madrid.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Atlético de Madrid.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Barcelona": {
+      "league": "La Liga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Spain%20-%20LaLiga/FC%20Barcelona.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "FC Barcelona.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Celta Vigo": {
+      "league": "La Liga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Spain%20-%20LaLiga/Celta%20de%20Vigo.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Celta de Vigo.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Elche": {
+      "league": "La Liga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Spain%20-%20LaLiga/Elche%20CF.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Elche CF.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Espanyol": {
+      "league": "La Liga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Spain%20-%20LaLiga/RCD%20Espanyol%20Barcelona.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "RCD Espanyol Barcelona.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Getafe": {
+      "league": "La Liga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Spain%20-%20LaLiga/Getafe%20CF.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Getafe CF.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Girona": {
+      "league": "La Liga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Spain%20-%20LaLiga/Girona%20FC.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Girona FC.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Levante": {
+      "league": "La Liga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Spain%20-%20LaLiga/Levante%20UD.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Levante UD.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Mallorca": {
+      "league": "La Liga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Spain%20-%20LaLiga/RCD%20Mallorca.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "RCD Mallorca.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Osasuna": {
+      "league": "La Liga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Spain%20-%20LaLiga/CA%20Osasuna.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "CA Osasuna.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Oviedo": {
+      "league": "La Liga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Spain%20-%20LaLiga/Real%20Oviedo.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Real Oviedo.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Rayo Vallecano": {
+      "league": "La Liga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Spain%20-%20LaLiga/Rayo%20Vallecano.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Rayo Vallecano.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Betis": {
+      "league": "La Liga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Spain%20-%20LaLiga/Real%20Betis%20Balompi%C3%A9.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Real Betis Balompié.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Real Madrid": {
+      "league": "La Liga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Spain%20-%20LaLiga/Real%20Madrid.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Real Madrid.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Real Sociedad": {
+      "league": "La Liga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Spain%20-%20LaLiga/Real%20Sociedad.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Real Sociedad.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Sevilla": {
+      "league": "La Liga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Spain%20-%20LaLiga/Sevilla%20FC.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Sevilla FC.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Valencia": {
+      "league": "La Liga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Spain%20-%20LaLiga/Valencia%20CF.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Valencia CF.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Villarreal": {
+      "league": "La Liga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Spain%20-%20LaLiga/Villarreal%20CF.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Villarreal CF.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Atalanta": {
+      "league": "Serie A",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Italy%20-%20Serie%20A/Atalanta%20BC.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Atalanta BC.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Bologna": {
+      "league": "Serie A",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Italy%20-%20Serie%20A/Bologna%20FC%201909.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Bologna FC 1909.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Cagliari": {
+      "league": "Serie A",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Italy%20-%20Serie%20A/Cagliari%20Calcio.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Cagliari Calcio.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Como": {
+      "league": "Serie A",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Italy%20-%20Serie%20A/Como%201907.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Como 1907.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Cremonese": {
+      "league": "Serie A",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Italy%20-%20Serie%20A/US%20Cremonese.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "US Cremonese.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Fiorentina": {
+      "league": "Serie A",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Italy%20-%20Serie%20A/ACF%20Fiorentina.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "ACF Fiorentina.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Genoa": {
+      "league": "Serie A",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Italy%20-%20Serie%20A/Genoa%20CFC.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Genoa CFC.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Verona": {
+      "league": "Serie A",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Italy%20-%20Serie%20A/Hellas%20Verona.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Hellas Verona.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Inter Milan": {
+      "league": "Serie A",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Italy%20-%20Serie%20A/Inter%20Milan.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Inter Milan.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Juventus": {
+      "league": "Serie A",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Italy%20-%20Serie%20A/Juventus%20FC.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Juventus FC.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Lazio": {
+      "league": "Serie A",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Italy%20-%20Serie%20A/SS%20Lazio.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "SS Lazio.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Lecce": {
+      "league": "Serie A",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Italy%20-%20Serie%20A/US%20Lecce.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "US Lecce.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Milan": {
+      "league": "Serie A",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Italy%20-%20Serie%20A/AC%20Milan.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "AC Milan.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Napoli": {
+      "league": "Serie A",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Italy%20-%20Serie%20A/SSC%20Napoli.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "SSC Napoli.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Parma": {
+      "league": "Serie A",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Italy%20-%20Serie%20A/Parma%20Calcio%201913.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Parma Calcio 1913.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Pisa": {
+      "league": "Serie A",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Italy%20-%20Serie%20A/Pisa%20Sporting%20Club.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Pisa Sporting Club.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Roma": {
+      "league": "Serie A",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Italy%20-%20Serie%20A/AS%20Roma.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "AS Roma.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Sassuolo": {
+      "league": "Serie A",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Italy%20-%20Serie%20A/US%20Sassuolo.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "US Sassuolo.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Torino": {
+      "league": "Serie A",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Italy%20-%20Serie%20A/Torino%20FC.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Torino FC.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Udinese": {
+      "league": "Serie A",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Italy%20-%20Serie%20A/Udinese%20Calcio.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Udinese Calcio.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Augsburg": {
+      "league": "Bundesliga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Germany%20-%20Bundesliga/FC%20Augsburg.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "FC Augsburg.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Union Berlin": {
+      "league": "Bundesliga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Germany%20-%20Bundesliga/1.FC%20Union%20Berlin.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "1.FC Union Berlin.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Werder Bremen": {
+      "league": "Bundesliga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Germany%20-%20Bundesliga/SV%20Werder%20Bremen.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "SV Werder Bremen.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Dortmund": {
+      "league": "Bundesliga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Germany%20-%20Bundesliga/Borussia%20Dortmund.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Borussia Dortmund.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Eintracht Frankfurt": {
+      "league": "Bundesliga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Germany%20-%20Bundesliga/Eintracht%20Frankfurt.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Eintracht Frankfurt.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Freiburg": {
+      "league": "Bundesliga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Germany%20-%20Bundesliga/SC%20Freiburg.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "SC Freiburg.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Hamburg": {
+      "league": "Bundesliga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Germany%20-%20Bundesliga/Hamburger%20SV.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Hamburger SV.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Heidenheim": {
+      "league": "Bundesliga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Germany%20-%20Bundesliga/1.FC%20Heidenheim%201846.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "1.FC Heidenheim 1846.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Hoffenheim": {
+      "league": "Bundesliga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Germany%20-%20Bundesliga/TSG%201899%20Hoffenheim.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "TSG 1899 Hoffenheim.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Koln": {
+      "league": "Bundesliga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Germany%20-%20Bundesliga/1.FC%20K%C3%B6ln.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "1.FC Köln.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "RB Leipzig": {
+      "league": "Bundesliga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Germany%20-%20Bundesliga/RB%20Leipzig.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "RB Leipzig.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Leverkusen": {
+      "league": "Bundesliga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Germany%20-%20Bundesliga/Bayer%2004%20Leverkusen.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Bayer 04 Leverkusen.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Mainz": {
+      "league": "Bundesliga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Germany%20-%20Bundesliga/1.FSV%20Mainz%2005.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "1.FSV Mainz 05.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Monchengladbach": {
+      "league": "Bundesliga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Germany%20-%20Bundesliga/Borussia%20M%C3%B6nchengladbach.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Borussia Mönchengladbach.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Bayern Munich": {
+      "league": "Bundesliga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Germany%20-%20Bundesliga/Bayern%20Munich.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Bayern Munich.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "St Pauli": {
+      "league": "Bundesliga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Germany%20-%20Bundesliga/FC%20St.%20Pauli.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "FC St. Pauli.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Stuttgart": {
+      "league": "Bundesliga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Germany%20-%20Bundesliga/VfB%20Stuttgart.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "VfB Stuttgart.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Wolfsburg": {
+      "league": "Bundesliga",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/Germany%20-%20Bundesliga/VfL%20Wolfsburg.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "VfL Wolfsburg.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Angers": {
+      "league": "Ligue 1",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/France%20-%20Ligue%201/Angers%20SCO.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Angers SCO.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Auxerre": {
+      "league": "Ligue 1",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/France%20-%20Ligue%201/AJ%20Auxerre.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "AJ Auxerre.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Brest": {
+      "league": "Ligue 1",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/France%20-%20Ligue%201/Stade%20Brestois%2029.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Stade Brestois 29.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Le Havre": {
+      "league": "Ligue 1",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/France%20-%20Ligue%201/Le%20Havre%20AC.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Le Havre AC.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Lens": {
+      "league": "Ligue 1",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/France%20-%20Ligue%201/RC%20Lens.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "RC Lens.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Lille": {
+      "league": "Ligue 1",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/France%20-%20Ligue%201/LOSC%20Lille.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "LOSC Lille.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Lorient": {
+      "league": "Ligue 1",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/France%20-%20Ligue%201/FC%20Lorient.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "FC Lorient.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Lyon": {
+      "league": "Ligue 1",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/France%20-%20Ligue%201/Olympique%20Lyon.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Olympique Lyon.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Marseille": {
+      "league": "Ligue 1",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/France%20-%20Ligue%201/Olympique%20Marseille.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Olympique Marseille.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Metz": {
+      "league": "Ligue 1",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/France%20-%20Ligue%201/FC%20Metz.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "FC Metz.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Monaco": {
+      "league": "Ligue 1",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/France%20-%20Ligue%201/AS%20Monaco.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "AS Monaco.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Nantes": {
+      "league": "Ligue 1",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/France%20-%20Ligue%201/FC%20Nantes.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "FC Nantes.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Nice": {
+      "league": "Ligue 1",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/France%20-%20Ligue%201/OGC%20Nice.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "OGC Nice.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Paris FC": {
+      "league": "Ligue 1",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/France%20-%20Ligue%201/Paris%20FC.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Paris FC.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Paris SG": {
+      "league": "Ligue 1",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/France%20-%20Ligue%201/Paris%20Saint-Germain.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Paris Saint-Germain.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Rennes": {
+      "league": "Ligue 1",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/France%20-%20Ligue%201/Stade%20Rennais%20FC.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "Stade Rennais FC.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Strasbourg": {
+      "league": "Ligue 1",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/France%20-%20Ligue%201/RC%20Strasbourg%20Alsace.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "RC Strasbourg Alsace.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    },
+    "Toulouse": {
+      "league": "Ligue 1",
+      "source_url": "https://raw.githubusercontent.com/luukhopman/football-logos/master/logos/France%20-%20Ligue%201/FC%20Toulouse.png",
+      "source": "GitHub raw (luukhopman/football-logos)",
+      "matched_file": "FC Toulouse.png",
+      "format": "png",
+      "fallback_non_svg": true,
+      "notes": "PNG fallback from curated football-logos repo"
+    }
+  },
+  "teams_needing_fallback_or_non_svg": [
+    "Alaves",
+    "Angers",
+    "Arsenal",
+    "Aston Villa",
+    "Atalanta",
+    "Athletic Bilbao",
+    "Atletico Madrid",
+    "Augsburg",
+    "Auxerre",
+    "Barcelona",
+    "Bayern Munich",
+    "Betis",
+    "Bologna",
+    "Bournemouth",
+    "Brentford",
+    "Brest",
+    "Brighton",
+    "Burnley",
+    "Cagliari",
+    "Celta Vigo",
+    "Chelsea",
+    "Como",
+    "Cremonese",
+    "Crystal Palace",
+    "Dortmund",
+    "Eintracht Frankfurt",
+    "Elche",
+    "Espanyol",
+    "Everton",
+    "Fiorentina",
+    "Freiburg",
+    "Fulham",
+    "Genoa",
+    "Getafe",
+    "Girona",
+    "Hamburg",
+    "Heidenheim",
+    "Hoffenheim",
+    "Inter Milan",
+    "Juventus",
+    "Koln",
+    "Lazio",
+    "Le Havre",
+    "Lecce",
+    "Leeds",
+    "Lens",
+    "Levante",
+    "Leverkusen",
+    "Lille",
+    "Liverpool",
+    "Lorient",
+    "Lyon",
+    "Mainz",
+    "Mallorca",
+    "Man City",
+    "Man United",
+    "Marseille",
+    "Metz",
+    "Milan",
+    "Monaco",
+    "Monchengladbach",
+    "Nantes",
+    "Napoli",
+    "Newcastle",
+    "Nice",
+    "Nottingham Forest",
+    "Osasuna",
+    "Oviedo",
+    "Paris FC",
+    "Paris SG",
+    "Parma",
+    "Pisa",
+    "RB Leipzig",
+    "Rayo Vallecano",
+    "Real Madrid",
+    "Real Sociedad",
+    "Rennes",
+    "Roma",
+    "Sassuolo",
+    "Sevilla",
+    "St Pauli",
+    "Strasbourg",
+    "Stuttgart",
+    "Sunderland",
+    "Torino",
+    "Tottenham",
+    "Toulouse",
+    "Udinese",
+    "Union Berlin",
+    "Valencia",
+    "Verona",
+    "Villarreal",
+    "Werder Bremen",
+    "West Ham",
+    "Wolfsburg",
+    "Wolves"
+  ],
+  "issues": []
+}
