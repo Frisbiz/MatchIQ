@@ -426,7 +426,7 @@ def get_cached_data(league):
         return None, None
     
     teams = LEAGUE_DATA[league]["teams"]
-    available_teams = [t for t in teams if t in df['HomeTeam'].values or t in df['AwayTeam'].values]
+    available_teams = list(teams)
     
     model = EnhancedPoissonModel()
     model.fit(df, available_teams)
