@@ -11,11 +11,6 @@ warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
 
-@app.errorhandler(Exception)
-def handle_unexpected_error(error):
-    print(f"❌ Unhandled error: {error}")
-    return jsonify({'error': 'Internal server error', 'details': str(error)}), 500
-
 # Manual CORS headers
 @app.after_request
 def add_cors_headers(response):
@@ -71,21 +66,6 @@ class EnhancedPoissonModel:
             attack[team] = (home_gs + away_gs) / (2 * self.global_avg)
             defense[team] = (home_gc + away_gc) / (2 * self.global_avg)
         
-        current_teams = set(df[df['SeasonKey'] == CURRENT_SEASON_KEY]['HomeTeam']).union(
-            set(df[df['SeasonKey'] == CURRENT_SEASON_KEY]['AwayTeam'])
-        )
-        previous_teams = set(df[df['SeasonKey'] == PREVIOUS_SEASON_KEY]['HomeTeam']).union(
-            set(df[df['SeasonKey'] == PREVIOUS_SEASON_KEY]['AwayTeam'])
-        )
-        promoted_teams = current_teams - previous_teams
-
-        for team in teams:
-            attack[team] = 1.0 + (attack[team] - 1.0) * (1.0 - ATTACK_DEFENSE_SHRINKAGE)
-            defense[team] = 1.0 + (defense[team] - 1.0) * (1.0 - ATTACK_DEFENSE_SHRINKAGE)
-            if team in promoted_teams:
-                attack[team] *= (1.0 - PROMOTED_TEAM_ATTACK_PENALTY)
-                defense[team] *= (1.0 + PROMOTED_TEAM_DEFENSE_PENALTY)
-
         self.team_attack = attack
         self.team_defense = defense
         
@@ -232,14 +212,6 @@ SEASON_WEIGHTS = {
     "2425": 2.5, "2324": 2.0, "2223": 1.5, "2122": 1.2, "2021": 1.0,
     "1920": 0.9, "1819": 0.8, "1718": 0.7, "1617": 0.6, "1516": 0.5, "1415": 0.4
 }
-CURRENT_SEASON_KEY = "25"
-PREVIOUS_SEASON_KEY = "24"
-CURRENT_SEASON_WEIGHT_MULTIPLIER = 2.5
-RECENT_MATCH_WEIGHT_MULTIPLIER = 1.35
-ATTACK_DEFENSE_SHRINKAGE = 0.2
-PROMOTED_TEAM_ATTACK_PENALTY = 0.08
-PROMOTED_TEAM_DEFENSE_PENALTY = 0.10
-STANDINGS_SIMULATIONS = 200
 
 def fetch_data(league="Premier League"):
     """Fetch league data"""
@@ -305,14 +277,6 @@ def fetch_data(league="Premier League"):
         }
         combined['HomeTeam'] = combined['HomeTeam'].replace(name_map)
         combined['AwayTeam'] = combined['AwayTeam'].replace(name_map)
-
-        combined.loc[combined['SeasonKey'] == CURRENT_SEASON_KEY, 'Weight'] *= CURRENT_SEASON_WEIGHT_MULTIPLIER
-
-        combined = combined.sort_values('Date', ascending=True).reset_index(drop=True)
-        recent_mask = combined['SeasonKey'] == CURRENT_SEASON_KEY
-        recent_indices = combined[recent_mask].tail(80).index
-        if len(recent_indices) > 0:
-            combined.loc[recent_indices, 'Weight'] *= RECENT_MATCH_WEIGHT_MULTIPLIER
         
         print(f"Total {league}: {len(combined)} matches")
         return combined
@@ -322,20 +286,21 @@ def fetch_data(league="Premier League"):
 def calculate_team_stats(df, teams):
     """Calculate team statistics"""
     team_stats = {}
-    league_home_avg = df['FTHG'].mean() if len(df) else 1.4
-    league_away_avg = df['FTAG'].mean() if len(df) else 1.1
     
     for team in teams:
         home_matches = df[df['HomeTeam'] == team].sort_values('Date', ascending=True)
         away_matches = df[df['AwayTeam'] == team].sort_values('Date', ascending=True)
         
+        if len(home_matches) < 3:
+            continue
+        
         home_weights = home_matches['Weight'].values
         away_weights = away_matches['Weight'].values
         
-        home_gs = np.average(home_matches['FTHG'].values, weights=home_weights) if len(home_matches) > 0 else league_home_avg
-        home_gc = np.average(home_matches['FTAG'].values, weights=home_weights) if len(home_matches) > 0 else league_away_avg
-        away_gs = np.average(away_matches['FTAG'].values, weights=away_weights) if len(away_matches) > 0 else league_away_avg
-        away_gc = np.average(away_matches['FTHG'].values, weights=away_weights) if len(away_matches) > 0 else league_home_avg
+        home_gs = np.average(home_matches['FTHG'].values, weights=home_weights) if len(home_matches) > 0 else 1.4
+        home_gc = np.average(home_matches['FTAG'].values, weights=home_weights) if len(home_matches) > 0 else 1.4
+        away_gs = np.average(away_matches['FTAG'].values, weights=away_weights) if len(away_matches) > 0 else 1.1
+        away_gc = np.average(away_matches['FTHG'].values, weights=away_weights) if len(away_matches) > 0 else 1.4
         
         home_wins = (home_matches['FTR'] == 'H').sum() / max(len(home_matches), 1)
         away_wins = (away_matches['FTR'] == 'A').sum() / max(len(away_matches), 1)
@@ -408,73 +373,39 @@ def get_head_to_head(df, team1, team2, limit=5):
     }
 
 
-def simulate_season(model, current_df, teams, n_sim=STANDINGS_SIMULATIONS):
-    """Monte Carlo simulation for remaining fixtures"""
-    actual = {t: {'points': 0, 'gd': 0, 'gf': 0} for t in teams}
-    played = set()
-
-    for _, row in current_df.iterrows():
-        h, a = row['HomeTeam'], row['AwayTeam']
-        if h not in actual or a not in actual:
-            continue
-        try:
-            hg, ag, ftr = int(row['FTHG']), int(row['FTAG']), row['FTR']
-        except (ValueError, KeyError, TypeError):
-            continue
-        played.add((h, a))
-        actual[h]['gf'] += hg
-        actual[a]['gf'] += ag
-        actual[h]['gd'] += hg - ag
-        actual[a]['gd'] += ag - hg
-        if ftr == 'H':
-            actual[h]['points'] += 3
-        elif ftr == 'A':
-            actual[a]['points'] += 3
-        else:
-            actual[h]['points'] += 1
-            actual[a]['points'] += 1
-
-    remaining_fixtures = [(h, a) for h in teams for a in teams if h != a and (h, a) not in played]
-    aggregate = {t: {'points': 0.0, 'gd': 0.0, 'gf': 0.0} for t in teams}
-
+def simulate_season(model, teams, n_sim=100):
+    """Simulate season for standings - simplified for speed"""
+    standings = {t: {'points': 0, 'gd': 0, 'gf': 0} for t in teams}
+    
+    # Only simulate a subset for speed
+    teams_subset = teams[:8]
+    
     for _ in range(n_sim):
-        sim = {t: dict(actual[t]) for t in teams}
-        for home, away in remaining_fixtures:
-            result = model.predict(home, away)
-            if not result:
-                continue
-
-            home_goals = np.random.poisson(result['expected_goals']['home'])
-            away_goals = np.random.poisson(result['expected_goals']['away'])
-
-            sim[home]['gf'] += home_goals
-            sim[away]['gf'] += away_goals
-            sim[home]['gd'] += home_goals - away_goals
-            sim[away]['gd'] += away_goals - home_goals
-
-            if home_goals > away_goals:
-                sim[home]['points'] += 3
-            elif away_goals > home_goals:
-                sim[away]['points'] += 3
-            else:
-                sim[home]['points'] += 1
-                sim[away]['points'] += 1
-
-        for team in teams:
-            aggregate[team]['points'] += sim[team]['points']
-            aggregate[team]['gd'] += sim[team]['gd']
-            aggregate[team]['gf'] += sim[team]['gf']
-
-    standings = []
-    for team in teams:
-        standings.append({
-            'team': team,
-            'points': round(aggregate[team]['points'] / n_sim, 1),
-            'gd': round(aggregate[team]['gd'] / n_sim, 1),
-            'gf': round(aggregate[team]['gf'] / n_sim, 1),
-        })
-
-    return sorted(standings, key=lambda x: (-x['points'], -x['gd'], -x['gf']))
+        for home in teams_subset:
+            for away in teams_subset:
+                if home == away:
+                    continue
+                result = model.predict(home, away)
+                if result:
+                    r = np.random.random()
+                    if r < result['home_prob']:
+                        standings[home]['points'] += 3
+                    elif r < result['home_prob'] + result['away_prob']:
+                        standings[away]['points'] += 3
+                    else:
+                        standings[home]['points'] += 1
+                        standings[away]['points'] += 1
+                    standings[home]['gf'] += result['home_goals']
+                    standings[home]['gd'] += result['home_goals'] - result['away_goals']
+                    standings[away]['gf'] += result['away_goals']
+                    standings[away]['gd'] += result['away_goals'] - result['home_goals']
+    
+    for t in standings:
+        standings[t]['points'] /= n_sim
+        standings[t]['gd'] /= n_sim
+        standings[t]['gf'] /= n_sim
+    
+    return sorted(standings.items(), key=lambda x: (-x[1]['points'], -x[1]['gd']))
 
 
 # Cache
@@ -511,38 +442,78 @@ def get_cached_data(league, force_refresh=False):
     if not force_refresh and not _needs_refresh(now, league):
         return _cache[league], _cache_time[league]
     
-    try:
-        df = fetch_data(league)
-        if df is None:
-            return None, None
-        
-        teams = LEAGUE_DATA[league]["teams"]
-        available_teams = list(teams)
-        
-        model = EnhancedPoissonModel()
-        model.fit(df, available_teams)
-        team_stats = calculate_team_stats(df, available_teams)
-        standings = []
-        if model:
-            current_df = df[df['SeasonKey'] == CURRENT_SEASON_KEY]
-            if len(current_df) < 10:
-                current_df = df[df['SeasonKey'] == PREVIOUS_SEASON_KEY]
-
-            current_teams = list(teams)
-            if current_teams:
-                standings = simulate_season(model, current_df, current_teams, n_sim=STANDINGS_SIMULATIONS)
-        
-        data = {'model': model, 'df': df, 'teams': available_teams, 'team_stats': team_stats, 'standings': standings}
-        
-        _cache[league] = data
-        _cache_time[league] = now
-        return data, now
-    except Exception as e:
-        print(f"❌ Cache build failed for {league}: {e}")
-        if league in _cache and league in _cache_time:
-            print(f"↩️ Using stale cache for {league}")
-            return _cache[league], _cache_time[league]
+    df = fetch_data(league)
+    if df is None:
         return None, None
+    
+    teams = LEAGUE_DATA[league]["teams"]
+    available_teams = list(teams)
+    
+    model = EnhancedPoissonModel()
+    model.fit(df, available_teams)
+    team_stats = calculate_team_stats(df, available_teams)
+    # Build standings: actual current season results + predicted remaining fixtures
+    standings = []
+    if model:
+        # Get current season data, fall back to previous if sparse
+        current_df = df[df['SeasonKey'] == '25']
+        if len(current_df) < 10:
+            current_df = df[df['SeasonKey'] == '24']
+
+        # Start from the full configured league list, not just teams present in the current CSV.
+        # Some current-season files can be incomplete or use inconsistent naming mid-season.
+        current_teams = list(teams)
+
+        if current_teams:
+            # Accumulate real results from played matches
+            actual = {t: {'pts': 0, 'gd': 0} for t in current_teams}
+            played = set()
+            for _, row in current_df.iterrows():
+                h, a = row['HomeTeam'], row['AwayTeam']
+                if h not in actual or a not in actual:
+                    continue
+                try:
+                    hg, ag, ftr = int(row['FTHG']), int(row['FTAG']), row['FTR']
+                except (ValueError, KeyError):
+                    continue
+                played.add((h, a))
+                actual[h]['gd'] += hg - ag
+                actual[a]['gd'] += ag - hg
+                if ftr == 'H':
+                    actual[h]['pts'] += 3
+                elif ftr == 'A':
+                    actual[a]['pts'] += 3
+                else:
+                    actual[h]['pts'] += 1
+                    actual[a]['pts'] += 1
+
+            # Add expected points/GD from every remaining unplayed fixture
+            final = {t: dict(actual[t]) for t in current_teams}
+            for home in current_teams:
+                for away in current_teams:
+                    if home == away or (home, away) in played:
+                        continue
+                    result = model.predict(home, away)
+                    if result:
+                        xg_h = result['expected_goals']['home']
+                        xg_a = result['expected_goals']['away']
+                        final[home]['pts'] += result['home_prob'] * 3 + result['draw_prob']
+                        final[away]['pts'] += result['away_prob'] * 3 + result['draw_prob']
+                        final[home]['gd'] += xg_h - xg_a
+                        final[away]['gd'] += xg_a - xg_h
+
+            standings = sorted(
+                [{'team': t, 'points': round(final[t]['pts'], 1), 'gd': round(final[t]['gd'], 1)}
+                 for t in current_teams],
+                key=lambda x: (-x['points'], -x['gd'])
+            )
+    
+    data = {'model': model, 'df': df, 'teams': available_teams, 'team_stats': team_stats, 'standings': standings}
+    
+    _cache[league] = data
+    _cache_time[league] = now
+    
+    return data, now
 
 
 @app.route('/')
@@ -556,14 +527,10 @@ def index():
 @app.route('/api/teams')
 def get_teams():
     league = request.args.get('league', 'Premier League')
-    league_info = LEAGUE_DATA.get(league, LEAGUE_DATA['Premier League'])
-    try:
-        data, _ = get_cached_data(league)
-        if data and data.get('teams'):
-            return jsonify({'teams': data['teams'], 'league': league})
-    except Exception as e:
-        print(f"❌ Could not build/cache teams for {league}: {e}")
-    return jsonify({'teams': league_info['teams'], 'league': league})
+    data, _ = get_cached_data(league)
+    if data:
+        return jsonify({'teams': data['teams'], 'league': league})
+    return jsonify({'teams': premier_league_teams, 'league': 'Premier League'})
 
 
 @app.route('/api/league/<league_name>')
@@ -648,25 +615,25 @@ def predict():
 @app.route('/api/standings')
 def get_standings():
     league = request.args.get('league', 'Premier League')
-    try:
-        cache_data, cache_time = get_cached_data(league)
-        
-        if cache_data is None:
-            return jsonify({'error': f'Could not load standings for {league}'}), 500
-        
-        standings = cache_data.get('standings', [])
-        if standings and isinstance(standings[0], tuple):
-            formatted = [{'team': t, **s} for t, s in standings]
-        else:
-            formatted = standings
-        
-        return jsonify({
-            'standings': formatted,
-            'league': league,
-            'last_updated': cache_time.strftime('%Y-%m-%d %H:%M') if cache_time else None
-        })
-    except Exception as e:
-        return jsonify({'error': f'Could not load standings for {league}', 'details': str(e)}), 500
+    cache_data, cache_time = get_cached_data(league)
+    
+    if cache_data is None:
+        return jsonify({'error': 'Could not load data'}), 500
+    
+    # Handle both old tuple format and new dict format
+    standings = cache_data.get('standings', [])
+    if standings and isinstance(standings[0], tuple):
+        # Old format: [(team, {points, gd, gf}), ...]
+        formatted = [{'team': t, **s} for t, s in standings]
+    else:
+        # New format: [{team, points, gd}, ...]
+        formatted = standings
+    
+    return jsonify({
+        'standings': formatted,
+        'league': league,
+        'last_updated': cache_time.strftime('%Y-%m-%d %H:%M') if cache_time else None
+    })
 
 
 @app.route('/api/team/<team>')
@@ -703,19 +670,16 @@ def refresh_data():
 @app.route('/api/status')
 def get_status():
     league = request.args.get('league', 'Premier League')
-    try:
-        cache_data, cache_time = get_cached_data(league)
-        
-        return jsonify({
-            'loaded': cache_data is not None,
-            'model_type': 'Enhanced Poisson',
-            'last_updated': cache_time.strftime('%Y-%m-%d %H:%M') if cache_time else None,
-            'matches': len(cache_data['df']) if cache_data else 0,
-            'teams': len(cache_data['teams']) if cache_data else 0,
-            'league': league
-        })
-    except Exception as e:
-        return jsonify({'error': f'Could not load status for {league}', 'details': str(e)}), 500
+    cache_data, cache_time = get_cached_data(league)
+    
+    return jsonify({
+        'loaded': cache_data is not None,
+        'model_type': 'Enhanced Poisson',
+        'last_updated': cache_time.strftime('%Y-%m-%d %H:%M') if cache_time else None,
+        'matches': len(cache_data['df']) if cache_data else 0,
+        'teams': len(cache_data['teams']) if cache_data else 0,
+        'league': league
+    })
 
 
 @app.route('/healthz')
@@ -740,11 +704,7 @@ def healthz():
 
 
 def _preload_all():
-    """Optional preload hook. Disabled by default to keep startup stable on small hosts."""
-    if os.environ.get('MATCHIQ_PRELOAD_ALL', '0') != '1':
-        print("ℹ️ Preload disabled")
-        return
-
+    """Preload all leagues on startup so switching is instant."""
     leagues = list(LEAGUE_DATA.keys())
     for league in leagues:
         try:
