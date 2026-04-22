@@ -695,7 +695,7 @@ def predict():
     if home == away:
         return jsonify({'error': 'Teams must be different'}), 400
     
-    cache_data, cache_time = get_cached_data(league, force_refresh=True)
+    cache_data, cache_time = get_cached_data(league)
     
     if cache_data is None:
         return jsonify({'error': 'Could not load data'}), 500
