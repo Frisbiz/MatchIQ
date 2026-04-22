@@ -512,6 +512,7 @@ STANDINGS_SIMULATIONS = 120
 # Cache
 _cache = {}
 _cache_time = {}
+_cache_locks = {league: threading.Lock() for league in ["Premier League", "La Liga", "Serie A", "Bundesliga", "Ligue 1"]}
 DAILY_REFRESH_HOUR_UTC = 2
 LEAGUE_REFRESH_OFFSETS = {
     "Premier League": 0,
@@ -612,48 +613,52 @@ def simulate_remaining_season_standings(model, current_df, teams, n_sim=STANDING
 
 def get_cached_data(league, force_refresh=False):
     now = datetime.now()
-    
+
+    # Fast path: cache is fresh, no lock needed
     if not force_refresh and not _needs_refresh(now, league):
         return _cache[league], _cache_time[league]
-    
-    df = fetch_data(league)
-    if df is None:
-        return None, None
-    
-    teams = LEAGUE_DATA[league]["teams"]
-    available_teams = list(teams)
-    
-    model = EnhancedPoissonModel()
-    model.fit(df, available_teams)
-    team_stats = calculate_team_stats(df, available_teams)
-    # Build standings: actual current season results + predicted remaining fixtures
-    standings = []
-    if model:
-        # Get current season data, fall back to previous if sparse
-        current_df = df[df['SeasonKey'] == '25']
-        if len(current_df) < 10:
-            current_df = df[df['SeasonKey'] == '24']
 
-        # Start from the full configured league list, not just teams present in the current CSV.
-        # Some current-season files can be incomplete or use inconsistent naming mid-season.
-        current_teams = list(teams)
+    lock = _cache_locks.get(league, threading.Lock())
+    with lock:
+        # Re-check inside lock — another thread may have loaded it while we waited
+        now = datetime.now()
+        if not force_refresh and not _needs_refresh(now, league):
+            return _cache[league], _cache_time[league]
 
-        if current_teams:
-            yahoo_baseline = fetch_yahoo_current_results(league) if league == 'Premier League' else None
-            standings = simulate_remaining_season_standings(
-                model,
-                current_df,
-                current_teams,
-                n_sim=STANDINGS_SIMULATIONS,
-                baseline_df=yahoo_baseline
-            )
-    
-    data = {'model': model, 'df': df, 'teams': available_teams, 'team_stats': team_stats, 'standings': standings}
-    
-    _cache[league] = data
-    _cache_time[league] = now
-    
-    return data, now
+        df = fetch_data(league)
+        if df is None:
+            return None, None
+
+        teams = LEAGUE_DATA[league]["teams"]
+        available_teams = list(teams)
+
+        model = EnhancedPoissonModel()
+        model.fit(df, available_teams)
+        team_stats = calculate_team_stats(df, available_teams)
+
+        standings = []
+        if model:
+            current_df = df[df['SeasonKey'] == '25']
+            if len(current_df) < 10:
+                current_df = df[df['SeasonKey'] == '24']
+
+            current_teams = list(teams)
+            if current_teams:
+                yahoo_baseline = fetch_yahoo_current_results(league) if league == 'Premier League' else None
+                standings = simulate_remaining_season_standings(
+                    model,
+                    current_df,
+                    current_teams,
+                    n_sim=STANDINGS_SIMULATIONS,
+                    baseline_df=yahoo_baseline
+                )
+
+        data = {'model': model, 'df': df, 'teams': available_teams, 'team_stats': team_stats, 'standings': standings}
+
+        _cache[league] = data
+        _cache_time[league] = now
+
+        return data, now
 
 
 @app.route('/')
