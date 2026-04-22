@@ -815,8 +815,10 @@ def refresh_data():
 @app.route('/api/status')
 def get_status():
     league = request.args.get('league', 'Premier League')
-    cache_data, cache_time = get_cached_data(league)
-    
+    # Read directly from cache — never triggers a load, never blocks
+    cache_data = _cache.get(league)
+    cache_time = _cache_time.get(league)
+
     return jsonify({
         'loaded': cache_data is not None,
         'model_type': 'Enhanced Poisson',
