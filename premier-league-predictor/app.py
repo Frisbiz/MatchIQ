@@ -69,7 +69,10 @@ class EnhancedPoissonModel:
         current_teams = set(df[df['SeasonKey'] == CURRENT_SEASON_KEY]['HomeTeam']).union(
             set(df[df['SeasonKey'] == CURRENT_SEASON_KEY]['AwayTeam'])
         )
-        promoted_teams = set(teams) - current_teams
+        previous_teams = set(df[df['SeasonKey'] == PREVIOUS_SEASON_KEY]['HomeTeam']).union(
+            set(df[df['SeasonKey'] == PREVIOUS_SEASON_KEY]['AwayTeam'])
+        )
+        promoted_teams = current_teams - previous_teams
 
         for team in teams:
             attack[team] = 1.0 + (attack[team] - 1.0) * (1.0 - ATTACK_DEFENSE_SHRINKAGE)
@@ -231,7 +234,7 @@ RECENT_MATCH_WEIGHT_MULTIPLIER = 1.35
 ATTACK_DEFENSE_SHRINKAGE = 0.2
 PROMOTED_TEAM_ATTACK_PENALTY = 0.08
 PROMOTED_TEAM_DEFENSE_PENALTY = 0.10
-STANDINGS_SIMULATIONS = 750
+STANDINGS_SIMULATIONS = 200
 
 def fetch_data(league="Premier League"):
     """Fetch league data"""
