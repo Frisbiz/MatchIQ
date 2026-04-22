@@ -11,6 +11,11 @@ warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
 
+@app.errorhandler(Exception)
+def handle_unexpected_error(error):
+    print(f"❌ Unhandled error: {error}")
+    return jsonify({'error': 'Internal server error', 'details': str(error)}), 500
+
 # Manual CORS headers
 @app.after_request
 def add_cors_headers(response):
@@ -551,13 +556,14 @@ def index():
 @app.route('/api/teams')
 def get_teams():
     league = request.args.get('league', 'Premier League')
+    league_info = LEAGUE_DATA.get(league, LEAGUE_DATA['Premier League'])
     try:
         data, _ = get_cached_data(league)
-        if data:
+        if data and data.get('teams'):
             return jsonify({'teams': data['teams'], 'league': league})
-        return jsonify({'teams': LEAGUE_DATA.get(league, LEAGUE_DATA['Premier League'])['teams'], 'league': league})
     except Exception as e:
-        return jsonify({'error': f'Could not load teams for {league}', 'details': str(e)}), 500
+        print(f"❌ Could not build/cache teams for {league}: {e}")
+    return jsonify({'teams': league_info['teams'], 'league': league})
 
 
 @app.route('/api/league/<league_name>')
