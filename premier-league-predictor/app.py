@@ -506,33 +506,38 @@ def get_cached_data(league, force_refresh=False):
     if not force_refresh and not _needs_refresh(now, league):
         return _cache[league], _cache_time[league]
     
-    df = fetch_data(league)
-    if df is None:
-        return None, None
-    
-    teams = LEAGUE_DATA[league]["teams"]
-    available_teams = list(teams)
-    
-    model = EnhancedPoissonModel()
-    model.fit(df, available_teams)
-    team_stats = calculate_team_stats(df, available_teams)
-    # Build standings from actual current season results plus Monte Carlo simulation of remaining fixtures
-    standings = []
-    if model:
-        current_df = df[df['SeasonKey'] == CURRENT_SEASON_KEY]
-        if len(current_df) < 10:
-            current_df = df[df['SeasonKey'] == PREVIOUS_SEASON_KEY]
+    try:
+        df = fetch_data(league)
+        if df is None:
+            return None, None
+        
+        teams = LEAGUE_DATA[league]["teams"]
+        available_teams = list(teams)
+        
+        model = EnhancedPoissonModel()
+        model.fit(df, available_teams)
+        team_stats = calculate_team_stats(df, available_teams)
+        standings = []
+        if model:
+            current_df = df[df['SeasonKey'] == CURRENT_SEASON_KEY]
+            if len(current_df) < 10:
+                current_df = df[df['SeasonKey'] == PREVIOUS_SEASON_KEY]
 
-        current_teams = list(teams)
-        if current_teams:
-            standings = simulate_season(model, current_df, current_teams, n_sim=STANDINGS_SIMULATIONS)
-    
-    data = {'model': model, 'df': df, 'teams': available_teams, 'team_stats': team_stats, 'standings': standings}
-    
-    _cache[league] = data
-    _cache_time[league] = now
-    
-    return data, now
+            current_teams = list(teams)
+            if current_teams:
+                standings = simulate_season(model, current_df, current_teams, n_sim=STANDINGS_SIMULATIONS)
+        
+        data = {'model': model, 'df': df, 'teams': available_teams, 'team_stats': team_stats, 'standings': standings}
+        
+        _cache[league] = data
+        _cache_time[league] = now
+        return data, now
+    except Exception as e:
+        print(f"❌ Cache build failed for {league}: {e}")
+        if league in _cache and league in _cache_time:
+            print(f"↩️ Using stale cache for {league}")
+            return _cache[league], _cache_time[league]
+        return None, None
 
 
 @app.route('/')
@@ -546,10 +551,13 @@ def index():
 @app.route('/api/teams')
 def get_teams():
     league = request.args.get('league', 'Premier League')
-    data, _ = get_cached_data(league)
-    if data:
-        return jsonify({'teams': data['teams'], 'league': league})
-    return jsonify({'teams': premier_league_teams, 'league': 'Premier League'})
+    try:
+        data, _ = get_cached_data(league)
+        if data:
+            return jsonify({'teams': data['teams'], 'league': league})
+        return jsonify({'teams': LEAGUE_DATA.get(league, LEAGUE_DATA['Premier League'])['teams'], 'league': league})
+    except Exception as e:
+        return jsonify({'error': f'Could not load teams for {league}', 'details': str(e)}), 500
 
 
 @app.route('/api/league/<league_name>')
@@ -634,25 +642,25 @@ def predict():
 @app.route('/api/standings')
 def get_standings():
     league = request.args.get('league', 'Premier League')
-    cache_data, cache_time = get_cached_data(league)
-    
-    if cache_data is None:
-        return jsonify({'error': 'Could not load data'}), 500
-    
-    # Handle both old tuple format and new dict format
-    standings = cache_data.get('standings', [])
-    if standings and isinstance(standings[0], tuple):
-        # Old format: [(team, {points, gd, gf}), ...]
-        formatted = [{'team': t, **s} for t, s in standings]
-    else:
-        # New format: [{team, points, gd}, ...]
-        formatted = standings
-    
-    return jsonify({
-        'standings': formatted,
-        'league': league,
-        'last_updated': cache_time.strftime('%Y-%m-%d %H:%M') if cache_time else None
-    })
+    try:
+        cache_data, cache_time = get_cached_data(league)
+        
+        if cache_data is None:
+            return jsonify({'error': f'Could not load standings for {league}'}), 500
+        
+        standings = cache_data.get('standings', [])
+        if standings and isinstance(standings[0], tuple):
+            formatted = [{'team': t, **s} for t, s in standings]
+        else:
+            formatted = standings
+        
+        return jsonify({
+            'standings': formatted,
+            'league': league,
+            'last_updated': cache_time.strftime('%Y-%m-%d %H:%M') if cache_time else None
+        })
+    except Exception as e:
+        return jsonify({'error': f'Could not load standings for {league}', 'details': str(e)}), 500
 
 
 @app.route('/api/team/<team>')
@@ -689,16 +697,19 @@ def refresh_data():
 @app.route('/api/status')
 def get_status():
     league = request.args.get('league', 'Premier League')
-    cache_data, cache_time = get_cached_data(league)
-    
-    return jsonify({
-        'loaded': cache_data is not None,
-        'model_type': 'Enhanced Poisson',
-        'last_updated': cache_time.strftime('%Y-%m-%d %H:%M') if cache_time else None,
-        'matches': len(cache_data['df']) if cache_data else 0,
-        'teams': len(cache_data['teams']) if cache_data else 0,
-        'league': league
-    })
+    try:
+        cache_data, cache_time = get_cached_data(league)
+        
+        return jsonify({
+            'loaded': cache_data is not None,
+            'model_type': 'Enhanced Poisson',
+            'last_updated': cache_time.strftime('%Y-%m-%d %H:%M') if cache_time else None,
+            'matches': len(cache_data['df']) if cache_data else 0,
+            'teams': len(cache_data['teams']) if cache_data else 0,
+            'league': league
+        })
+    except Exception as e:
+        return jsonify({'error': f'Could not load status for {league}', 'details': str(e)}), 500
 
 
 @app.route('/healthz')
