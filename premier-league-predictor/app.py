@@ -8,6 +8,8 @@ from collections import defaultdict
 import json
 import threading
 import warnings
+from urllib.request import urlopen
+from urllib.parse import urlencode
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
@@ -201,11 +203,11 @@ ligue_1_teams = [
 
 # Leagues
 LEAGUE_DATA = {
-    "Premier League": {"country": "England", "code": "E0", "teams": premier_league_teams},
-    "La Liga": {"country": "Spain", "code": "SP1", "teams": la_liga_teams},
-    "Serie A": {"country": "Italy", "code": "I1", "teams": serie_a_teams},
-    "Bundesliga": {"country": "Germany", "code": "D1", "teams": bundesliga_teams},
-    "Ligue 1": {"country": "France", "code": "F1", "teams": ligue_1_teams},
+    "Premier League": {"country": "England", "code": "E0", "teams": premier_league_teams, "yahoo_code": "soccer.l.fbgb"},
+    "La Liga": {"country": "Spain", "code": "SP1", "teams": la_liga_teams, "yahoo_code": None},
+    "Serie A": {"country": "Italy", "code": "I1", "teams": serie_a_teams, "yahoo_code": None},
+    "Bundesliga": {"country": "Germany", "code": "D1", "teams": bundesliga_teams, "yahoo_code": None},
+    "Ligue 1": {"country": "France", "code": "F1", "teams": ligue_1_teams, "yahoo_code": None},
 }
 
 # Season weights
@@ -213,6 +215,32 @@ SEASON_WEIGHTS = {
     "2425": 2.5, "2324": 2.0, "2223": 1.5, "2122": 1.2, "2021": 1.0,
     "1920": 0.9, "1819": 0.8, "1718": 0.7, "1617": 0.6, "1516": 0.5, "1415": 0.4
 }
+
+def fetch_yahoo_scoreboard(league, week):
+    league_info = LEAGUE_DATA.get(league, LEAGUE_DATA["Premier League"])
+    yahoo_code = league_info.get("yahoo_code")
+    if not yahoo_code:
+        return None
+
+    params = {
+        'lang': 'en-US',
+        'ysp_redesign': '1',
+        'ysp_platform': 'desktop',
+        'leagues': yahoo_code,
+        'week': week,
+        'sched_states': '2',
+        'v': '2',
+        'ysp_enable_last_update': '1',
+    }
+    url = f"https://api-secure.sports.yahoo.com/v1/editorial/s/scoreboard?{urlencode(params)}"
+
+    try:
+        with urlopen(url, timeout=15) as resp:
+            return json.loads(resp.read().decode('utf-8'))
+    except Exception as e:
+        print(f"⚠️ Yahoo fetch failed for {league} week {week}: {e}")
+        return None
+
 
 def fetch_data(league="Premier League"):
     """Fetch league data"""
