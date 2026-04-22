@@ -3,7 +3,7 @@ import pandas as pd
 import numpy as np
 from scipy.stats import poisson
 import os
-from datetime import datetime
+from datetime import datetime, timedelta
 import json
 import threading
 import warnings
@@ -411,15 +411,36 @@ def simulate_season(model, teams, n_sim=100):
 # Cache
 _cache = {}
 _cache_time = {}
-CACHE_DURATION = 3600
+DAILY_REFRESH_HOUR_UTC = 2
+LEAGUE_REFRESH_OFFSETS = {
+    "Premier League": 0,
+    "La Liga": 1,
+    "Serie A": 2,
+    "Bundesliga": 3,
+    "Ligue 1": 4,
+}
 
 
-def get_cached_data(league):
+def _scheduled_refresh_time(now, league):
+    base_hour = (DAILY_REFRESH_HOUR_UTC + LEAGUE_REFRESH_OFFSETS.get(league, 0)) % 24
+    scheduled = now.replace(hour=base_hour, minute=0, second=0, microsecond=0)
+    if now < scheduled:
+        scheduled -= timedelta(days=1)
+    return scheduled
+
+
+def _needs_refresh(now, league):
+    if league not in _cache or league not in _cache_time:
+        return True
+    last_refresh = _cache_time[league]
+    return last_refresh < _scheduled_refresh_time(now, league)
+
+
+def get_cached_data(league, force_refresh=False):
     now = datetime.now()
     
-    if league in _cache and league in _cache_time:
-        if (now - _cache_time[league]).total_seconds() < CACHE_DURATION:
-            return _cache[league], _cache_time[league]
+    if not force_refresh and not _needs_refresh(now, league):
+        return _cache[league], _cache_time[league]
     
     df = fetch_data(league)
     if df is None:
@@ -534,7 +555,7 @@ def predict():
     if home == away:
         return jsonify({'error': 'Teams must be different'}), 400
     
-    cache_data, cache_time = get_cached_data(league)
+    cache_data, cache_time = get_cached_data(league, force_refresh=True)
     
     if cache_data is None:
         return jsonify({'error': 'Could not load data'}), 500
