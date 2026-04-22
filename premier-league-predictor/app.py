@@ -4,6 +4,7 @@ import numpy as np
 from scipy.stats import poisson
 import os
 from datetime import datetime, timedelta
+from collections import defaultdict
 import json
 import threading
 import warnings
@@ -408,6 +409,8 @@ def simulate_season(model, teams, n_sim=100):
     return sorted(standings.items(), key=lambda x: (-x[1]['points'], -x[1]['gd']))
 
 
+STANDINGS_SIMULATIONS = 120
+
 # Cache
 _cache = {}
 _cache_time = {}
@@ -434,6 +437,77 @@ def _needs_refresh(now, league):
         return True
     last_refresh = _cache_time[league]
     return last_refresh < _scheduled_refresh_time(now, league)
+
+
+def simulate_remaining_season_standings(model, current_df, teams, n_sim=STANDINGS_SIMULATIONS):
+    actual = {t: {'pts': 0, 'gd': 0, 'gf': 0} for t in teams}
+    played = set()
+
+    for _, row in current_df.iterrows():
+        h, a = row['HomeTeam'], row['AwayTeam']
+        if h not in actual or a not in actual:
+            continue
+        try:
+            hg, ag, ftr = int(row['FTHG']), int(row['FTAG']), row['FTR']
+        except (ValueError, KeyError, TypeError):
+            continue
+        played.add((h, a))
+        actual[h]['gf'] += hg
+        actual[a]['gf'] += ag
+        actual[h]['gd'] += hg - ag
+        actual[a]['gd'] += ag - hg
+        if ftr == 'H':
+            actual[h]['pts'] += 3
+        elif ftr == 'A':
+            actual[a]['pts'] += 3
+        else:
+            actual[h]['pts'] += 1
+            actual[a]['pts'] += 1
+
+    remaining = [(h, a) for h in teams for a in teams if h != a and (h, a) not in played]
+    totals = defaultdict(lambda: {'pts': 0.0, 'gd': 0.0, 'gf': 0.0})
+
+    for _ in range(n_sim):
+        sim = {t: dict(actual[t]) for t in teams}
+        for home, away in remaining:
+            result = model.predict(home, away)
+            if not result:
+                continue
+
+            r = np.random.random()
+            if r < result['home_prob']:
+                home_goals = max(result['home_goals'], result['away_goals'] + 1)
+                away_goals = result['away_goals']
+                sim[home]['pts'] += 3
+            elif r < result['home_prob'] + result['draw_prob']:
+                home_goals = away_goals = max(0, round((result['home_goals'] + result['away_goals']) / 2))
+                sim[home]['pts'] += 1
+                sim[away]['pts'] += 1
+            else:
+                away_goals = max(result['away_goals'], result['home_goals'] + 1)
+                home_goals = result['home_goals']
+                sim[away]['pts'] += 3
+
+            sim[home]['gf'] += home_goals
+            sim[away]['gf'] += away_goals
+            sim[home]['gd'] += home_goals - away_goals
+            sim[away]['gd'] += away_goals - home_goals
+
+        for team in teams:
+            totals[team]['pts'] += sim[team]['pts']
+            totals[team]['gd'] += sim[team]['gd']
+            totals[team]['gf'] += sim[team]['gf']
+
+    standings = [
+        {
+            'team': team,
+            'points': round(totals[team]['pts'] / n_sim, 1),
+            'gd': round(totals[team]['gd'] / n_sim, 1),
+            'gf': round(totals[team]['gf'] / n_sim, 1),
+        }
+        for team in teams
+    ]
+    return sorted(standings, key=lambda x: (-x['points'], -x['gd'], -x['gf']))
 
 
 def get_cached_data(league, force_refresh=False):
@@ -465,48 +539,7 @@ def get_cached_data(league, force_refresh=False):
         current_teams = list(teams)
 
         if current_teams:
-            # Accumulate real results from played matches
-            actual = {t: {'pts': 0, 'gd': 0} for t in current_teams}
-            played = set()
-            for _, row in current_df.iterrows():
-                h, a = row['HomeTeam'], row['AwayTeam']
-                if h not in actual or a not in actual:
-                    continue
-                try:
-                    hg, ag, ftr = int(row['FTHG']), int(row['FTAG']), row['FTR']
-                except (ValueError, KeyError):
-                    continue
-                played.add((h, a))
-                actual[h]['gd'] += hg - ag
-                actual[a]['gd'] += ag - hg
-                if ftr == 'H':
-                    actual[h]['pts'] += 3
-                elif ftr == 'A':
-                    actual[a]['pts'] += 3
-                else:
-                    actual[h]['pts'] += 1
-                    actual[a]['pts'] += 1
-
-            # Add expected points/GD from every remaining unplayed fixture
-            final = {t: dict(actual[t]) for t in current_teams}
-            for home in current_teams:
-                for away in current_teams:
-                    if home == away or (home, away) in played:
-                        continue
-                    result = model.predict(home, away)
-                    if result:
-                        xg_h = result['expected_goals']['home']
-                        xg_a = result['expected_goals']['away']
-                        final[home]['pts'] += result['home_prob'] * 3 + result['draw_prob']
-                        final[away]['pts'] += result['away_prob'] * 3 + result['draw_prob']
-                        final[home]['gd'] += xg_h - xg_a
-                        final[away]['gd'] += xg_a - xg_h
-
-            standings = sorted(
-                [{'team': t, 'points': round(final[t]['pts'], 1), 'gd': round(final[t]['gd'], 1)}
-                 for t in current_teams],
-                key=lambda x: (-x['points'], -x['gd'])
-            )
+            standings = simulate_remaining_season_standings(model, current_df, current_teams, n_sim=STANDINGS_SIMULATIONS)
     
     data = {'model': model, 'df': df, 'teams': available_teams, 'team_stats': team_stats, 'standings': standings}
     
