@@ -235,7 +235,7 @@ def fetch_yahoo_scoreboard(league, week):
     url = f"https://api-secure.sports.yahoo.com/v1/editorial/s/scoreboard?{urlencode(params)}"
 
     try:
-        with urlopen(url, timeout=15) as resp:
+        with urlopen(url, timeout=5) as resp:
             return json.loads(resp.read().decode('utf-8'))
     except Exception as e:
         print(f"⚠️ Yahoo fetch failed for {league} week {week}: {e}")
@@ -267,12 +267,17 @@ YAHOO_TEAM_NAME_MAP = {
 
 
 def fetch_yahoo_current_results(league, max_weeks=38):
+    import time
     league_info = LEAGUE_DATA.get(league, LEAGUE_DATA['Premier League'])
     if not league_info.get('yahoo_code'):
         return None
 
     rows = []
+    deadline = time.time() + 30  # bail out after 30 seconds total
     for week in range(1, max_weeks + 1):
+        if time.time() > deadline:
+            print(f"⚠️ Yahoo fetch budget exceeded for {league}, stopping at week {week}")
+            break
         payload = fetch_yahoo_scoreboard(league, week)
         if not payload:
             continue
