@@ -740,7 +740,11 @@ def healthz():
 
 
 def _preload_all():
-    """Preload all leagues on startup so switching is instant."""
+    """Optional preload hook. Disabled by default to keep startup stable on small hosts."""
+    if os.environ.get('MATCHIQ_PRELOAD_ALL', '0') != '1':
+        print("ℹ️ Preload disabled")
+        return
+
     leagues = list(LEAGUE_DATA.keys())
     for league in leagues:
         try:
