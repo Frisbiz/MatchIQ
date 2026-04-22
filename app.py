@@ -273,8 +273,8 @@ def predict_match(home, away, team_stats, models, df):
     away_goals = max(0, round(away_pred))
     
     # Calculate confidence based on prediction certainty
-    home_std = np.std([tree.predict(features)[0] for tree in model_home.estimators_])
-    away_std = np.std([tree.predict(features)[0] for tree in model_away.estimators_])
+    home_std = np.std([tree[0].predict(features)[0] for tree in model_home.estimators_])
+    away_std = np.std([tree[0].predict(features)[0] for tree in model_away.estimators_])
     avg_std = (home_std + away_std) / 2
     confidence = max(0.4, min(0.9, 1.0 - (avg_std / 3.0)))
     
