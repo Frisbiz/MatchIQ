@@ -672,10 +672,12 @@ def index():
 @app.route('/api/teams')
 def get_teams():
     league = request.args.get('league', 'Premier League')
-    data, _ = get_cached_data(league)
+    data = _cache.get(league)
     if data:
         return jsonify({'teams': data['teams'], 'league': league})
-    return jsonify({'teams': premier_league_teams, 'league': 'Premier League'})
+    # Still loading — return static fallback so UI isn't blocked
+    fallback = LEAGUE_DATA.get(league, LEAGUE_DATA['Premier League'])['teams']
+    return jsonify({'teams': list(fallback), 'league': league, 'loading': True})
 
 
 @app.route('/api/league/<league_name>')
@@ -699,11 +701,12 @@ def predict():
     
     if home == away:
         return jsonify({'error': 'Teams must be different'}), 400
-    
-    cache_data, cache_time = get_cached_data(league)
-    
+
+    cache_data = _cache.get(league)
+    cache_time = _cache_time.get(league)
+
     if cache_data is None:
-        return jsonify({'error': 'Could not load data'}), 500
+        return jsonify({'error': 'Data is still loading, please try again in a moment.'}), 503
     
     model = cache_data['model']
     df = cache_data['df']
@@ -760,10 +763,11 @@ def predict():
 @app.route('/api/standings')
 def get_standings():
     league = request.args.get('league', 'Premier League')
-    cache_data, cache_time = get_cached_data(league)
-    
+    cache_data = _cache.get(league)
+    cache_time = _cache_time.get(league)
+
     if cache_data is None:
-        return jsonify({'error': 'Could not load data'}), 500
+        return jsonify({'standings': [], 'league': league, 'loading': True})
     
     # Handle both old tuple format and new dict format
     standings = cache_data.get('standings', [])
@@ -784,8 +788,7 @@ def get_standings():
 @app.route('/api/team/<team>')
 def get_team_info(team):
     league = request.args.get('league', 'Premier League')
-    cache_data, _ = get_cached_data(league)
-    
+    cache_data = _cache.get(league)
     if cache_data and team in cache_data['team_stats']:
         return jsonify(cache_data['team_stats'][team])
     return jsonify({'error': 'Team not found'}), 404
