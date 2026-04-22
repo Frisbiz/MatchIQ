@@ -242,6 +242,76 @@ def fetch_yahoo_scoreboard(league, week):
         return None
 
 
+YAHOO_TEAM_NAME_MAP = {
+    'Arsenal': 'Arsenal',
+    'Aston Villa': 'Aston Villa',
+    'Bournemouth': 'Bournemouth',
+    'Brentford': 'Brentford',
+    'Brighton & Hove Albion': 'Brighton',
+    'Burnley': 'Burnley',
+    'Chelsea': 'Chelsea',
+    'Crystal Palace': 'Crystal Palace',
+    'Everton': 'Everton',
+    'Fulham': 'Fulham',
+    'Leeds United': 'Leeds',
+    'Liverpool': 'Liverpool',
+    'Manchester City': 'Man City',
+    'Manchester United': 'Man United',
+    'Newcastle United': 'Newcastle',
+    'Nottingham Forest': 'Nottingham Forest',
+    'Sunderland': 'Sunderland',
+    'Tottenham Hotspur': 'Tottenham',
+    'West Ham United': 'West Ham',
+    'Wolverhampton Wanderers': 'Wolves',
+}
+
+
+def fetch_yahoo_current_results(league, max_weeks=38):
+    league_info = LEAGUE_DATA.get(league, LEAGUE_DATA['Premier League'])
+    if not league_info.get('yahoo_code'):
+        return None
+
+    rows = []
+    for week in range(1, max_weeks + 1):
+        payload = fetch_yahoo_scoreboard(league, week)
+        if not payload:
+            continue
+        games = payload.get('service', {}).get('scoreboard', {}).get('games', {})
+        if not isinstance(games, dict):
+            continue
+
+        for game in games.values():
+            home_name = YAHOO_TEAM_NAME_MAP.get(game.get('home_team_name') or game.get('home_team_display_name') or '')
+            away_name = YAHOO_TEAM_NAME_MAP.get(game.get('away_team_name') or game.get('away_team_display_name') or '')
+            if not home_name or not away_name:
+                continue
+
+            status = game.get('status_type')
+            home_goals = game.get('total_home_points')
+            away_goals = game.get('total_away_points')
+            if status != 'status.type.final' or home_goals is None or away_goals is None:
+                continue
+
+            try:
+                hg = int(home_goals)
+                ag = int(away_goals)
+            except (ValueError, TypeError):
+                continue
+
+            rows.append({
+                'HomeTeam': home_name,
+                'AwayTeam': away_name,
+                'FTHG': hg,
+                'FTAG': ag,
+                'FTR': 'H' if hg > ag else 'A' if ag > hg else 'D',
+                'Week': int(game.get('week_number') or week),
+            })
+
+    if not rows:
+        return None
+    return pd.DataFrame(rows).drop_duplicates(subset=['HomeTeam', 'AwayTeam'], keep='last')
+
+
 def fetch_data(league="Premier League"):
     """Fetch league data"""
     league_info = LEAGUE_DATA.get(league, LEAGUE_DATA["Premier League"])
@@ -467,11 +537,13 @@ def _needs_refresh(now, league):
     return last_refresh < _scheduled_refresh_time(now, league)
 
 
-def simulate_remaining_season_standings(model, current_df, teams, n_sim=STANDINGS_SIMULATIONS):
+def simulate_remaining_season_standings(model, current_df, teams, n_sim=STANDINGS_SIMULATIONS, baseline_df=None):
     actual = {t: {'pts': 0, 'gd': 0, 'gf': 0} for t in teams}
     played = set()
 
-    for _, row in current_df.iterrows():
+    source_df = baseline_df if baseline_df is not None and not baseline_df.empty else current_df
+
+    for _, row in source_df.iterrows():
         h, a = row['HomeTeam'], row['AwayTeam']
         if h not in actual or a not in actual:
             continue
@@ -567,7 +639,14 @@ def get_cached_data(league, force_refresh=False):
         current_teams = list(teams)
 
         if current_teams:
-            standings = simulate_remaining_season_standings(model, current_df, current_teams, n_sim=STANDINGS_SIMULATIONS)
+            yahoo_baseline = fetch_yahoo_current_results(league) if league == 'Premier League' else None
+            standings = simulate_remaining_season_standings(
+                model,
+                current_df,
+                current_teams,
+                n_sim=STANDINGS_SIMULATIONS,
+                baseline_df=yahoo_baseline
+            )
     
     data = {'model': model, 'df': df, 'teams': available_teams, 'team_stats': team_stats, 'standings': standings}
     
