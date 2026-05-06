@@ -15,7 +15,7 @@ from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
-APP_VERSION = 'bg-refresh-v10'
+APP_VERSION = 'bg-refresh-v11'
 
 # Manual CORS headers
 @app.after_request
@@ -338,8 +338,16 @@ def fetch_data(league="Premier League"):
     for snapshot_path in snapshot_paths:
         if os.path.exists(snapshot_path):
             print(f"✓ {league} local training snapshot: {snapshot_path}")
+            try:
+                mark_refresh_state(league, refresh_stage='loading local training snapshot')
+            except NameError:
+                pass
             return pd.read_csv(snapshot_path, usecols=['Date', 'HomeTeam', 'AwayTeam', 'FTHG', 'FTAG', 'FTR', 'Season', 'SeasonKey', 'Weight'])
     print(f"⚠️ {league} no local snapshot found; falling back to network")
+    try:
+        mark_refresh_state(league, refresh_stage='fetching training data from network')
+    except NameError:
+        pass
     
     seasons = [
         # Last 9 seasons including current
