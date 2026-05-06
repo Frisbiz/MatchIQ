@@ -518,6 +518,11 @@ STANDINGS_SIMULATIONS = 120
 _cache = {}
 _cache_time = {}
 _cache_locks = {league: threading.Lock() for league in ["Premier League", "La Liga", "Serie A", "Bundesliga", "Ligue 1"]}
+_refresh_state = {
+    league: {'refreshing': False, 'refresh_started_at': None, 'refresh_error': None}
+    for league in ["Premier League", "La Liga", "Serie A", "Bundesliga", "Ligue 1"]
+}
+_refresh_state_lock = threading.Lock()
 DAILY_REFRESH_HOUR_UTC = 2
 LEAGUE_REFRESH_OFFSETS = {
     "Premier League": 0,
@@ -541,6 +546,91 @@ def _needs_refresh(now, league):
         return True
     last_refresh = _cache_time[league]
     return last_refresh < _scheduled_refresh_time(now, league)
+
+
+def latest_match_date(df):
+    if df is None or df.empty or 'Date' not in df.columns:
+        return None
+    completed = df[df.get('FTR').notna()].copy() if 'FTR' in df.columns else df.copy()
+    if completed.empty:
+        return None
+    parsed = pd.to_datetime(completed['Date'], dayfirst=True, errors='coerce')
+    latest = parsed.max()
+    if pd.isna(latest):
+        return None
+    return latest.strftime('%Y-%m-%d')
+
+
+def cache_status_payload(league):
+    cache_data = _cache.get(league)
+    cache_time = _cache_time.get(league)
+    with _refresh_state_lock:
+        state = dict(_refresh_state.get(league, {}))
+    return {
+        'loaded': cache_data is not None,
+        'model_type': 'Enhanced Poisson',
+        'last_updated': cache_time.strftime('%Y-%m-%d %H:%M') if cache_time else None,
+        'data_latest_match_date': latest_match_date(cache_data['df']) if cache_data else None,
+        'matches': len(cache_data['df']) if cache_data else 0,
+        'teams': len(cache_data['teams']) if cache_data else 0,
+        'league': league,
+        'refreshing': bool(state.get('refreshing')),
+        'refresh_started_at': state.get('refresh_started_at'),
+        'refresh_error': state.get('refresh_error'),
+    }
+
+
+def mark_refresh_state(league, **updates):
+    with _refresh_state_lock:
+        state = _refresh_state.setdefault(league, {'refreshing': False, 'refresh_started_at': None, 'refresh_error': None})
+        state.update(updates)
+
+
+def refresh_worker(league, force_refresh=True):
+    mark_refresh_state(
+        league,
+        refreshing=True,
+        refresh_started_at=datetime.now().strftime('%Y-%m-%d %H:%M'),
+        refresh_error=None,
+    )
+    try:
+        cache_data, _ = get_cached_data(league, force_refresh=force_refresh)
+        if cache_data is None:
+            raise RuntimeError('Could not load data')
+        mark_refresh_state(league, refreshing=False, refresh_error=None)
+    except Exception as e:
+        print(f"❌ Refresh failed for {league}: {e}")
+        mark_refresh_state(league, refreshing=False, refresh_error=str(e))
+
+
+def start_background_refresh(league, force_refresh=True):
+    if league not in LEAGUE_DATA:
+        return False, 'Unknown league'
+    with _refresh_state_lock:
+        state = _refresh_state.setdefault(league, {'refreshing': False, 'refresh_started_at': None, 'refresh_error': None})
+        if state.get('refreshing'):
+            return False, None
+        state['refreshing'] = True
+        state['refresh_started_at'] = datetime.now().strftime('%Y-%m-%d %H:%M')
+        state['refresh_error'] = None
+    thread = threading.Thread(target=refresh_worker, args=(league, force_refresh), daemon=True)
+    thread.start()
+    return True, None
+
+
+def _daily_refresh_loop():
+    # Let startup preloading run first. On small Render instances, kicking off
+    # every league refresh immediately can starve the first usable cache load.
+    threading.Event().wait(10 * 60)
+    while True:
+        try:
+            now = datetime.now()
+            for league in LEAGUE_DATA.keys():
+                if _needs_refresh(now, league):
+                    start_background_refresh(league, force_refresh=True)
+        except Exception as e:
+            print(f"❌ Daily refresh loop failed: {e}")
+        threading.Event().wait(15 * 60)
 
 
 def simulate_remaining_season_standings(model, current_df, teams, n_sim=STANDINGS_SIMULATIONS, baseline_df=None):
@@ -659,11 +749,12 @@ def get_cached_data(league, force_refresh=False):
                 )
 
         data = {'model': model, 'df': df, 'teams': available_teams, 'team_stats': team_stats, 'standings': standings}
+        loaded_at = datetime.now()
 
         _cache[league] = data
-        _cache_time[league] = now
+        _cache_time[league] = loaded_at
 
-        return data, now
+        return data, loaded_at
 
 
 @app.route('/')
@@ -801,54 +892,30 @@ def get_team_info(team):
 
 @app.route('/api/refresh', methods=['POST'])
 def refresh_data():
-    global _cache, _cache_time
-    
     league = request.json.get('league', 'Premier League') if request.json else 'Premier League'
-    
-    if league in _cache:
-        del _cache[league]
-    if league in _cache_time:
-        del _cache_time[league]
-    
-    cache_data, cache_time = get_cached_data(league)
-    
-    if cache_data:
-        return jsonify({
-            'success': True, 'matches': len(cache_data['df']), 'teams': len(cache_data['teams']),
-            'model_type': 'Enhanced Poisson', 'last_updated': cache_time.strftime('%Y-%m-%d %H:%M') if cache_time else None, 'league': league
-        })
-    return jsonify({'error': 'Could not load data'}), 500
+    started, error = start_background_refresh(league, force_refresh=True)
+    if error:
+        return jsonify({'success': False, 'error': error}), 400
+    payload = cache_status_payload(league)
+    payload['success'] = True
+    payload['started'] = started
+    payload['message'] = 'Refresh started' if started else 'Refresh already running'
+    return jsonify(payload), 202 if started else 200
 
 
 @app.route('/api/status')
 def get_status():
     league = request.args.get('league', 'Premier League')
-    # Read directly from cache — never triggers a load, never blocks
-    cache_data = _cache.get(league)
-    cache_time = _cache_time.get(league)
-
-    return jsonify({
-        'loaded': cache_data is not None,
-        'model_type': 'Enhanced Poisson',
-        'last_updated': cache_time.strftime('%Y-%m-%d %H:%M') if cache_time else None,
-        'matches': len(cache_data['df']) if cache_data else 0,
-        'teams': len(cache_data['teams']) if cache_data else 0,
-        'league': league
-    })
+    if league not in LEAGUE_DATA:
+        return jsonify({'error': 'Unknown league'}), 404
+    return jsonify(cache_status_payload(league))
 
 
 @app.route('/healthz')
 def healthz():
     cache_summary = {}
     for league in LEAGUE_DATA.keys():
-        league_cache = _cache.get(league)
-        league_time = _cache_time.get(league)
-        cache_summary[league] = {
-            'loaded': league_cache is not None,
-            'last_updated': league_time.strftime('%Y-%m-%d %H:%M') if league_time else None,
-            'teams': len(league_cache['teams']) if league_cache else 0,
-            'matches': len(league_cache['df']) if league_cache else 0,
-        }
+        cache_summary[league] = cache_status_payload(league)
 
     return jsonify({
         'status': 'ok',
@@ -864,12 +931,13 @@ def _preload_all():
     for league in leagues:
         try:
             print(f"🔄 Preloading {league}...")
-            get_cached_data(league)
+            refresh_worker(league, force_refresh=False)
             print(f"✅ {league} ready")
         except Exception as e:
             print(f"❌ Preload failed for {league}: {e}")
 
 threading.Thread(target=_preload_all, daemon=True).start()
+threading.Thread(target=_daily_refresh_loop, daemon=True).start()
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))

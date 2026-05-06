@@ -915,11 +915,14 @@
                 const response = await fetch(`/api/status?league=${currentLeague}`);
                 const data = await response.json();
                 if (data.loaded) {
+                    const freshness = data.data_latest_match_date ? ` | Data through: ${data.data_latest_match_date}` : '';
+                    const refreshState = data.refreshing ? ' | Refreshing…' : data.refresh_error ? ' | Refresh failed' : '';
                     document.getElementById('matchCount').textContent =
-                        `📊 ${data.matches} matches | Updated: ${data.last_updated}`;
+                        `📊 ${data.matches} matches | Updated: ${data.last_updated}${freshness}${refreshState}`;
                     loadStandings();
+                    if (data.refreshing) setTimeout(loadStatus, 3000);
                 } else {
-                    document.getElementById('matchCount').textContent = 'Loading data…';
+                    document.getElementById('matchCount').textContent = data.refresh_error ? `Refresh failed: ${data.refresh_error}` : 'Loading data…';
                     setTimeout(loadStatus, 3000);
                 }
             } catch (error) {
@@ -987,7 +990,7 @@
 
         async function refreshData() {
             const btn = event.target;
-            btn.textContent = 'Refreshing...';
+            btn.textContent = 'Starting...';
             btn.disabled = true;
             
             try {
@@ -998,14 +1001,43 @@
                 });
                 const data = await response.json();
                 if (data.success) {
-                    document.getElementById('matchCount').textContent = 
-                        `📊 ${data.matches} matches | Updated: ${data.last_updated}`;
-                    btn.textContent = '✓ Refreshed!';
-                    loadTeams();
-                    loadStandings();
+                    btn.textContent = data.started ? 'Refreshing…' : 'Already refreshing…';
+                    pollRefresh(btn);
                 } else {
                     btn.textContent = 'Error';
+                    btn.disabled = false;
                 }
+            } catch (error) {
+                btn.textContent = 'Error';
+                btn.disabled = false;
+            }
+        }
+
+        async function pollRefresh(btn) {
+            try {
+                const response = await fetch(`/api/status?league=${currentLeague}&t=${Date.now()}`);
+                const data = await response.json();
+                const freshness = data.data_latest_match_date ? ` | Data through: ${data.data_latest_match_date}` : '';
+                if (data.loaded) {
+                    document.getElementById('matchCount').textContent =
+                        `📊 ${data.matches} matches | Updated: ${data.last_updated}${freshness}${data.refreshing ? ' | Refreshing…' : ''}`;
+                }
+                if (data.refreshing) {
+                    setTimeout(() => pollRefresh(btn), 3000);
+                    return;
+                }
+                if (data.refresh_error) {
+                    btn.textContent = 'Error';
+                    document.getElementById('matchCount').textContent = `Refresh failed: ${data.refresh_error}`;
+                    setTimeout(() => {
+                        btn.textContent = '↻ Refresh';
+                        btn.disabled = false;
+                    }, 2500);
+                    return;
+                }
+                btn.textContent = '✓ Refreshed!';
+                loadTeams();
+                loadStandings();
                 setTimeout(() => {
                     btn.textContent = '↻ Refresh';
                     btn.disabled = false;
