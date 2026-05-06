@@ -16,7 +16,7 @@ from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
-APP_VERSION = 'bg-refresh-v14'
+APP_VERSION = 'bg-refresh-v15'
 
 # Manual CORS headers
 @app.after_request
@@ -304,6 +304,39 @@ def fit_fast_model(df, teams):
         model.team_attack[team] = max(0.3, scored / max(model.global_avg, 0.1))
         model.team_defense[team] = max(0.3, conceded / max(model.global_avg, 0.1))
     return model
+
+
+def load_precomputed_model(league, teams):
+    params_paths = [
+        os.path.join(os.path.dirname(__file__), 'data', 'model-params.json'),
+        os.path.join(os.getcwd(), 'data', 'model-params.json'),
+        os.path.join(os.getcwd(), 'premier-league-predictor', 'data', 'model-params.json'),
+    ]
+    params = None
+    for path in params_paths:
+        if os.path.exists(path):
+            with open(path, encoding='utf-8') as f:
+                params = json.load(f).get(league)
+            break
+    if not params:
+        return None
+    model = EnhancedPoissonModel()
+    model.n_teams = len(teams)
+    model.teams_list = teams
+    model.global_avg = float(params.get('global_avg') or 1.3)
+    model.home_advantage = 0.35
+    model.rho = 0.03
+    model.team_attack = {team: float(params.get('attack', {}).get(team, 1.0)) for team in teams}
+    model.team_defense = {team: float(params.get('defense', {}).get(team, 1.0)) for team in teams}
+    return {
+        'model': model,
+        'df': pd.DataFrame(columns=['Date', 'HomeTeam', 'AwayTeam', 'FTHG', 'FTAG', 'FTR', 'SeasonKey']),
+        'teams': list(teams),
+        'team_stats': {},
+        'standings': [],
+        'match_count': int(params.get('match_count') or 0),
+        'data_latest_match_date': params.get('latest_match_date'),
+    }
 
 
 YAHOO_TEAM_NAME_MAP = {
@@ -670,8 +703,8 @@ def cache_status_payload(league):
         'loaded': cache_data is not None,
         'model_type': 'Enhanced Poisson',
         'last_updated': cache_time.strftime('%Y-%m-%d %H:%M') if cache_time else None,
-        'data_latest_match_date': latest_match_date(cache_data['df']) if cache_data else None,
-        'matches': len(cache_data['df']) if cache_data else 0,
+        'data_latest_match_date': cache_data.get('data_latest_match_date') or latest_match_date(cache_data['df']) if cache_data else None,
+        'matches': cache_data.get('match_count', len(cache_data['df'])) if cache_data else 0,
         'teams': len(cache_data['teams']) if cache_data else 0,
         'league': league,
         'refreshing': bool(state.get('refreshing')),
@@ -823,12 +856,20 @@ def get_cached_data(league, force_refresh=False):
         if not force_refresh and not _needs_refresh(now, league):
             return _cache[league], _cache_time[league]
 
+        teams = LEAGUE_DATA[league]["teams"]
+        mark_refresh_state(league, refresh_stage='loading precomputed model')
+        precomputed = load_precomputed_model(league, teams)
+        if precomputed:
+            _cache[league] = precomputed
+            _cache_time[league] = now
+            mark_refresh_state(league, refresh_stage='complete')
+            return precomputed, now
+
         mark_refresh_state(league, refresh_stage='fetching training data')
         df = fetch_data(league)
         if df is None:
             return None, None
 
-        teams = LEAGUE_DATA[league]["teams"]
         available_teams = list(teams)
 
         mark_refresh_state(league, refresh_stage='fitting model')
