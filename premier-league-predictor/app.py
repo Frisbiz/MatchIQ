@@ -16,7 +16,7 @@ from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
-APP_VERSION = 'bg-refresh-v13'
+APP_VERSION = 'bg-refresh-v14'
 
 # Manual CORS headers
 @app.after_request
@@ -848,32 +848,6 @@ def get_cached_data(league, force_refresh=False):
         }
         _cache[league] = data
         _cache_time[league] = loaded_at
-        mark_refresh_state(league, refresh_stage='model ready; calculating team stats')
-
-        team_stats = calculate_team_stats(df, available_teams)
-        data['team_stats'] = team_stats
-        _cache[league] = data
-        mark_refresh_state(league, refresh_stage='model ready; simulating standings')
-
-        standings = []
-        if model:
-            current_df = df[df['SeasonKey'] == '25']
-            if len(current_df) < 10:
-                current_df = df[df['SeasonKey'] == '24']
-
-            current_teams = list(teams)
-            if current_teams:
-                yahoo_baseline = fetch_yahoo_current_results(league) if league == 'Premier League' else None
-                standings = simulate_remaining_season_standings(
-                    model,
-                    current_df,
-                    current_teams,
-                    n_sim=STANDINGS_SIMULATIONS,
-                    baseline_df=yahoo_baseline
-                )
-
-        data['standings'] = standings
-        _cache[league] = data
         mark_refresh_state(league, refresh_stage='complete')
 
         return data, loaded_at
