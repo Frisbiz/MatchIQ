@@ -737,6 +737,21 @@ def get_cached_data(league, force_refresh=False):
         model.fit(df, available_teams)
         team_stats = calculate_team_stats(df, available_teams)
 
+        loaded_at = datetime.now()
+        previous_data = _cache.get(league)
+        # Publish the refreshed model as soon as it is usable. Standings are
+        # slower to simulate, especially on Render free instances, and should
+        # not keep predictions/status stuck in an unloaded state.
+        data = {
+            'model': model,
+            'df': df,
+            'teams': available_teams,
+            'team_stats': team_stats,
+            'standings': previous_data.get('standings', []) if previous_data else [],
+        }
+        _cache[league] = data
+        _cache_time[league] = loaded_at
+
         standings = []
         if model:
             current_df = df[df['SeasonKey'] == '25']
@@ -754,11 +769,8 @@ def get_cached_data(league, force_refresh=False):
                     baseline_df=yahoo_baseline
                 )
 
-        data = {'model': model, 'df': df, 'teams': available_teams, 'team_stats': team_stats, 'standings': standings}
-        loaded_at = datetime.now()
-
+        data['standings'] = standings
         _cache[league] = data
-        _cache_time[league] = loaded_at
 
         return data, loaded_at
 
