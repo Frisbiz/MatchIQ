@@ -14,6 +14,7 @@ from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
+APP_VERSION = 'bg-refresh-v4'
 
 # Manual CORS headers
 @app.after_request
@@ -583,6 +584,8 @@ def cache_status_payload(league):
         'refreshing': bool(state.get('refreshing')),
         'refresh_started_at': state.get('refresh_started_at'),
         'refresh_error': state.get('refresh_error'),
+        'refresh_stage': state.get('refresh_stage'),
+        'app_version': APP_VERSION,
     }
 
 
@@ -619,6 +622,7 @@ def start_background_refresh(league, force_refresh=True):
         state['refreshing'] = True
         state['refresh_started_at'] = datetime.now().strftime('%Y-%m-%d %H:%M')
         state['refresh_error'] = None
+        state['refresh_stage'] = 'queued'
     thread = threading.Thread(target=refresh_worker, args=(league, force_refresh), daemon=True)
     thread.start()
     return True, None
@@ -726,6 +730,7 @@ def get_cached_data(league, force_refresh=False):
         if not force_refresh and not _needs_refresh(now, league):
             return _cache[league], _cache_time[league]
 
+        mark_refresh_state(league, refresh_stage='fetching training data')
         df = fetch_data(league)
         if df is None:
             return None, None
@@ -733,6 +738,7 @@ def get_cached_data(league, force_refresh=False):
         teams = LEAGUE_DATA[league]["teams"]
         available_teams = list(teams)
 
+        mark_refresh_state(league, refresh_stage='fitting model')
         model = EnhancedPoissonModel()
         model.fit(df, available_teams)
         team_stats = calculate_team_stats(df, available_teams)
@@ -751,6 +757,7 @@ def get_cached_data(league, force_refresh=False):
         }
         _cache[league] = data
         _cache_time[league] = loaded_at
+        mark_refresh_state(league, refresh_stage='model ready; simulating standings')
 
         standings = []
         if model:
@@ -771,6 +778,7 @@ def get_cached_data(league, force_refresh=False):
 
         data['standings'] = standings
         _cache[league] = data
+        mark_refresh_state(league, refresh_stage='complete')
 
         return data, loaded_at
 
