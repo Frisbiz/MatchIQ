@@ -10,6 +10,7 @@ import threading
 import warnings
 from urllib.request import urlopen
 from urllib.parse import urlencode
+from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
@@ -242,6 +243,11 @@ def fetch_yahoo_scoreboard(league, week):
         return None
 
 
+def read_csv_with_timeout(url, timeout=10):
+    with urlopen(url, timeout=timeout) as resp:
+        return pd.read_csv(BytesIO(resp.read()))
+
+
 YAHOO_TEAM_NAME_MAP = {
     'Arsenal': 'Arsenal',
     'Aston Villa': 'Aston Villa',
@@ -333,7 +339,7 @@ def fetch_data(league="Premier League"):
     for season_code, season_name, season_key in seasons:
         url = f"https://www.football-data.co.uk/mmz4281/{season_code}/{code}.csv"
         try:
-            df = pd.read_csv(url)
+            df = read_csv_with_timeout(url)
             df['Season'] = season_name
             df['SeasonKey'] = season_key
             df['Weight'] = SEASON_WEIGHTS.get(season_key, 1.0)
