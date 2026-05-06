@@ -15,7 +15,7 @@ from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
-APP_VERSION = 'bg-refresh-v8'
+APP_VERSION = 'bg-refresh-v9'
 
 # Manual CORS headers
 @app.after_request
@@ -764,7 +764,6 @@ def get_cached_data(league, force_refresh=False):
         mark_refresh_state(league, refresh_stage='fitting model')
         model = EnhancedPoissonModel()
         model.fit(df, available_teams)
-        team_stats = calculate_team_stats(df, available_teams)
 
         loaded_at = datetime.now()
         previous_data = _cache.get(league)
@@ -775,11 +774,16 @@ def get_cached_data(league, force_refresh=False):
             'model': model,
             'df': df,
             'teams': available_teams,
-            'team_stats': team_stats,
+            'team_stats': previous_data.get('team_stats', {}) if previous_data else {},
             'standings': previous_data.get('standings', []) if previous_data else [],
         }
         _cache[league] = data
         _cache_time[league] = loaded_at
+        mark_refresh_state(league, refresh_stage='model ready; calculating team stats')
+
+        team_stats = calculate_team_stats(df, available_teams)
+        data['team_stats'] = team_stats
+        _cache[league] = data
         mark_refresh_state(league, refresh_stage='model ready; simulating standings')
 
         standings = []
