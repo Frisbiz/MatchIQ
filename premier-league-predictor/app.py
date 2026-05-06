@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 from scipy.stats import poisson
 import os
+import re
 from datetime import datetime, timedelta
 from collections import defaultdict
 import json
@@ -14,7 +15,7 @@ from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
-APP_VERSION = 'bg-refresh-v6'
+APP_VERSION = 'bg-refresh-v7'
 
 # Manual CORS headers
 @app.after_request
@@ -328,6 +329,11 @@ def fetch_data(league="Premier League"):
     """Fetch league data"""
     league_info = LEAGUE_DATA.get(league, LEAGUE_DATA["Premier League"])
     code = league_info["code"]
+    slug = re.sub(r'[^a-z0-9]+', '-', league.lower()).strip('-')
+    snapshot_path = os.path.join(os.path.dirname(__file__), 'data', f'{slug}.csv')
+    if os.path.exists(snapshot_path):
+        print(f"✓ {league} local training snapshot")
+        return pd.read_csv(snapshot_path)
     
     seasons = [
         # Last 9 seasons including current
