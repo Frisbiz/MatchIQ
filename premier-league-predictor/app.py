@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 import json
 import threading
+from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError
 import warnings
 from urllib.request import urlopen
 from urllib.parse import urlencode
@@ -14,7 +15,7 @@ from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
-APP_VERSION = 'bg-refresh-v4'
+APP_VERSION = 'bg-refresh-v5'
 
 # Manual CORS headers
 @app.after_request
@@ -336,18 +337,31 @@ def fetch_data(league="Premier League"):
         ("2223", "2022-23", "22"), ("2324", "2023-24", "23"), ("2425", "2024-25", "24"), ("2526", "2025-26", "25"),
     ]
     
-    all_data = []
-    for season_code, season_name, season_key in seasons:
+    def fetch_season(season_code, season_name, season_key):
         url = f"https://www.football-data.co.uk/mmz4281/{season_code}/{code}.csv"
-        try:
-            df = read_csv_with_timeout(url)
-            df['Season'] = season_name
-            df['SeasonKey'] = season_key
-            df['Weight'] = SEASON_WEIGHTS.get(season_key, 1.0)
-            all_data.append(df)
-            print(f"✓ {league} {season_name}")
-        except Exception as e:
-            print(f"✗ {league} {season_name}: {e}")
+        df = read_csv_with_timeout(url, timeout=5)
+        df['Season'] = season_name
+        df['SeasonKey'] = season_key
+        df['Weight'] = SEASON_WEIGHTS.get(season_key, 1.0)
+        return season_name, df
+
+    all_data = []
+    executor = ThreadPoolExecutor(max_workers=5)
+    futures = [executor.submit(fetch_season, *season) for season in seasons]
+    try:
+        for future in as_completed(futures, timeout=35):
+            try:
+                season_name, df = future.result(timeout=0)
+                all_data.append(df)
+                print(f"✓ {league} {season_name}")
+            except Exception as e:
+                print(f"✗ {league} season fetch: {e}")
+    except TimeoutError:
+        print(f"⚠️ {league} fetch capped at 35s; using completed seasons")
+    finally:
+        for future in futures:
+            future.cancel()
+        executor.shutdown(wait=False, cancel_futures=True)
     
     if all_data:
         combined = pd.concat(all_data, ignore_index=True)
