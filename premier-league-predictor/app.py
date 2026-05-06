@@ -16,7 +16,7 @@ from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
-APP_VERSION = 'bg-refresh-v12'
+APP_VERSION = 'bg-refresh-v13'
 
 # Manual CORS headers
 @app.after_request
@@ -261,6 +261,49 @@ def read_local_training_snapshot(path):
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors='coerce')
     return df
+
+
+def fit_fast_model(df, teams):
+    model = EnhancedPoissonModel()
+    model.n_teams = len(teams)
+    model.teams_list = teams
+    attack_for = {team: 0.0 for team in teams}
+    defense_against = {team: 0.0 for team in teams}
+    weights = {team: 0.0 for team in teams}
+    total_goals = 0.0
+    total_rows = 0
+
+    for row in df[['HomeTeam', 'AwayTeam', 'FTHG', 'FTAG', 'Weight']].itertuples(index=False, name=None):
+        home, away, home_goals, away_goals, weight = row
+        try:
+            home_goals = float(home_goals)
+            away_goals = float(away_goals)
+            weight = float(weight) if weight else 1.0
+        except (TypeError, ValueError):
+            continue
+        total_goals += home_goals + away_goals
+        total_rows += 1
+        if home in weights:
+            attack_for[home] += home_goals * weight
+            defense_against[home] += away_goals * weight
+            weights[home] += weight
+        if away in weights:
+            attack_for[away] += away_goals * weight
+            defense_against[away] += home_goals * weight
+            weights[away] += weight
+
+    model.global_avg = total_goals / max(total_rows * 2, 1)
+    model.home_advantage = 0.35
+    model.rho = 0.03
+    model.team_attack = {}
+    model.team_defense = {}
+    for team in teams:
+        team_weight = max(weights.get(team, 0.0), 1.0)
+        scored = attack_for.get(team, 0.0) / team_weight
+        conceded = defense_against.get(team, 0.0) / team_weight
+        model.team_attack[team] = max(0.3, scored / max(model.global_avg, 0.1))
+        model.team_defense[team] = max(0.3, conceded / max(model.global_avg, 0.1))
+    return model
 
 
 YAHOO_TEAM_NAME_MAP = {
@@ -789,8 +832,7 @@ def get_cached_data(league, force_refresh=False):
         available_teams = list(teams)
 
         mark_refresh_state(league, refresh_stage='fitting model')
-        model = EnhancedPoissonModel()
-        model.fit(df, available_teams)
+        model = fit_fast_model(df, available_teams)
 
         loaded_at = datetime.now()
         previous_data = _cache.get(league)
