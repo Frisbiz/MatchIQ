@@ -7,6 +7,7 @@ import re
 from datetime import datetime, timedelta
 from collections import defaultdict
 import json
+import csv
 import threading
 import warnings
 from urllib.request import urlopen
@@ -15,7 +16,7 @@ from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
-APP_VERSION = 'bg-refresh-v11'
+APP_VERSION = 'bg-refresh-v12'
 
 # Manual CORS headers
 @app.after_request
@@ -250,6 +251,18 @@ def read_csv_with_timeout(url, timeout=10):
         return pd.read_csv(BytesIO(resp.read()))
 
 
+def read_local_training_snapshot(path):
+    rows = []
+    with open(path, newline='', encoding='utf-8') as f:
+        for row in csv.DictReader(f):
+            rows.append(row)
+    df = pd.DataFrame(rows)
+    for col in ['FTHG', 'FTAG', 'Weight']:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors='coerce')
+    return df
+
+
 YAHOO_TEAM_NAME_MAP = {
     'Arsenal': 'Arsenal',
     'Aston Villa': 'Aston Villa',
@@ -342,7 +355,7 @@ def fetch_data(league="Premier League"):
                 mark_refresh_state(league, refresh_stage='loading local training snapshot')
             except NameError:
                 pass
-            return pd.read_csv(snapshot_path, usecols=['Date', 'HomeTeam', 'AwayTeam', 'FTHG', 'FTAG', 'FTR', 'Season', 'SeasonKey', 'Weight'])
+            return read_local_training_snapshot(snapshot_path)
     print(f"⚠️ {league} no local snapshot found; falling back to network")
     try:
         mark_refresh_state(league, refresh_stage='fetching training data from network')
