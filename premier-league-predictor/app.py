@@ -7,7 +7,6 @@ from datetime import datetime, timedelta
 from collections import defaultdict
 import json
 import threading
-from concurrent.futures import ThreadPoolExecutor, as_completed, TimeoutError
 import warnings
 from urllib.request import urlopen
 from urllib.parse import urlencode
@@ -15,7 +14,7 @@ from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
-APP_VERSION = 'bg-refresh-v5'
+APP_VERSION = 'bg-refresh-v6'
 
 # Manual CORS headers
 @app.after_request
@@ -346,22 +345,26 @@ def fetch_data(league="Premier League"):
         return season_name, df
 
     all_data = []
-    executor = ThreadPoolExecutor(max_workers=5)
-    futures = [executor.submit(fetch_season, *season) for season in seasons]
-    try:
-        for future in as_completed(futures, timeout=35):
+    for season in seasons:
+        result = {}
+
+        def run_fetch():
             try:
-                season_name, df = future.result(timeout=0)
-                all_data.append(df)
-                print(f"✓ {league} {season_name}")
+                result['season_name'], result['df'] = fetch_season(*season)
             except Exception as e:
-                print(f"✗ {league} season fetch: {e}")
-    except TimeoutError:
-        print(f"⚠️ {league} fetch capped at 35s; using completed seasons")
-    finally:
-        for future in futures:
-            future.cancel()
-        executor.shutdown(wait=False, cancel_futures=True)
+                result['error'] = e
+
+        thread = threading.Thread(target=run_fetch, daemon=True)
+        thread.start()
+        thread.join(6)
+        if thread.is_alive():
+            print(f"✗ {league} {season[1]}: timed out")
+            continue
+        if 'df' in result:
+            all_data.append(result['df'])
+            print(f"✓ {league} {result['season_name']}")
+        else:
+            print(f"✗ {league} {season[1]}: {result.get('error')}")
     
     if all_data:
         combined = pd.concat(all_data, ignore_index=True)
