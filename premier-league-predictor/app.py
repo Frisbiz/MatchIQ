@@ -15,7 +15,7 @@ from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
-APP_VERSION = 'bg-refresh-v9'
+APP_VERSION = 'bg-refresh-v10'
 
 # Manual CORS headers
 @app.after_request
@@ -330,10 +330,16 @@ def fetch_data(league="Premier League"):
     league_info = LEAGUE_DATA.get(league, LEAGUE_DATA["Premier League"])
     code = league_info["code"]
     slug = re.sub(r'[^a-z0-9]+', '-', league.lower()).strip('-')
-    snapshot_path = os.path.join(os.path.dirname(__file__), 'data', f'{slug}.csv')
-    if os.path.exists(snapshot_path):
-        print(f"✓ {league} local training snapshot")
-        return pd.read_csv(snapshot_path, usecols=['Date', 'HomeTeam', 'AwayTeam', 'FTHG', 'FTAG', 'FTR', 'Season', 'SeasonKey', 'Weight'])
+    snapshot_paths = [
+        os.path.join(os.path.dirname(__file__), 'data', f'{slug}.csv'),
+        os.path.join(os.getcwd(), 'data', f'{slug}.csv'),
+        os.path.join(os.getcwd(), 'premier-league-predictor', 'data', f'{slug}.csv'),
+    ]
+    for snapshot_path in snapshot_paths:
+        if os.path.exists(snapshot_path):
+            print(f"✓ {league} local training snapshot: {snapshot_path}")
+            return pd.read_csv(snapshot_path, usecols=['Date', 'HomeTeam', 'AwayTeam', 'FTHG', 'FTAG', 'FTR', 'Season', 'SeasonKey', 'Weight'])
+    print(f"⚠️ {league} no local snapshot found; falling back to network")
     
     seasons = [
         # Last 9 seasons including current
