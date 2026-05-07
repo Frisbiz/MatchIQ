@@ -16,7 +16,7 @@ from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
-APP_VERSION = 'bg-refresh-v22'
+APP_VERSION = 'bg-refresh-v24'
 DEFAULT_HOME_ADVANTAGE = 0.25
 RECENT_SEASON_WEIGHTS = [0.60, 0.25, 0.10]
 OLDER_SEASONS_WEIGHT = 0.05
@@ -28,6 +28,13 @@ def add_cors_headers(response):
     response.headers['Access-Control-Allow-Methods'] = 'GET, POST, OPTIONS'
     response.headers['Access-Control-Allow-Headers'] = 'Content-Type'
     return response
+
+
+@app.before_request
+def ensure_startup_warm_started():
+    # Render can defer process work until the first real hit. If that happens,
+    # kick the same sequential warmer from the request path without blocking it.
+    start_startup_warm(initial_delay=0)
 
 # ==================== ENHANCED POISSON MODEL ====================
 
@@ -851,11 +858,17 @@ _refresh_state_lock = threading.Lock()
 DAILY_REFRESH_HOUR_UTC = 2
 LEAGUE_REFRESH_OFFSETS = {
     "Premier League": 0,
-    "La Liga": 1,
-    "Serie A": 2,
-    "Bundesliga": 3,
-    "Ligue 1": 4,
+    "La Liga": 0,
+    "Serie A": 0,
+    "Bundesliga": 0,
+    "Ligue 1": 0,
 }
+STARTUP_WARM_DELAY_SECONDS = 30
+LEAGUE_REFRESH_PAUSE_SECONDS = 20
+REFRESH_CHECK_INTERVAL_SECONDS = 15 * 60
+_refresh_sequence_lock = threading.Lock()
+_startup_warm_started = False
+_startup_warm_started_lock = threading.Lock()
 
 
 def _scheduled_refresh_time(now, league):
@@ -946,19 +959,54 @@ def start_background_refresh(league, force_refresh=True):
     return True, None
 
 
+def warm_leagues_sequentially(leagues=None, force_refresh=False, only_if_needed=True, reason='warm'):
+    """Warm/refresh league caches one at a time so small hosts do not get dogpiled."""
+    leagues = list(leagues or LEAGUE_DATA.keys())
+    if not _refresh_sequence_lock.acquire(blocking=False):
+        print(f"↪️ Skipping {reason}; another league refresh sequence is already running")
+        return False
+
+    try:
+        for league in leagues:
+            if league not in LEAGUE_DATA:
+                continue
+            if only_if_needed and not _needs_refresh(datetime.now(), league):
+                continue
+
+            print(f"🔄 {reason}: warming {league}")
+            refresh_worker(league, force_refresh=force_refresh)
+            threading.Event().wait(LEAGUE_REFRESH_PAUSE_SECONDS)
+        return True
+    finally:
+        _refresh_sequence_lock.release()
+
+
+def _startup_warm_loop(initial_delay=STARTUP_WARM_DELAY_SECONDS):
+    # Boot fast, then fill all league caches in a calm sequence. This keeps the
+    # first request from fighting five simultaneous model loads on Render.
+    threading.Event().wait(initial_delay)
+    warm_leagues_sequentially(force_refresh=False, only_if_needed=True, reason='startup warm')
+
+
+def start_startup_warm(initial_delay=STARTUP_WARM_DELAY_SECONDS):
+    global _startup_warm_started
+    with _startup_warm_started_lock:
+        if _startup_warm_started:
+            return False
+        _startup_warm_started = True
+    threading.Thread(target=_startup_warm_loop, args=(initial_delay,), daemon=True).start()
+    return True
+
+
 def _daily_refresh_loop():
-    # Let startup preloading run first. On small Render instances, kicking off
-    # every league refresh immediately can starve the first usable cache load.
-    threading.Event().wait(10 * 60)
+    # Give the startup warmer first shot so boot stays predictable.
+    threading.Event().wait(STARTUP_WARM_DELAY_SECONDS + (len(LEAGUE_DATA) * LEAGUE_REFRESH_PAUSE_SECONDS) + 60)
     while True:
         try:
-            now = datetime.now()
-            for league in LEAGUE_DATA.keys():
-                if _needs_refresh(now, league):
-                    start_background_refresh(league, force_refresh=True)
+            warm_leagues_sequentially(force_refresh=True, only_if_needed=True, reason='daily refresh')
         except Exception as e:
             print(f"❌ Daily refresh loop failed: {e}")
-        threading.Event().wait(15 * 60)
+        threading.Event().wait(REFRESH_CHECK_INTERVAL_SECONDS)
 
 
 def simulate_remaining_season_standings(model, current_df, teams, n_sim=STANDINGS_SIMULATIONS, baseline_df=None):
@@ -1049,13 +1097,14 @@ def get_cached_data(league, force_refresh=False):
             return _cache[league], _cache_time[league]
 
         teams = LEAGUE_DATA[league]["teams"]
-        mark_refresh_state(league, refresh_stage='loading precomputed model')
-        precomputed = load_precomputed_model(league, teams)
-        if precomputed:
-            _cache[league] = precomputed
-            _cache_time[league] = now
-            mark_refresh_state(league, refresh_stage='complete')
-            return precomputed, now
+        if not force_refresh:
+            mark_refresh_state(league, refresh_stage='loading precomputed model')
+            precomputed = load_precomputed_model(league, teams)
+            if precomputed:
+                _cache[league] = precomputed
+                _cache_time[league] = now
+                mark_refresh_state(league, refresh_stage='complete')
+                return precomputed, now
 
         mark_refresh_state(league, refresh_stage='fetching training data')
         df = fetch_data(league)
@@ -1260,18 +1309,14 @@ def healthz():
 
 
 def _preload_all():
-    """Preload all leagues on startup so switching is instant."""
-    leagues = list(LEAGUE_DATA.keys())
-    for league in leagues:
-        try:
-            print(f"🔄 Preloading {league}...")
-            refresh_worker(league, force_refresh=False)
-            print(f"✅ {league} ready")
-        except Exception as e:
-            print(f"❌ Preload failed for {league}: {e}")
+    """Compatibility wrapper: preload all leagues sequentially, never in parallel."""
+    warm_leagues_sequentially(force_refresh=False, only_if_needed=True, reason='manual preload')
 
-# Do not block first boot by preloading every league on Render's small free
-# instances. Prediction/standings endpoints lazily load their league cache.
+# Do not block first boot by preloading every league at once on Render's small
+# free instances. Warm each league shortly after boot, one by one. Prediction and
+# standings endpoints can still lazily load a league if someone asks before the
+# warm sequence reaches it.
+threading.Thread(target=_startup_warm_loop, args=(STARTUP_WARM_DELAY_SECONDS,), daemon=True).start()
 threading.Thread(target=_daily_refresh_loop, daemon=True).start()
 
 if __name__ == '__main__':
