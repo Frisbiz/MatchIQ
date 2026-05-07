@@ -16,7 +16,7 @@ from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
-APP_VERSION = 'bg-refresh-v21'
+APP_VERSION = 'bg-refresh-v22'
 DEFAULT_HOME_ADVANTAGE = 0.25
 RECENT_SEASON_WEIGHTS = [0.60, 0.25, 0.10]
 OLDER_SEASONS_WEIGHT = 0.05
@@ -1131,7 +1131,9 @@ def predict():
     cache_time = _cache_time.get(league)
 
     if cache_data is None:
-        return jsonify({'error': 'Data is still loading, please try again in a moment.'}), 503
+        cache_data, cache_time = get_cached_data(league, force_refresh=False)
+        if cache_data is None:
+            return jsonify({'error': 'Data is still loading, please try again in a moment.'}), 503
     
     model = cache_data['model']
     df = cache_data['df']
@@ -1268,7 +1270,8 @@ def _preload_all():
         except Exception as e:
             print(f"❌ Preload failed for {league}: {e}")
 
-threading.Thread(target=_preload_all, daemon=True).start()
+# Do not block first boot by preloading every league on Render's small free
+# instances. Prediction/standings endpoints lazily load their league cache.
 threading.Thread(target=_daily_refresh_loop, daemon=True).start()
 
 if __name__ == '__main__':
