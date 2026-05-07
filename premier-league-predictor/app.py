@@ -16,7 +16,7 @@ from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
-APP_VERSION = 'bg-refresh-v24'
+APP_VERSION = 'bg-refresh-v25'
 DEFAULT_HOME_ADVANTAGE = 0.25
 RECENT_SEASON_WEIGHTS = [0.60, 0.25, 0.10]
 OLDER_SEASONS_WEIGHT = 0.05
@@ -281,6 +281,9 @@ def read_local_training_snapshot(path):
     for col in ['FTHG', 'FTAG', 'Weight']:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors='coerce')
+    for col in ['HomeTeam', 'AwayTeam']:
+        if col in df.columns:
+            df[col] = df[col].map(normalize_team_name)
     return df
 
 
@@ -630,6 +633,8 @@ def fetch_data(league="Premier League"):
         }
         combined['HomeTeam'] = combined['HomeTeam'].replace(name_map)
         combined['AwayTeam'] = combined['AwayTeam'].replace(name_map)
+        combined['HomeTeam'] = combined['HomeTeam'].map(normalize_team_name)
+        combined['AwayTeam'] = combined['AwayTeam'].map(normalize_team_name)
         
         print(f"Total {league}: {len(combined)} matches")
         return combined
@@ -726,12 +731,22 @@ def normalize_team_name(name):
         'Sunderland AFC': 'Sunderland',
         'Burnley FC': 'Burnley',
         'Real Betis': 'Betis',
+        'Ath Bilbao': 'Athletic Bilbao',
+        'Ath Madrid': 'Atletico Madrid',
         'Atlético Madrid': 'Atletico Madrid',
+        'Celta': 'Celta Vigo',
+        'Espanol': 'Espanyol',
+        'Sociedad': 'Real Sociedad',
+        'Vallecano': 'Rayo Vallecano',
         'AC Milan': 'Milan',
         'Hellas Verona': 'Verona',
+        'Inter': 'Inter Milan',
         'Bayer Leverkusen': 'Leverkusen',
         'Borussia Dortmund': 'Dortmund',
         'Borussia Mönchengladbach': 'Monchengladbach',
+        "M'gladbach": 'Monchengladbach',
+        'Ein Frankfurt': 'Eintracht Frankfurt',
+        'FC Koln': 'Koln',
         'Paris Saint-Germain': 'Paris SG',
     }
     return aliases.get(cleaned, cleaned)
@@ -845,6 +860,13 @@ def simulate_season(model, teams, n_sim=100):
 
 
 STANDINGS_SIMULATIONS = 120
+MATCHES_PER_TEAM = {
+    "Premier League": 38,
+    "La Liga": 38,
+    "Serie A": 38,
+    "Bundesliga": 34,
+    "Ligue 1": 34,
+}
 
 # Cache
 _cache = {}
@@ -1009,76 +1031,180 @@ def _daily_refresh_loop():
         threading.Event().wait(REFRESH_CHECK_INTERVAL_SECONDS)
 
 
-def simulate_remaining_season_standings(model, current_df, teams, n_sim=STANDINGS_SIMULATIONS, baseline_df=None):
-    actual = {t: {'pts': 0, 'gd': 0, 'gf': 0} for t in teams}
-    played = set()
+def _current_season_df(df):
+    if df is None or df.empty or 'Season' not in df.columns:
+        return pd.DataFrame()
 
-    source_df = baseline_df if baseline_df is not None and not baseline_df.empty else current_df
+    completed = df.copy()
+    completed['FTHG'] = pd.to_numeric(completed.get('FTHG'), errors='coerce')
+    completed['FTAG'] = pd.to_numeric(completed.get('FTAG'), errors='coerce')
+    completed = completed[completed.get('FTR').notna() & completed['FTHG'].notna() & completed['FTAG'].notna()].copy()
+    if completed.empty:
+        return completed
 
-    for _, row in source_df.iterrows():
-        h, a = row['HomeTeam'], row['AwayTeam']
-        if h not in actual or a not in actual:
+    if 'Date' in completed.columns:
+        completed['_parsed_date'] = pd.to_datetime(completed['Date'], dayfirst=True, errors='coerce')
+        season_order = completed.groupby('Season')['_parsed_date'].max().sort_values().index.tolist()
+    else:
+        season_order = sorted(completed['Season'].dropna().unique().tolist())
+
+    if not season_order:
+        return pd.DataFrame()
+    return completed[completed['Season'] == season_order[-1]].copy()
+
+
+def build_current_table_and_remaining(current_df, teams):
+    """Seed standings from actual current-season results and infer unplayed fixtures."""
+    active_teams = [team for team in teams if team in set(current_df.get('HomeTeam', [])) | set(current_df.get('AwayTeam', []))]
+    if not active_teams:
+        active_teams = list(teams)
+
+    table = {
+        team: {'played': 0, 'wins': 0, 'draws': 0, 'losses': 0, 'gf': 0, 'ga': 0, 'gd': 0, 'points': 0}
+        for team in active_teams
+    }
+    played_fixtures = set()
+
+    for _, row in current_df.iterrows():
+        home, away = row.get('HomeTeam'), row.get('AwayTeam')
+        if home not in table or away not in table:
             continue
         try:
-            hg, ag, ftr = int(row['FTHG']), int(row['FTAG']), row['FTR']
-        except (ValueError, KeyError, TypeError):
+            home_goals = int(row['FTHG'])
+            away_goals = int(row['FTAG'])
+        except (TypeError, ValueError, KeyError):
             continue
-        played.add((h, a))
-        actual[h]['gf'] += hg
-        actual[a]['gf'] += ag
-        actual[h]['gd'] += hg - ag
-        actual[a]['gd'] += ag - hg
-        if ftr == 'H':
-            actual[h]['pts'] += 3
-        elif ftr == 'A':
-            actual[a]['pts'] += 3
+
+        played_fixtures.add((home, away))
+        table[home]['played'] += 1
+        table[away]['played'] += 1
+        table[home]['gf'] += home_goals
+        table[home]['ga'] += away_goals
+        table[away]['gf'] += away_goals
+        table[away]['ga'] += home_goals
+
+        if home_goals > away_goals:
+            table[home]['wins'] += 1
+            table[away]['losses'] += 1
+            table[home]['points'] += 3
+        elif away_goals > home_goals:
+            table[away]['wins'] += 1
+            table[home]['losses'] += 1
+            table[away]['points'] += 3
         else:
-            actual[h]['pts'] += 1
-            actual[a]['pts'] += 1
+            table[home]['draws'] += 1
+            table[away]['draws'] += 1
+            table[home]['points'] += 1
+            table[away]['points'] += 1
 
-    remaining = [(h, a) for h in teams for a in teams if h != a and (h, a) not in played]
-    totals = defaultdict(lambda: {'pts': 0.0, 'gd': 0.0, 'gf': 0.0})
+    for stats in table.values():
+        stats['gd'] = stats['gf'] - stats['ga']
 
-    for _ in range(n_sim):
-        sim = {t: dict(actual[t]) for t in teams}
+    remaining = [(home, away) for home in active_teams for away in active_teams if home != away and (home, away) not in played_fixtures]
+    return table, remaining, active_teams
+
+
+def validate_projected_standings(standings, current_table, remaining):
+    remaining_counts = defaultdict(int)
+    for home, away in remaining:
+        remaining_counts[home] += 1
+        remaining_counts[away] += 1
+
+    for row in standings:
+        team = row['team']
+        current_points = current_table[team]['points']
+        max_points = current_points + remaining_counts[team] * 3
+        if row['points'] < current_points - 0.05 or row['points'] > max_points + 0.05:
+            raise ValueError(f"Projected points out of range for {team}: {row['points']} not in [{current_points}, {max_points}]")
+        if row['remaining_matches'] != remaining_counts[team]:
+            raise ValueError(f"Remaining match count mismatch for {team}")
+
+
+def simulate_remaining_season_standings(model, current_df, teams, league='Premier League', n_sim=STANDINGS_SIMULATIONS, strength_profile=None):
+    current_season = _current_season_df(current_df)
+    if current_season.empty:
+        return []
+
+    current_table, remaining, active_teams = build_current_table_and_remaining(current_season, teams)
+    remaining_counts = defaultdict(int)
+    for home, away in remaining:
+        remaining_counts[home] += 1
+        remaining_counts[away] += 1
+
+    totals = defaultdict(lambda: {'points': 0.0, 'gd': 0.0, 'gf': 0.0, 'ga': 0.0})
+
+    for _ in range(max(1, n_sim)):
+        sim = {team: dict(stats) for team, stats in current_table.items()}
         for home, away in remaining:
-            result = model.predict(home, away)
+            result = model.predict(home, away, strength_profile=strength_profile)
             if not result:
                 continue
 
-            r = np.random.random()
-            if r < result['home_prob']:
-                home_goals = max(result['home_goals'], result['away_goals'] + 1)
-                away_goals = result['away_goals']
-                sim[home]['pts'] += 3
-            elif r < result['home_prob'] + result['draw_prob']:
-                home_goals = away_goals = max(0, round((result['home_goals'] + result['away_goals']) / 2))
-                sim[home]['pts'] += 1
-                sim[away]['pts'] += 1
-            else:
-                away_goals = max(result['away_goals'], result['home_goals'] + 1)
-                home_goals = result['home_goals']
-                sim[away]['pts'] += 3
+            expected = result.get('expected_goals') or {}
+            home_lambda = max(0.05, float(expected.get('home', result.get('home_goals', 1))))
+            away_lambda = max(0.05, float(expected.get('away', result.get('away_goals', 1))))
+            home_goals = int(min(np.random.poisson(home_lambda), 9))
+            away_goals = int(min(np.random.poisson(away_lambda), 9))
 
+            sim[home]['played'] += 1
+            sim[away]['played'] += 1
             sim[home]['gf'] += home_goals
+            sim[home]['ga'] += away_goals
             sim[away]['gf'] += away_goals
-            sim[home]['gd'] += home_goals - away_goals
-            sim[away]['gd'] += away_goals - home_goals
+            sim[away]['ga'] += home_goals
 
-        for team in teams:
-            totals[team]['pts'] += sim[team]['pts']
+            if home_goals > away_goals:
+                sim[home]['wins'] += 1
+                sim[away]['losses'] += 1
+                sim[home]['points'] += 3
+            elif away_goals > home_goals:
+                sim[away]['wins'] += 1
+                sim[home]['losses'] += 1
+                sim[away]['points'] += 3
+            else:
+                sim[home]['draws'] += 1
+                sim[away]['draws'] += 1
+                sim[home]['points'] += 1
+                sim[away]['points'] += 1
+
+            sim[home]['gd'] = sim[home]['gf'] - sim[home]['ga']
+            sim[away]['gd'] = sim[away]['gf'] - sim[away]['ga']
+
+        for team in active_teams:
+            totals[team]['points'] += sim[team]['points']
             totals[team]['gd'] += sim[team]['gd']
             totals[team]['gf'] += sim[team]['gf']
+            totals[team]['ga'] += sim[team]['ga']
 
-    standings = [
-        {
+    standings = []
+    expected_final_matches = MATCHES_PER_TEAM.get(league)
+    for team in active_teams:
+        current = current_table[team]
+        remaining_matches = remaining_counts[team]
+        max_points = current['points'] + remaining_matches * 3
+        projected_points = round(totals[team]['points'] / n_sim, 1)
+        projected_points = max(current['points'], min(projected_points, max_points))
+        projected_gf = round(totals[team]['gf'] / n_sim, 1)
+        projected_ga = round(totals[team]['ga'] / n_sim, 1)
+        projected_gd = round(projected_gf - projected_ga, 1)
+        standings.append({
             'team': team,
-            'points': round(totals[team]['pts'] / n_sim, 1),
-            'gd': round(totals[team]['gd'] / n_sim, 1),
-            'gf': round(totals[team]['gf'] / n_sim, 1),
-        }
-        for team in teams
-    ]
+            'points': projected_points,
+            'gd': projected_gd,
+            'gf': projected_gf,
+            'ga': projected_ga,
+            'current_points': current['points'],
+            'current_gd': current['gd'],
+            'current_gf': current['gf'],
+            'current_ga': current['ga'],
+            'played': current['played'],
+            'remaining_matches': remaining_matches,
+            'max_points': max_points,
+            'projected_played': current['played'] + remaining_matches,
+            'expected_final_matches': expected_final_matches,
+        })
+
+    validate_projected_standings(standings, current_table, remaining)
     return sorted(standings, key=lambda x: (-x['points'], -x['gd'], -x['gf']))
 
 
@@ -1101,6 +1227,16 @@ def get_cached_data(league, force_refresh=False):
             mark_refresh_state(league, refresh_stage='loading precomputed model')
             precomputed = load_precomputed_model(league, teams)
             if precomputed:
+                snapshot_df = get_snapshot_df(league)
+                projected = simulate_remaining_season_standings(
+                    precomputed['model'],
+                    snapshot_df,
+                    teams,
+                    league=league,
+                    strength_profile=recent_strength_profile(league, teams),
+                )
+                if projected:
+                    precomputed['standings'] = projected
                 _cache[league] = precomputed
                 _cache_time[league] = now
                 mark_refresh_state(league, refresh_stage='complete')
@@ -1115,6 +1251,13 @@ def get_cached_data(league, force_refresh=False):
 
         mark_refresh_state(league, refresh_stage='fitting model')
         model = fit_fast_model(df, available_teams)
+        projected_standings = simulate_remaining_season_standings(
+            model,
+            df,
+            available_teams,
+            league=league,
+            strength_profile=recent_strength_profile(league, available_teams),
+        )
 
         loaded_at = datetime.now()
         previous_data = _cache.get(league)
@@ -1126,7 +1269,7 @@ def get_cached_data(league, force_refresh=False):
             'df': df,
             'teams': available_teams,
             'team_stats': previous_data.get('team_stats', {}) if previous_data else {},
-            'standings': previous_data.get('standings', []) if previous_data else [],
+            'standings': projected_standings,
         }
         _cache[league] = data
         _cache_time[league] = loaded_at
