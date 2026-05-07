@@ -16,7 +16,7 @@ from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
-APP_VERSION = 'bg-refresh-v18'
+APP_VERSION = 'bg-refresh-v19'
 
 # Manual CORS headers
 @app.after_request
@@ -329,21 +329,14 @@ def load_precomputed_model(league, teams):
     model.team_attack = {team: float(params.get('attack', {}).get(team, 1.0)) for team in teams}
     model.team_defense = {team: float(params.get('defense', {}).get(team, 1.0)) for team in teams}
 
-    # Keep the fast precomputed model path, but still attach the bundled
-    # training snapshot so prediction details such as recent head-to-heads have
-    # match rows to read from.
-    snapshot_df = fetch_data(league)
-    if snapshot_df is None:
-        snapshot_df = pd.DataFrame(columns=['Date', 'HomeTeam', 'AwayTeam', 'FTHG', 'FTAG', 'FTR', 'SeasonKey'])
-
     return {
         'model': model,
-        'df': snapshot_df,
+        'df': pd.DataFrame(columns=['Date', 'HomeTeam', 'AwayTeam', 'FTHG', 'FTAG', 'FTR', 'SeasonKey']),
         'teams': list(teams),
         'team_stats': {team: params.get('team_stats', {}).get(team, {}) for team in teams},
         'standings': [row for row in params.get('standings', []) if row.get('team') in teams],
-        'match_count': len(snapshot_df) if not snapshot_df.empty else int(params.get('match_count') or 0),
-        'data_latest_match_date': latest_match_date(snapshot_df) if not snapshot_df.empty else params.get('latest_match_date'),
+        'match_count': int(params.get('match_count') or 0),
+        'data_latest_match_date': params.get('latest_match_date'),
     }
 
 
@@ -690,6 +683,26 @@ def get_head_to_head(df, team1, team2, limit=5):
     }
 
 
+def get_head_to_head_from_snapshot(league, team1, team2, limit=5):
+    """Read h2h rows from the bundled snapshot when the fast model cache has no df."""
+    slug = re.sub(r'[^a-z0-9]+', '-', league.lower()).strip('-')
+    snapshot_paths = [
+        os.path.join(os.path.dirname(__file__), 'data', f'{slug}.csv'),
+        os.path.join(os.getcwd(), 'data', f'{slug}.csv'),
+        os.path.join(os.getcwd(), 'premier-league-predictor', 'data', f'{slug}.csv'),
+    ]
+    for snapshot_path in snapshot_paths:
+        if not os.path.exists(snapshot_path):
+            continue
+        try:
+            df = read_local_training_snapshot(snapshot_path)
+            return get_head_to_head(df, team1, team2, limit=limit)
+        except Exception as e:
+            print(f"⚠️ H2H snapshot read failed for {league}: {e}")
+            break
+    return {'team1_wins': 0, 'team2_wins': 0, 'draws': 0, 'avg_goals': 0, 'matches': []}
+
+
 def simulate_season(model, teams, n_sim=100):
     """Simulate season for standings - simplified for speed"""
     standings = {t: {'points': 0, 'gd': 0, 'gf': 0} for t in teams}
@@ -1032,6 +1045,8 @@ def predict():
             return jsonify({'error': 'Insufficient data'}), 400
         
         h2h = get_head_to_head(df, home, away)
+        if not h2h.get('matches'):
+            h2h = get_head_to_head_from_snapshot(league, home, away)
         home_stats = team_stats.get(home, {})
         away_stats = team_stats.get(away, {})
         
