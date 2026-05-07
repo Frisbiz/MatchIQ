@@ -16,8 +16,10 @@ from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
-APP_VERSION = 'bg-refresh-v20'
+APP_VERSION = 'bg-refresh-v21'
 DEFAULT_HOME_ADVANTAGE = 0.25
+RECENT_SEASON_WEIGHTS = [0.60, 0.25, 0.10]
+OLDER_SEASONS_WEIGHT = 0.05
 
 # Manual CORS headers
 @app.after_request
@@ -88,17 +90,25 @@ class EnhancedPoissonModel:
         print(f"✓ Enhanced Poisson model fitted for {len(teams)} teams")
         print(f"  Global avg: {self.global_avg:.3f}, Home adv: {self.home_advantage:.3f}")
     
-    def predict(self, home_team, away_team, exclude_draw=False):
+    def predict(self, home_team, away_team, exclude_draw=False, strength_profile=None):
         """Predict match using enhanced Poisson"""
         if home_team not in self.team_attack or away_team not in self.team_attack:
             return None
         
+        team_attack = self.team_attack
+        team_defense = self.team_defense
+        global_avg = self.global_avg
+        if strength_profile:
+            team_attack = strength_profile.get('attack', team_attack)
+            team_defense = strength_profile.get('defense', team_defense)
+            global_avg = strength_profile.get('global_avg', global_avg)
+
         # Expected goals with team strengths.
         # Defense is stored as goals-conceded relative to the league average:
         # lower than 1.0 means a strong defense, higher than 1.0 means leaky.
         # Multiplying by opponent defense lowers xG against strong defenses.
-        lam = float(self.global_avg * self.team_attack[home_team] * self.team_defense[away_team] * np.exp(self.home_advantage))
-        mu = float(self.global_avg * self.team_attack[away_team] * self.team_defense[home_team])
+        lam = float(global_avg * team_attack[home_team] * team_defense[away_team] * np.exp(self.home_advantage))
+        mu = float(global_avg * team_attack[away_team] * team_defense[home_team])
         
         # Bound
         lam = max(0.3, min(lam, 4.0))
@@ -265,6 +275,100 @@ def read_local_training_snapshot(path):
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors='coerce')
     return df
+
+
+_snapshot_cache = {}
+
+
+def get_snapshot_df(league):
+    slug = re.sub(r'[^a-z0-9]+', '-', league.lower()).strip('-')
+    if slug in _snapshot_cache:
+        return _snapshot_cache[slug]
+    snapshot_paths = [
+        os.path.join(os.path.dirname(__file__), 'data', f'{slug}.csv'),
+        os.path.join(os.getcwd(), 'data', f'{slug}.csv'),
+        os.path.join(os.getcwd(), 'premier-league-predictor', 'data', f'{slug}.csv'),
+    ]
+    for snapshot_path in snapshot_paths:
+        if os.path.exists(snapshot_path):
+            _snapshot_cache[slug] = read_local_training_snapshot(snapshot_path)
+            return _snapshot_cache[slug]
+    return None
+
+
+def recent_strength_profile(league, teams):
+    """Build a recency-heavy attack/defense profile from bundled snapshots."""
+    df = get_snapshot_df(league)
+    if df is None or df.empty or 'Season' not in df.columns:
+        return None
+
+    completed = df[df.get('FTR').notna()].copy()
+    if completed.empty:
+        return None
+    completed['FTHG'] = pd.to_numeric(completed['FTHG'], errors='coerce')
+    completed['FTAG'] = pd.to_numeric(completed['FTAG'], errors='coerce')
+    completed = completed[completed['FTHG'].notna() & completed['FTAG'].notna()]
+    if completed.empty:
+        return None
+
+    if 'Date' in completed.columns:
+        completed['_parsed_date'] = pd.to_datetime(completed['Date'], dayfirst=True, errors='coerce')
+        season_order = completed.groupby('Season')['_parsed_date'].max().sort_values().index.tolist()
+    else:
+        season_order = sorted(completed['Season'].dropna().unique().tolist())
+    if not season_order:
+        return None
+
+    recent_seasons = list(reversed(season_order[-len(RECENT_SEASON_WEIGHTS):]))
+    explicit_weights = dict(zip(recent_seasons, RECENT_SEASON_WEIGHTS))
+    older_seasons = [season for season in season_order if season not in explicit_weights]
+    older_weight = OLDER_SEASONS_WEIGHT / len(older_seasons) if older_seasons else 0.0
+
+    season_weights = {season: older_weight for season in older_seasons}
+    season_weights.update(explicit_weights)
+
+    weighted_global = total_weight = 0.0
+    for season, weight in season_weights.items():
+        season_df = completed[completed['Season'] == season]
+        if season_df.empty or weight <= 0:
+            continue
+        weighted_global += ((season_df['FTHG'].sum() + season_df['FTAG'].sum()) / (len(season_df) * 2)) * weight
+        total_weight += weight
+    if total_weight <= 0:
+        return None
+    global_avg = weighted_global / total_weight
+
+    attack = {}
+    defense = {}
+    for team in teams:
+        weighted_for = weighted_against = team_weight = 0.0
+        for season, weight in season_weights.items():
+            if weight <= 0:
+                continue
+            season_df = completed[completed['Season'] == season]
+            matches = season_df[(season_df['HomeTeam'] == team) | (season_df['AwayTeam'] == team)]
+            if matches.empty:
+                continue
+            goals_for = 0.0
+            goals_against = 0.0
+            for _, row in matches.iterrows():
+                if row['HomeTeam'] == team:
+                    goals_for += row['FTHG']
+                    goals_against += row['FTAG']
+                else:
+                    goals_for += row['FTAG']
+                    goals_against += row['FTHG']
+            weighted_for += (goals_for / len(matches)) * weight
+            weighted_against += (goals_against / len(matches)) * weight
+            team_weight += weight
+
+        if team_weight > 0:
+            attack[team] = max(0.35, min((weighted_for / team_weight) / max(global_avg, 0.1), 2.2))
+            defense[team] = max(0.35, min((weighted_against / team_weight) / max(global_avg, 0.1), 2.2))
+
+    if not attack or not defense:
+        return None
+    return {'attack': attack, 'defense': defense, 'global_avg': global_avg}
 
 
 def fit_fast_model(df, teams):
@@ -689,21 +793,12 @@ def get_head_to_head(df, team1, team2, limit=5):
 
 def get_head_to_head_from_snapshot(league, team1, team2, limit=5):
     """Read h2h rows from the bundled snapshot when the fast model cache has no df."""
-    slug = re.sub(r'[^a-z0-9]+', '-', league.lower()).strip('-')
-    snapshot_paths = [
-        os.path.join(os.path.dirname(__file__), 'data', f'{slug}.csv'),
-        os.path.join(os.getcwd(), 'data', f'{slug}.csv'),
-        os.path.join(os.getcwd(), 'premier-league-predictor', 'data', f'{slug}.csv'),
-    ]
-    for snapshot_path in snapshot_paths:
-        if not os.path.exists(snapshot_path):
-            continue
-        try:
-            df = read_local_training_snapshot(snapshot_path)
+    try:
+        df = get_snapshot_df(league)
+        if df is not None:
             return get_head_to_head(df, team1, team2, limit=limit)
-        except Exception as e:
-            print(f"⚠️ H2H snapshot read failed for {league}: {e}")
-            break
+    except Exception as e:
+        print(f"⚠️ H2H snapshot read failed for {league}: {e}")
     return {'team1_wins': 0, 'team2_wins': 0, 'draws': 0, 'avg_goals': 0, 'matches': []}
 
 
@@ -1043,7 +1138,8 @@ def predict():
     team_stats = cache_data['team_stats']
     
     try:
-        result = model.predict(home, away, exclude_draw=exclude_draw)
+        strength_profile = recent_strength_profile(league, cache_data['teams'])
+        result = model.predict(home, away, exclude_draw=exclude_draw, strength_profile=strength_profile)
         
         if result is None:
             return jsonify({'error': 'Insufficient data'}), 400
