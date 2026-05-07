@@ -16,7 +16,7 @@ from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
-APP_VERSION = 'bg-refresh-v25'
+APP_VERSION = 'bg-refresh-v26'
 DEFAULT_HOME_ADVANTAGE = 0.25
 RECENT_SEASON_WEIGHTS = [0.60, 0.25, 0.10]
 OLDER_SEASONS_WEIGHT = 0.05
@@ -1131,18 +1131,21 @@ def simulate_remaining_season_standings(model, current_df, teams, league='Premie
         remaining_counts[home] += 1
         remaining_counts[away] += 1
 
+    remaining_predictions = []
+    for home, away in remaining:
+        result = model.predict(home, away, strength_profile=strength_profile)
+        if not result:
+            continue
+        expected = result.get('expected_goals') or {}
+        home_lambda = max(0.05, float(expected.get('home', result.get('home_goals', 1))))
+        away_lambda = max(0.05, float(expected.get('away', result.get('away_goals', 1))))
+        remaining_predictions.append((home, away, home_lambda, away_lambda))
+
     totals = defaultdict(lambda: {'points': 0.0, 'gd': 0.0, 'gf': 0.0, 'ga': 0.0})
 
     for _ in range(max(1, n_sim)):
         sim = {team: dict(stats) for team, stats in current_table.items()}
-        for home, away in remaining:
-            result = model.predict(home, away, strength_profile=strength_profile)
-            if not result:
-                continue
-
-            expected = result.get('expected_goals') or {}
-            home_lambda = max(0.05, float(expected.get('home', result.get('home_goals', 1))))
-            away_lambda = max(0.05, float(expected.get('away', result.get('away_goals', 1))))
+        for home, away, home_lambda, away_lambda in remaining_predictions:
             home_goals = int(min(np.random.poisson(home_lambda), 9))
             away_goals = int(min(np.random.poisson(away_lambda), 9))
 
@@ -1228,6 +1231,7 @@ def get_cached_data(league, force_refresh=False):
             precomputed = load_precomputed_model(league, teams)
             if precomputed:
                 snapshot_df = get_snapshot_df(league)
+                mark_refresh_state(league, refresh_stage='projecting standings')
                 projected = simulate_remaining_season_standings(
                     precomputed['model'],
                     snapshot_df,
@@ -1251,6 +1255,7 @@ def get_cached_data(league, force_refresh=False):
 
         mark_refresh_state(league, refresh_stage='fitting model')
         model = fit_fast_model(df, available_teams)
+        mark_refresh_state(league, refresh_stage='projecting standings')
         projected_standings = simulate_remaining_season_standings(
             model,
             df,
