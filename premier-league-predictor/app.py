@@ -16,7 +16,7 @@ from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
-APP_VERSION = 'bg-refresh-v16'
+APP_VERSION = 'bg-refresh-v17'
 
 # Manual CORS headers
 @app.after_request
@@ -580,10 +580,71 @@ def calculate_team_stats(df, teams):
     return team_stats
 
 
+def normalize_team_name(name):
+    """Normalize team labels from UI, Yahoo, and football-data sources."""
+    if name is None:
+        return ''
+    cleaned = str(name).strip()
+    aliases = {
+        'CHE': 'Chelsea',
+        'Chelsea FC': 'Chelsea',
+        'LIV': 'Liverpool',
+        'Liverpool FC': 'Liverpool',
+        'ARS': 'Arsenal',
+        'MCI': 'Man City',
+        'Manchester City': 'Man City',
+        'MUN': 'Man United',
+        'Manchester United': 'Man United',
+        'NEW': 'Newcastle',
+        'Newcastle United': 'Newcastle',
+        'TOT': 'Tottenham',
+        'Tottenham Hotspur': 'Tottenham',
+        'WHU': 'West Ham',
+        'West Ham United': 'West Ham',
+        'WOL': 'Wolves',
+        'Wolverhampton Wanderers': 'Wolves',
+        'Nott\'m Forest': 'Nottingham Forest',
+        'Nottingham': 'Nottingham Forest',
+        'Brighton & Hove Albion': 'Brighton',
+        'Leeds United': 'Leeds',
+        'Sunderland AFC': 'Sunderland',
+        'Burnley FC': 'Burnley',
+        'Real Betis': 'Betis',
+        'Atlético Madrid': 'Atletico Madrid',
+        'AC Milan': 'Milan',
+        'Hellas Verona': 'Verona',
+        'Bayer Leverkusen': 'Leverkusen',
+        'Borussia Dortmund': 'Dortmund',
+        'Borussia Mönchengladbach': 'Monchengladbach',
+        'Paris Saint-Germain': 'Paris SG',
+    }
+    return aliases.get(cleaned, cleaned)
+
+
 def get_head_to_head(df, team1, team2, limit=5):
-    """Get head-to-head"""
-    h2h = df[((df['HomeTeam'] == team1) & (df['AwayTeam'] == team2)) |
-             ((df['HomeTeam'] == team2) & (df['AwayTeam'] == team1))].tail(limit)
+    """Get recent head-to-head matches, tolerant of source/team-name differences."""
+    if df is None or df.empty:
+        return {'team1_wins': 0, 'team2_wins': 0, 'draws': 0, 'avg_goals': 0, 'matches': []}
+
+    team1_norm = normalize_team_name(team1)
+    team2_norm = normalize_team_name(team2)
+    h2h_df = df.copy()
+    home_norm = h2h_df['HomeTeam'].map(normalize_team_name)
+    away_norm = h2h_df['AwayTeam'].map(normalize_team_name)
+    h2h = h2h_df[((home_norm == team1_norm) & (away_norm == team2_norm)) |
+                 ((home_norm == team2_norm) & (away_norm == team1_norm))].copy()
+
+    if 'FTR' in h2h.columns:
+        h2h = h2h[h2h['FTR'].notna()]
+    h2h['FTHG'] = pd.to_numeric(h2h['FTHG'], errors='coerce')
+    h2h['FTAG'] = pd.to_numeric(h2h['FTAG'], errors='coerce')
+    h2h = h2h[h2h['FTHG'].notna() & h2h['FTAG'].notna()]
+
+    if 'Date' in h2h.columns:
+        h2h['_parsed_date'] = pd.to_datetime(h2h['Date'], dayfirst=True, errors='coerce')
+        h2h = h2h.sort_values(['_parsed_date'], na_position='first')
+
+    h2h = h2h.tail(limit)
     
     if len(h2h) == 0:
         return {'team1_wins': 0, 'team2_wins': 0, 'draws': 0, 'avg_goals': 0, 'matches': []}
@@ -592,17 +653,28 @@ def get_head_to_head(df, team1, team2, limit=5):
     matches = []
     
     for _, match in h2h.iterrows():
-        if match['HomeTeam'] == team1:
+        home_team = normalize_team_name(match['HomeTeam'])
+        away_team = normalize_team_name(match['AwayTeam'])
+        home_goals = int(match['FTHG'])
+        away_goals = int(match['FTAG'])
+
+        if home_team == team1_norm:
             if match['FTR'] == 'H': team1_wins += 1
             elif match['FTR'] == 'A': team2_wins += 1
             else: draws += 1
-            matches.append({'home': team1, 'away': team2, 'score': f"{match['FTHG']}-{match['FTAG']}"})
         else:
             if match['FTR'] == 'A': team1_wins += 1
             elif match['FTR'] == 'H': team2_wins += 1
             else: draws += 1
-            matches.append({'home': team2, 'away': team1, 'score': f"{match['FTAG']}-{match['FTHG']}"})
-        total_goals += match['FTHG'] + match['FTAG']
+
+        matches.append({
+            'home': home_team,
+            'away': away_team,
+            'score': f"{home_goals}-{away_goals}",
+            'date': match.get('Date'),
+            'season': match.get('Season'),
+        })
+        total_goals += home_goals + away_goals
     
     return {
         'team1_wins': team1_wins, 'team2_wins': team2_wins, 'draws': draws,
