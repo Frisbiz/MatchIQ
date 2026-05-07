@@ -16,7 +16,7 @@ from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
-APP_VERSION = 'bg-refresh-v17'
+APP_VERSION = 'bg-refresh-v18'
 
 # Manual CORS headers
 @app.after_request
@@ -328,14 +328,22 @@ def load_precomputed_model(league, teams):
     model.rho = 0.03
     model.team_attack = {team: float(params.get('attack', {}).get(team, 1.0)) for team in teams}
     model.team_defense = {team: float(params.get('defense', {}).get(team, 1.0)) for team in teams}
+
+    # Keep the fast precomputed model path, but still attach the bundled
+    # training snapshot so prediction details such as recent head-to-heads have
+    # match rows to read from.
+    snapshot_df = fetch_data(league)
+    if snapshot_df is None:
+        snapshot_df = pd.DataFrame(columns=['Date', 'HomeTeam', 'AwayTeam', 'FTHG', 'FTAG', 'FTR', 'SeasonKey'])
+
     return {
         'model': model,
-        'df': pd.DataFrame(columns=['Date', 'HomeTeam', 'AwayTeam', 'FTHG', 'FTAG', 'FTR', 'SeasonKey']),
+        'df': snapshot_df,
         'teams': list(teams),
         'team_stats': {team: params.get('team_stats', {}).get(team, {}) for team in teams},
         'standings': [row for row in params.get('standings', []) if row.get('team') in teams],
-        'match_count': int(params.get('match_count') or 0),
-        'data_latest_match_date': params.get('latest_match_date'),
+        'match_count': len(snapshot_df) if not snapshot_df.empty else int(params.get('match_count') or 0),
+        'data_latest_match_date': latest_match_date(snapshot_df) if not snapshot_df.empty else params.get('latest_match_date'),
     }
 
 
