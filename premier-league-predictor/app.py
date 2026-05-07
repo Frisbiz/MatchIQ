@@ -16,7 +16,8 @@ from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
-APP_VERSION = 'bg-refresh-v19'
+APP_VERSION = 'bg-refresh-v20'
+DEFAULT_HOME_ADVANTAGE = 0.25
 
 # Manual CORS headers
 @app.after_request
@@ -79,7 +80,7 @@ class EnhancedPoissonModel:
         # Estimate home advantage from data
         home_wins = (df['FTHG'] > df['FTAG']).sum()
         draws = (df['FTHG'] == df['FTAG']).sum()
-        self.home_advantage = 0.35  # Standard home advantage
+        self.home_advantage = DEFAULT_HOME_ADVANTAGE
         
         # Estimate rho (correlation for low scores)
         self.rho = 0.03  # Small positive correlation
@@ -92,9 +93,12 @@ class EnhancedPoissonModel:
         if home_team not in self.team_attack or away_team not in self.team_attack:
             return None
         
-        # Expected goals with team strengths
-        lam = float(self.global_avg * self.team_attack[home_team] / self.team_defense[away_team] * np.exp(self.home_advantage))
-        mu = float(self.global_avg * self.team_attack[away_team] / self.team_defense[home_team])
+        # Expected goals with team strengths.
+        # Defense is stored as goals-conceded relative to the league average:
+        # lower than 1.0 means a strong defense, higher than 1.0 means leaky.
+        # Multiplying by opponent defense lowers xG against strong defenses.
+        lam = float(self.global_avg * self.team_attack[home_team] * self.team_defense[away_team] * np.exp(self.home_advantage))
+        mu = float(self.global_avg * self.team_attack[away_team] * self.team_defense[home_team])
         
         # Bound
         lam = max(0.3, min(lam, 4.0))
@@ -293,7 +297,7 @@ def fit_fast_model(df, teams):
             weights[away] += weight
 
     model.global_avg = total_goals / max(total_rows * 2, 1)
-    model.home_advantage = 0.35
+    model.home_advantage = DEFAULT_HOME_ADVANTAGE
     model.rho = 0.03
     model.team_attack = {}
     model.team_defense = {}
@@ -324,7 +328,7 @@ def load_precomputed_model(league, teams):
     model.n_teams = len(teams)
     model.teams_list = teams
     model.global_avg = float(params.get('global_avg') or 1.3)
-    model.home_advantage = 0.35
+    model.home_advantage = DEFAULT_HOME_ADVANTAGE
     model.rho = 0.03
     model.team_attack = {team: float(params.get('attack', {}).get(team, 1.0)) for team in teams}
     model.team_defense = {team: float(params.get('defense', {}).get(team, 1.0)) for team in teams}
