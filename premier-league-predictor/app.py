@@ -16,7 +16,7 @@ from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
-APP_VERSION = 'bg-refresh-v15'
+APP_VERSION = 'bg-refresh-v16'
 
 # Manual CORS headers
 @app.after_request
@@ -332,8 +332,8 @@ def load_precomputed_model(league, teams):
         'model': model,
         'df': pd.DataFrame(columns=['Date', 'HomeTeam', 'AwayTeam', 'FTHG', 'FTAG', 'FTR', 'SeasonKey']),
         'teams': list(teams),
-        'team_stats': {},
-        'standings': [],
+        'team_stats': {team: params.get('team_stats', {}).get(team, {}) for team in teams},
+        'standings': [row for row in params.get('standings', []) if row.get('team') in teams],
         'match_count': int(params.get('match_count') or 0),
         'data_latest_match_date': params.get('latest_match_date'),
     }

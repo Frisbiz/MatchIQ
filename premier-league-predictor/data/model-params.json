@@ -74,7 +74,573 @@
       "Wolves": 1.0212149798713106
     },
     "match_count": 3769,
-    "latest_match_date": "2026-05-04"
+    "latest_match_date": "2026-05-04",
+    "team_stats": {
+      "Arsenal": {
+        "home_gs": 2.1481481481481484,
+        "home_gc": 0.9682539682539683,
+        "away_gs": 1.622340425531915,
+        "away_gc": 1.2234042553191489,
+        "home_win_rate": 0.6772486772486772,
+        "away_win_rate": 0.4574468085106383,
+        "form_points": 20.0,
+        "goals_last5": 8.0,
+        "home_cs_rate": 0.36507936507936506,
+        "away_cs_rate": 0.32978723404255317,
+        "matches_played": 377
+      },
+      "Aston Villa": {
+        "home_gs": 1.6893939393939394,
+        "home_gc": 1.3257575757575757,
+        "away_gs": 1.2061068702290076,
+        "away_gc": 1.4809160305343512,
+        "home_win_rate": 0.5,
+        "away_win_rate": 0.3511450381679389,
+        "form_points": 11.0,
+        "goals_last5": 8.0,
+        "home_cs_rate": 0.30303030303030304,
+        "away_cs_rate": 0.2366412213740458,
+        "matches_played": 263
+      },
+      "Bournemouth": {
+        "home_gs": 1.3973509933774835,
+        "home_gc": 1.3576158940397351,
+        "away_gs": 1.26,
+        "away_gc": 1.96,
+        "home_win_rate": 0.37748344370860926,
+        "away_win_rate": 0.26,
+        "form_points": 18.0,
+        "goals_last5": 11.0,
+        "home_cs_rate": 0.271523178807947,
+        "away_cs_rate": 0.17333333333333334,
+        "matches_played": 301
+      },
+      "Brentford": {
+        "home_gs": 1.6702127659574468,
+        "home_gc": 1.351063829787234,
+        "away_gs": 1.3225806451612903,
+        "away_gc": 1.5376344086021505,
+        "home_win_rate": 0.4148936170212766,
+        "away_win_rate": 0.3118279569892473,
+        "form_points": 12.0,
+        "goals_last5": 6.0,
+        "home_cs_rate": 0.2553191489361702,
+        "away_cs_rate": 0.23655913978494625,
+        "matches_played": 187
+      },
+      "Brighton": {
+        "home_gs": 1.349112426035503,
+        "home_gc": 1.2781065088757397,
+        "away_gs": 1.2,
+        "away_gc": 1.5176470588235293,
+        "home_win_rate": 0.3609467455621302,
+        "away_win_rate": 0.27058823529411763,
+        "form_points": 19.0,
+        "goals_last5": 10.0,
+        "home_cs_rate": 0.27218934911242604,
+        "away_cs_rate": 0.2235294117647059,
+        "matches_played": 339
+      },
+      "Burnley": {
+        "home_gs": 1.04,
+        "home_gc": 1.42,
+        "away_gs": 0.9933774834437086,
+        "away_gc": 1.695364238410596,
+        "home_win_rate": 0.3,
+        "away_win_rate": 0.2119205298013245,
+        "form_points": 5.0,
+        "goals_last5": 3.0,
+        "home_cs_rate": 0.26666666666666666,
+        "away_cs_rate": 0.2052980132450331,
+        "matches_played": 301
+      },
+      "Cardiff": {
+        "home_gs": 1.105263157894737,
+        "home_gc": 2.0,
+        "away_gs": 0.6842105263157895,
+        "away_gc": 1.631578947368421,
+        "home_win_rate": 0.3157894736842105,
+        "away_win_rate": 0.21052631578947367,
+        "form_points": 9.0,
+        "goals_last5": 6.0,
+        "home_cs_rate": 0.2631578947368421,
+        "away_cs_rate": 0.2631578947368421,
+        "matches_played": 38
+      },
+      "Chelsea": {
+        "home_gs": 1.8253968253968254,
+        "home_gc": 0.9947089947089947,
+        "away_gs": 1.601063829787234,
+        "away_gc": 1.3085106382978724,
+        "home_win_rate": 0.5502645502645502,
+        "away_win_rate": 0.4787234042553192,
+        "form_points": 5.0,
+        "goals_last5": 1.0,
+        "home_cs_rate": 0.3968253968253968,
+        "away_cs_rate": 0.2872340425531915,
+        "matches_played": 377
+      },
+      "Crystal Palace": {
+        "home_gs": 1.2340425531914894,
+        "home_gc": 1.2659574468085106,
+        "away_gs": 1.1702127659574468,
+        "away_gc": 1.5691489361702127,
+        "home_win_rate": 0.32978723404255317,
+        "away_win_rate": 0.30319148936170215,
+        "form_points": 14.0,
+        "goals_last5": 3.0,
+        "home_cs_rate": 0.31382978723404253,
+        "away_cs_rate": 0.21808510638297873,
+        "matches_played": 376
+      },
+      "Everton": {
+        "home_gs": 1.3968253968253967,
+        "home_gc": 1.1904761904761905,
+        "away_gs": 1.0106382978723405,
+        "away_gc": 1.5372340425531914,
+        "home_win_rate": 0.42857142857142855,
+        "away_win_rate": 0.26595744680851063,
+        "form_points": 11.0,
+        "goals_last5": 10.0,
+        "home_cs_rate": 0.3544973544973545,
+        "away_cs_rate": 0.23404255319148937,
+        "matches_played": 377
+      },
+      "Fulham": {
+        "home_gs": 1.3214285714285714,
+        "home_gc": 1.4821428571428572,
+        "away_gs": 1.0707964601769913,
+        "away_gc": 1.6371681415929205,
+        "home_win_rate": 0.375,
+        "away_win_rate": 0.23893805309734514,
+        "form_points": 14.0,
+        "goals_last5": 4.0,
+        "home_cs_rate": 0.21428571428571427,
+        "away_cs_rate": 0.19469026548672566,
+        "matches_played": 225
+      },
+      "Huddersfield": {
+        "home_gs": 0.6842105263157895,
+        "home_gc": 1.4736842105263157,
+        "away_gs": 0.631578947368421,
+        "away_gc": 2.0526315789473686,
+        "home_win_rate": 0.21052631578947367,
+        "away_win_rate": 0.10526315789473684,
+        "form_points": 2.0,
+        "goals_last5": 3.0,
+        "home_cs_rate": 0.2631578947368421,
+        "away_cs_rate": 0.13157894736842105,
+        "matches_played": 76
+      },
+      "Hull": {
+        "home_gs": 1.4736842105263157,
+        "home_gc": 1.8421052631578947,
+        "away_gs": 0.47368421052631576,
+        "away_gc": 2.3684210526315788,
+        "home_win_rate": 0.42105263157894735,
+        "away_win_rate": 0.05263157894736842,
+        "form_points": 10.0,
+        "goals_last5": 3.0,
+        "home_cs_rate": 0.10526315789473684,
+        "away_cs_rate": 0.15789473684210525,
+        "matches_played": 38
+      },
+      "Ipswich": {
+        "home_gs": 0.7368421052631579,
+        "home_gc": 2.3157894736842106,
+        "away_gs": 1.1578947368421053,
+        "away_gc": 2.0,
+        "home_win_rate": 0.05263157894736842,
+        "away_win_rate": 0.15789473684210525,
+        "form_points": 5.0,
+        "goals_last5": 3.0,
+        "home_cs_rate": 0.05263157894736842,
+        "away_cs_rate": 0.05263157894736842,
+        "matches_played": 38
+      },
+      "Leeds": {
+        "home_gs": 1.3466666666666667,
+        "home_gc": 1.56,
+        "away_gs": 1.3243243243243243,
+        "away_gc": 1.972972972972973,
+        "home_win_rate": 0.3333333333333333,
+        "away_win_rate": 0.25675675675675674,
+        "form_points": 14.0,
+        "goals_last5": 10.0,
+        "home_cs_rate": 0.22666666666666666,
+        "away_cs_rate": 0.16216216216216217,
+        "matches_played": 149
+      },
+      "Leicester": {
+        "home_gs": 1.4539473684210527,
+        "home_gc": 1.3026315789473684,
+        "away_gs": 1.4144736842105263,
+        "away_gc": 1.7828947368421053,
+        "home_win_rate": 0.42105263157894735,
+        "away_win_rate": 0.27631578947368424,
+        "form_points": 8.0,
+        "goals_last5": 6.0,
+        "home_cs_rate": 0.29605263157894735,
+        "away_cs_rate": 0.15789473684210525,
+        "matches_played": 304
+      },
+      "Liverpool": {
+        "home_gs": 2.3617021276595747,
+        "home_gc": 0.8031914893617021,
+        "away_gs": 1.9047619047619047,
+        "away_gc": 1.2063492063492063,
+        "home_win_rate": 0.723404255319149,
+        "away_win_rate": 0.5396825396825397,
+        "form_points": 19.0,
+        "goals_last5": 10.0,
+        "home_cs_rate": 0.425531914893617,
+        "away_cs_rate": 0.3492063492063492,
+        "matches_played": 377
+      },
+      "Luton": {
+        "home_gs": 1.4736842105263157,
+        "home_gc": 1.9473684210526316,
+        "away_gs": 1.263157894736842,
+        "away_gc": 2.526315789473684,
+        "home_win_rate": 0.21052631578947367,
+        "away_win_rate": 0.10526315789473684,
+        "form_points": 5.0,
+        "goals_last5": 6.0,
+        "home_cs_rate": 0.10526315789473684,
+        "away_cs_rate": 0.0,
+        "matches_played": 38
+      },
+      "Man City": {
+        "home_gs": 2.700534759358289,
+        "home_gc": 0.8342245989304813,
+        "away_gs": 2.068783068783069,
+        "away_gc": 0.8941798941798942,
+        "home_win_rate": 0.7700534759358288,
+        "away_win_rate": 0.6507936507936508,
+        "form_points": 24.0,
+        "goals_last5": 10.0,
+        "home_cs_rate": 0.41711229946524064,
+        "away_cs_rate": 0.43386243386243384,
+        "matches_played": 376
+      },
+      "Man United": {
+        "home_gs": 1.7619047619047619,
+        "home_gc": 1.0634920634920635,
+        "away_gs": 1.446808510638298,
+        "away_gc": 1.3297872340425532,
+        "home_win_rate": 0.5608465608465608,
+        "away_win_rate": 0.4308510638297872,
+        "form_points": 20.0,
+        "goals_last5": 9.0,
+        "home_cs_rate": 0.3386243386243386,
+        "away_cs_rate": 0.2925531914893617,
+        "matches_played": 377
+      },
+      "Middlesbrough": {
+        "home_gs": 0.8947368421052632,
+        "home_gc": 1.2105263157894737,
+        "away_gs": 0.5263157894736842,
+        "away_gc": 1.5789473684210527,
+        "home_win_rate": 0.21052631578947367,
+        "away_win_rate": 0.05263157894736842,
+        "form_points": 6.0,
+        "goals_last5": 4.0,
+        "home_cs_rate": 0.3684210526315789,
+        "away_cs_rate": 0.21052631578947367,
+        "matches_played": 38
+      },
+      "Newcastle": {
+        "home_gs": 1.6176470588235294,
+        "home_gc": 1.223529411764706,
+        "away_gs": 1.2071005917159763,
+        "away_gc": 1.5502958579881656,
+        "home_win_rate": 0.47058823529411764,
+        "away_win_rate": 0.2958579881656805,
+        "form_points": 12.0,
+        "goals_last5": 6.0,
+        "home_cs_rate": 0.3176470588235294,
+        "away_cs_rate": 0.21893491124260356,
+        "matches_played": 339
+      },
+      "Norwich": {
+        "home_gs": 0.8157894736842105,
+        "home_gc": 2.1052631578947367,
+        "away_gs": 0.47368421052631576,
+        "away_gc": 2.0789473684210527,
+        "home_win_rate": 0.18421052631578946,
+        "away_win_rate": 0.07894736842105263,
+        "form_points": 5.0,
+        "goals_last5": 1.0,
+        "home_cs_rate": 0.13157894736842105,
+        "away_cs_rate": 0.15789473684210525,
+        "matches_played": 76
+      },
+      "Nottingham Forest": {
+        "home_gs": 1.3243243243243243,
+        "home_gc": 1.2297297297297298,
+        "away_gs": 1.2133333333333334,
+        "away_gc": 1.8133333333333332,
+        "home_win_rate": 0.35135135135135137,
+        "away_win_rate": 0.29333333333333333,
+        "form_points": 16.0,
+        "goals_last5": 16.0,
+        "home_cs_rate": 0.2702702702702703,
+        "away_cs_rate": 0.18666666666666668,
+        "matches_played": 149
+      },
+      "Sheffield United": {
+        "home_gs": 0.9649122807017544,
+        "home_gc": 1.736842105263158,
+        "away_gs": 0.6842105263157895,
+        "away_gc": 1.8771929824561404,
+        "home_win_rate": 0.2982456140350877,
+        "away_win_rate": 0.12280701754385964,
+        "form_points": 2.0,
+        "goals_last5": 4.0,
+        "home_cs_rate": 0.22807017543859648,
+        "away_cs_rate": 0.10526315789473684,
+        "matches_played": 114
+      },
+      "Southampton": {
+        "home_gs": 1.105263157894737,
+        "home_gc": 1.611842105263158,
+        "away_gs": 1.0394736842105263,
+        "away_gc": 1.8289473684210527,
+        "home_win_rate": 0.25,
+        "away_win_rate": 0.2236842105263158,
+        "form_points": 3.0,
+        "goals_last5": 2.0,
+        "home_cs_rate": 0.21052631578947367,
+        "away_cs_rate": 0.19736842105263158,
+        "matches_played": 304
+      },
+      "Stoke": {
+        "home_gs": 1.1578947368421053,
+        "home_gc": 1.4210526315789473,
+        "away_gs": 0.8421052631578947,
+        "away_gc": 1.8421052631578947,
+        "home_win_rate": 0.3157894736842105,
+        "away_win_rate": 0.15789473684210525,
+        "form_points": 7.0,
+        "goals_last5": 5.0,
+        "home_cs_rate": 0.2631578947368421,
+        "away_cs_rate": 0.18421052631578946,
+        "matches_played": 76
+      },
+      "Sunderland": {
+        "home_gs": 1.0833333333333333,
+        "home_gc": 1.4722222222222223,
+        "away_gs": 0.7297297297297297,
+        "away_gc": 1.6756756756756757,
+        "home_win_rate": 0.3055555555555556,
+        "away_win_rate": 0.1891891891891892,
+        "form_points": 11.0,
+        "goals_last5": 7.0,
+        "home_cs_rate": 0.2777777777777778,
+        "away_cs_rate": 0.16216216216216217,
+        "matches_played": 73
+      },
+      "Swansea": {
+        "home_gs": 1.1578947368421053,
+        "home_gc": 1.5263157894736843,
+        "away_gs": 0.7631578947368421,
+        "away_gc": 1.7894736842105263,
+        "home_win_rate": 0.3684210526315789,
+        "away_win_rate": 0.15789473684210525,
+        "form_points": 6.0,
+        "goals_last5": 1.0,
+        "home_cs_rate": 0.2894736842105263,
+        "away_cs_rate": 0.15789473684210525,
+        "matches_played": 76
+      },
+      "Tottenham": {
+        "home_gs": 1.9148936170212767,
+        "home_gc": 1.1382978723404256,
+        "away_gs": 1.6825396825396826,
+        "away_gc": 1.3862433862433863,
+        "home_win_rate": 0.5851063829787234,
+        "away_win_rate": 0.4021164021164021,
+        "form_points": 8.0,
+        "goals_last5": 5.0,
+        "home_cs_rate": 0.32978723404255317,
+        "away_cs_rate": 0.2698412698412698,
+        "matches_played": 377
+      },
+      "Watford": {
+        "home_gs": 1.231578947368421,
+        "home_gc": 1.694736842105263,
+        "away_gs": 0.9368421052631579,
+        "away_gc": 1.8,
+        "home_win_rate": 0.3263157894736842,
+        "away_win_rate": 0.2,
+        "form_points": 4.0,
+        "goals_last5": 3.0,
+        "home_cs_rate": 0.23157894736842105,
+        "away_cs_rate": 0.14736842105263157,
+        "matches_played": 190
+      },
+      "West Brom": {
+        "home_gs": 1.105263157894737,
+        "home_gc": 1.5789473684210527,
+        "away_gs": 0.8070175438596491,
+        "away_gc": 1.631578947368421,
+        "home_win_rate": 0.2631578947368421,
+        "away_win_rate": 0.14035087719298245,
+        "form_points": 8.0,
+        "goals_last5": 5.0,
+        "home_cs_rate": 0.2631578947368421,
+        "away_cs_rate": 0.12280701754385964,
+        "matches_played": 114
+      },
+      "West Ham": {
+        "home_gs": 1.4574468085106382,
+        "home_gc": 1.4893617021276595,
+        "away_gs": 1.2380952380952381,
+        "away_gc": 1.687830687830688,
+        "home_win_rate": 0.3882978723404255,
+        "away_win_rate": 0.2857142857142857,
+        "form_points": 13.0,
+        "goals_last5": 6.0,
+        "home_cs_rate": 0.24468085106382978,
+        "away_cs_rate": 0.17989417989417988,
+        "matches_played": 377
+      },
+      "Wolves": {
+        "home_gs": 1.2317880794701987,
+        "home_gc": 1.3576158940397351,
+        "away_gs": 0.9733333333333334,
+        "away_gc": 1.54,
+        "home_win_rate": 0.3841059602649007,
+        "away_win_rate": 0.26,
+        "form_points": 10.0,
+        "goals_last5": 3.0,
+        "home_cs_rate": 0.2980132450331126,
+        "away_cs_rate": 0.17333333333333334,
+        "matches_played": 301
+      }
+    },
+    "standings": [
+      {
+        "team": "Man City",
+        "points": 88.6,
+        "gd": 26.8,
+        "gf": 92.4
+      },
+      {
+        "team": "Liverpool",
+        "points": 79.9,
+        "gd": 19.9,
+        "gf": 82.7
+      },
+      {
+        "team": "Arsenal",
+        "points": 72.2,
+        "gd": 13.9,
+        "gf": 73.1
+      },
+      {
+        "team": "Tottenham",
+        "points": 67.1,
+        "gd": 9.4,
+        "gf": 69.7
+      },
+      {
+        "team": "Chelsea",
+        "points": 67.0,
+        "gd": 9.9,
+        "gf": 66.4
+      },
+      {
+        "team": "Man United",
+        "points": 63.5,
+        "gd": 7.2,
+        "gf": 62.2
+      },
+      {
+        "team": "Brentford",
+        "points": 56.5,
+        "gd": 0.9,
+        "gf": 58.1
+      },
+      {
+        "team": "Aston Villa",
+        "points": 56.0,
+        "gd": 0.8,
+        "gf": 56.2
+      },
+      {
+        "team": "Newcastle",
+        "points": 55.4,
+        "gd": 0.5,
+        "gf": 54.8
+      },
+      {
+        "team": "Leicester",
+        "points": 53.2,
+        "gd": -1.9,
+        "gf": 55.6
+      },
+      {
+        "team": "Brighton",
+        "points": 51.8,
+        "gd": -2.2,
+        "gf": 49.4
+      },
+      {
+        "team": "Everton",
+        "points": 50.7,
+        "gd": -2.8,
+        "gf": 46.7
+      },
+      {
+        "team": "West Ham",
+        "points": 50.2,
+        "gd": -4.3,
+        "gf": 52.2
+      },
+      {
+        "team": "Crystal Palace",
+        "points": 49.7,
+        "gd": -3.8,
+        "gf": 46.6
+      },
+      {
+        "team": "Nottingham Forest",
+        "points": 49.4,
+        "gd": -4.5,
+        "gf": 49.2
+      },
+      {
+        "team": "Bournemouth",
+        "points": 48.6,
+        "gd": -5.8,
+        "gf": 51.5
+      },
+      {
+        "team": "Fulham",
+        "points": 47.0,
+        "gd": -6.4,
+        "gf": 46.4
+      },
+      {
+        "team": "Leeds",
+        "points": 46.8,
+        "gd": -7.6,
+        "gf": 51.8
+      },
+      {
+        "team": "Wolves",
+        "points": 46.7,
+        "gd": -6.1,
+        "gf": 42.8
+      },
+      {
+        "team": "Burnley",
+        "points": 42.6,
+        "gd": -9.5,
+        "gf": 39.4
+      }
+    ]
   },
   "La Liga": {
     "global_avg": 1.3090425531914893,
@@ -145,7 +711,534 @@
       "Villarreal": 0.9345794392523364
     },
     "match_count": 3760,
-    "latest_match_date": "2026-05-04"
+    "latest_match_date": "2026-05-04",
+    "team_stats": {
+      "Alaves": {
+        "home_gs": 1.047337278106509,
+        "home_gc": 1.106508875739645,
+        "away_gs": 0.9349112426035503,
+        "away_gc": 1.680473372781065,
+        "home_win_rate": 0.378698224852071,
+        "away_win_rate": 0.21301775147928995,
+        "form_points": 10.0,
+        "goals_last5": 10.0,
+        "home_cs_rate": 0.3076923076923077,
+        "away_cs_rate": 0.15976331360946747,
+        "matches_played": 338
+      },
+      "Almeria": {
+        "home_gs": 1.3421052631578947,
+        "home_gc": 1.5263157894736843,
+        "away_gs": 1.0789473684210527,
+        "away_gc": 2.1578947368421053,
+        "home_win_rate": 0.2894736842105263,
+        "away_win_rate": 0.07894736842105263,
+        "form_points": 11.0,
+        "goals_last5": 11.0,
+        "home_cs_rate": 0.21052631578947367,
+        "away_cs_rate": 0.05263157894736842,
+        "matches_played": 76
+      },
+      "Ath Bilbao": {
+        "home_gs": 1.4734042553191489,
+        "home_gc": 0.898936170212766,
+        "away_gs": 1.0106382978723405,
+        "away_gc": 1.2925531914893618,
+        "home_win_rate": 0.5053191489361702,
+        "away_win_rate": 0.26595744680851063,
+        "form_points": 13.0,
+        "goals_last5": 8.0,
+        "home_cs_rate": 0.3617021276595745,
+        "away_cs_rate": 0.25,
+        "matches_played": 376
+      },
+      "Ath Madrid": {
+        "home_gs": 1.952127659574468,
+        "home_gc": 0.7340425531914894,
+        "away_gs": 1.4095744680851063,
+        "away_gc": 0.9468085106382979,
+        "home_win_rate": 0.7287234042553191,
+        "away_win_rate": 0.44680851063829785,
+        "form_points": 18.0,
+        "goals_last5": 9.0,
+        "home_cs_rate": 0.4946808510638298,
+        "away_cs_rate": 0.3882978723404255,
+        "matches_played": 376
+      },
+      "Barcelona": {
+        "home_gs": 2.5797872340425534,
+        "home_gc": 0.8191489361702128,
+        "away_gs": 2.122340425531915,
+        "away_gc": 1.0425531914893618,
+        "home_win_rate": 0.776595744680851,
+        "away_win_rate": 0.6223404255319149,
+        "form_points": 30.0,
+        "goals_last5": 11.0,
+        "home_cs_rate": 0.46808510638297873,
+        "away_cs_rate": 0.3776595744680851,
+        "matches_played": 376
+      },
+      "Betis": {
+        "home_gs": 1.553191489361702,
+        "home_gc": 1.202127659574468,
+        "away_gs": 1.148936170212766,
+        "away_gc": 1.4787234042553192,
+        "home_win_rate": 0.46808510638297873,
+        "away_win_rate": 0.3191489361702128,
+        "form_points": 12.0,
+        "goals_last5": 8.0,
+        "home_cs_rate": 0.324468085106383,
+        "away_cs_rate": 0.2553191489361702,
+        "matches_played": 376
+      },
+      "Cadiz": {
+        "home_gs": 0.9342105263157895,
+        "home_gc": 1.263157894736842,
+        "away_gs": 0.7368421052631579,
+        "away_gc": 1.5921052631578947,
+        "home_win_rate": 0.2631578947368421,
+        "away_win_rate": 0.19736842105263158,
+        "form_points": 11.0,
+        "goals_last5": 3.0,
+        "home_cs_rate": 0.32894736842105265,
+        "away_cs_rate": 0.27631578947368424,
+        "matches_played": 152
+      },
+      "Celta": {
+        "home_gs": 1.4787234042553192,
+        "home_gc": 1.2925531914893618,
+        "away_gs": 1.1595744680851063,
+        "away_gc": 1.6382978723404256,
+        "home_win_rate": 0.39893617021276595,
+        "away_win_rate": 0.22872340425531915,
+        "form_points": 13.0,
+        "goals_last5": 7.0,
+        "home_cs_rate": 0.25,
+        "away_cs_rate": 0.22340425531914893,
+        "matches_played": 376
+      },
+      "Eibar": {
+        "home_gs": 1.2947368421052632,
+        "home_gc": 1.1263157894736842,
+        "away_gs": 0.9578947368421052,
+        "away_gc": 1.6,
+        "home_win_rate": 0.3894736842105263,
+        "away_win_rate": 0.21052631578947367,
+        "form_points": 7.0,
+        "goals_last5": 6.0,
+        "home_cs_rate": 0.3368421052631579,
+        "away_cs_rate": 0.18947368421052632,
+        "matches_played": 190
+      },
+      "Elche": {
+        "home_gs": 1.1891891891891893,
+        "home_gc": 1.2297297297297298,
+        "away_gs": 0.8243243243243243,
+        "away_gc": 1.837837837837838,
+        "home_win_rate": 0.3108108108108108,
+        "away_win_rate": 0.13513513513513514,
+        "form_points": 13.0,
+        "goals_last5": 7.0,
+        "home_cs_rate": 0.24324324324324326,
+        "away_cs_rate": 0.10810810810810811,
+        "matches_played": 148
+      },
+      "Espanol": {
+        "home_gs": 1.2266666666666666,
+        "home_gc": 1.2666666666666666,
+        "away_gs": 0.9666666666666667,
+        "away_gc": 1.56,
+        "home_win_rate": 0.37333333333333335,
+        "away_win_rate": 0.19333333333333333,
+        "form_points": 4.0,
+        "goals_last5": 1.0,
+        "home_cs_rate": 0.2733333333333333,
+        "away_cs_rate": 0.20666666666666667,
+        "matches_played": 300
+      },
+      "Getafe": {
+        "home_gs": 1.0946745562130178,
+        "home_gc": 0.8875739644970414,
+        "away_gs": 0.8698224852071006,
+        "away_gc": 1.2603550295857988,
+        "home_win_rate": 0.3905325443786982,
+        "away_win_rate": 0.23076923076923078,
+        "form_points": 15.0,
+        "goals_last5": 3.0,
+        "home_cs_rate": 0.41420118343195267,
+        "away_cs_rate": 0.2485207100591716,
+        "matches_played": 338
+      },
+      "Girona": {
+        "home_gs": 1.5803571428571428,
+        "home_gc": 1.3482142857142858,
+        "away_gs": 1.1875,
+        "away_gc": 1.5446428571428572,
+        "home_win_rate": 0.4375,
+        "away_win_rate": 0.2857142857142857,
+        "form_points": 9.0,
+        "goals_last5": 5.0,
+        "home_cs_rate": 0.26785714285714285,
+        "away_cs_rate": 0.17857142857142858,
+        "matches_played": 224
+      },
+      "Granada": {
+        "home_gs": 1.2,
+        "home_gc": 1.4105263157894736,
+        "away_gs": 1.0210526315789474,
+        "away_gc": 2.0842105263157893,
+        "home_win_rate": 0.3368421052631579,
+        "away_win_rate": 0.1368421052631579,
+        "form_points": 7.0,
+        "goals_last5": 2.0,
+        "home_cs_rate": 0.25263157894736843,
+        "away_cs_rate": 0.12631578947368421,
+        "matches_played": 190
+      },
+      "Huesca": {
+        "home_gs": 1.0789473684210527,
+        "home_gc": 1.3421052631578947,
+        "away_gs": 0.9473684210526315,
+        "away_gc": 1.763157894736842,
+        "home_win_rate": 0.2631578947368421,
+        "away_win_rate": 0.10526315789473684,
+        "form_points": 13.0,
+        "goals_last5": 3.0,
+        "home_cs_rate": 0.2631578947368421,
+        "away_cs_rate": 0.13157894736842105,
+        "matches_played": 76
+      },
+      "La Coruna": {
+        "home_gs": 1.2894736842105263,
+        "home_gc": 1.4736842105263157,
+        "away_gs": 0.8421052631578947,
+        "away_gc": 2.1315789473684212,
+        "home_win_rate": 0.2894736842105263,
+        "away_win_rate": 0.07894736842105263,
+        "form_points": 10.0,
+        "goals_last5": 6.0,
+        "home_cs_rate": 0.23684210526315788,
+        "away_cs_rate": 0.15789473684210525,
+        "matches_played": 76
+      },
+      "Las Palmas": {
+        "home_gs": 1.1710526315789473,
+        "home_gc": 1.4736842105263157,
+        "away_gs": 0.8026315789473685,
+        "away_gc": 1.894736842105263,
+        "home_win_rate": 0.3026315789473684,
+        "away_win_rate": 0.13157894736842105,
+        "form_points": 7.0,
+        "goals_last5": 2.0,
+        "home_cs_rate": 0.21052631578947367,
+        "away_cs_rate": 0.07894736842105263,
+        "matches_played": 152
+      },
+      "Leganes": {
+        "home_gs": 1.0526315789473684,
+        "home_gc": 1.168421052631579,
+        "away_gs": 0.8,
+        "away_gc": 1.5263157894736843,
+        "home_win_rate": 0.3473684210526316,
+        "away_win_rate": 0.15789473684210525,
+        "form_points": 13.0,
+        "goals_last5": 9.0,
+        "home_cs_rate": 0.37894736842105264,
+        "away_cs_rate": 0.21052631578947367,
+        "matches_played": 190
+      },
+      "Levante": {
+        "home_gs": 1.4464285714285714,
+        "home_gc": 1.4910714285714286,
+        "away_gs": 1.0982142857142858,
+        "away_gc": 1.7678571428571428,
+        "home_win_rate": 0.33035714285714285,
+        "away_win_rate": 0.21428571428571427,
+        "form_points": 15.0,
+        "goals_last5": 4.0,
+        "home_cs_rate": 0.23214285714285715,
+        "away_cs_rate": 0.14285714285714285,
+        "matches_played": 224
+      },
+      "Malaga": {
+        "home_gs": 1.2105263157894737,
+        "home_gc": 1.368421052631579,
+        "away_gs": 0.7105263157894737,
+        "away_gc": 1.6842105263157894,
+        "home_win_rate": 0.3684210526315789,
+        "away_win_rate": 0.07894736842105263,
+        "form_points": 7.0,
+        "goals_last5": 4.0,
+        "home_cs_rate": 0.21052631578947367,
+        "away_cs_rate": 0.15789473684210525,
+        "matches_played": 76
+      },
+      "Mallorca": {
+        "home_gs": 1.1696428571428572,
+        "home_gc": 1.0357142857142858,
+        "away_gs": 0.8214285714285714,
+        "away_gc": 1.7321428571428572,
+        "home_win_rate": 0.4107142857142857,
+        "away_win_rate": 0.16071428571428573,
+        "form_points": 14.0,
+        "goals_last5": 8.0,
+        "home_cs_rate": 0.3125,
+        "away_cs_rate": 0.14285714285714285,
+        "matches_played": 224
+      },
+      "Osasuna": {
+        "home_gs": 1.28,
+        "home_gc": 1.38,
+        "away_gs": 0.92,
+        "away_gc": 1.5466666666666666,
+        "home_win_rate": 0.38,
+        "away_win_rate": 0.22,
+        "form_points": 12.0,
+        "goals_last5": 6.0,
+        "home_cs_rate": 0.28,
+        "away_cs_rate": 0.20666666666666667,
+        "matches_played": 300
+      },
+      "Oviedo": {
+        "home_gs": 0.5294117647058824,
+        "home_gc": 1.0,
+        "away_gs": 1.0,
+        "away_gc": 2.176470588235294,
+        "home_win_rate": 0.23529411764705882,
+        "away_win_rate": 0.11764705882352941,
+        "form_points": 11.0,
+        "goals_last5": 6.0,
+        "home_cs_rate": 0.47058823529411764,
+        "away_cs_rate": 0.058823529411764705,
+        "matches_played": 34
+      },
+      "Real Madrid": {
+        "home_gs": 2.271276595744681,
+        "home_gc": 0.7978723404255319,
+        "away_gs": 1.9308510638297873,
+        "away_gc": 1.0425531914893618,
+        "home_win_rate": 0.7393617021276596,
+        "away_win_rate": 0.601063829787234,
+        "form_points": 17.0,
+        "goals_last5": 7.0,
+        "home_cs_rate": 0.44148936170212766,
+        "away_cs_rate": 0.32978723404255317,
+        "matches_played": 376
+      },
+      "Sevilla": {
+        "home_gs": 1.5319148936170213,
+        "home_gc": 1.053191489361702,
+        "away_gs": 1.2234042553191489,
+        "away_gc": 1.4414893617021276,
+        "home_win_rate": 0.5212765957446809,
+        "away_win_rate": 0.324468085106383,
+        "form_points": 11.0,
+        "goals_last5": 4.0,
+        "home_cs_rate": 0.3670212765957447,
+        "away_cs_rate": 0.28191489361702127,
+        "matches_played": 376
+      },
+      "Sociedad": {
+        "home_gs": 1.5265957446808511,
+        "home_gc": 1.0851063829787233,
+        "away_gs": 1.2074468085106382,
+        "away_gc": 1.3297872340425532,
+        "home_win_rate": 0.4787234042553192,
+        "away_win_rate": 0.35638297872340424,
+        "form_points": 12.0,
+        "goals_last5": 8.0,
+        "home_cs_rate": 0.3404255319148936,
+        "away_cs_rate": 0.2872340425531915,
+        "matches_played": 376
+      },
+      "Sp Gijon": {
+        "home_gs": 1.368421052631579,
+        "home_gc": 2.0,
+        "away_gs": 0.8421052631578947,
+        "away_gc": 1.7894736842105263,
+        "home_win_rate": 0.2631578947368421,
+        "away_win_rate": 0.10526315789473684,
+        "form_points": 10.0,
+        "goals_last5": 6.0,
+        "home_cs_rate": 0.05263157894736842,
+        "away_cs_rate": 0.3157894736842105,
+        "matches_played": 38
+      },
+      "Valencia": {
+        "home_gs": 1.4734042553191489,
+        "home_gc": 1.047872340425532,
+        "away_gs": 1.074468085106383,
+        "away_gc": 1.5638297872340425,
+        "home_win_rate": 0.4521276595744681,
+        "away_win_rate": 0.2393617021276596,
+        "form_points": 13.0,
+        "goals_last5": 5.0,
+        "home_cs_rate": 0.32978723404255317,
+        "away_cs_rate": 0.17553191489361702,
+        "matches_played": 376
+      },
+      "Valladolid": {
+        "home_gs": 0.8947368421052632,
+        "home_gc": 1.3473684210526315,
+        "away_gs": 0.7578947368421053,
+        "away_gc": 1.8526315789473684,
+        "home_win_rate": 0.25263157894736843,
+        "away_win_rate": 0.15789473684210525,
+        "form_points": 0.0,
+        "goals_last5": 2.0,
+        "home_cs_rate": 0.2631578947368421,
+        "away_cs_rate": 0.1368421052631579,
+        "matches_played": 190
+      },
+      "Vallecano": {
+        "home_gs": 1.2678571428571428,
+        "home_gc": 1.2678571428571428,
+        "away_gs": 0.7857142857142857,
+        "away_gc": 1.4732142857142858,
+        "home_win_rate": 0.3392857142857143,
+        "away_win_rate": 0.22321428571428573,
+        "form_points": 16.0,
+        "goals_last5": 7.0,
+        "home_cs_rate": 0.25892857142857145,
+        "away_cs_rate": 0.26785714285714285,
+        "matches_played": 224
+      },
+      "Villarreal": {
+        "home_gs": 1.9148936170212767,
+        "home_gc": 1.1914893617021276,
+        "away_gs": 1.3138297872340425,
+        "away_gc": 1.2553191489361701,
+        "home_win_rate": 0.5106382978723404,
+        "away_win_rate": 0.39361702127659576,
+        "form_points": 20.0,
+        "goals_last5": 10.0,
+        "home_cs_rate": 0.2872340425531915,
+        "away_cs_rate": 0.28191489361702127,
+        "matches_played": 376
+      }
+    },
+    "standings": [
+      {
+        "team": "Barcelona",
+        "points": 90.1,
+        "gd": 27.1,
+        "gf": 98.8
+      },
+      {
+        "team": "Real Madrid",
+        "points": 83.6,
+        "gd": 22.6,
+        "gf": 88.3
+      },
+      {
+        "team": "Ath Madrid",
+        "points": 73.9,
+        "gd": 16.1,
+        "gf": 70.6
+      },
+      {
+        "team": "Villarreal",
+        "points": 64.8,
+        "gd": 7.5,
+        "gf": 67.8
+      },
+      {
+        "team": "Sociedad",
+        "points": 58.5,
+        "gd": 3.0,
+        "gf": 57.4
+      },
+      {
+        "team": "Sevilla",
+        "points": 58.0,
+        "gd": 2.5,
+        "gf": 57.9
+      },
+      {
+        "team": "Ath Bilbao",
+        "points": 57.3,
+        "gd": 2.8,
+        "gf": 52.2
+      },
+      {
+        "team": "Betis",
+        "points": 55.5,
+        "gd": 0.2,
+        "gf": 56.8
+      },
+      {
+        "team": "Girona",
+        "points": 54.4,
+        "gd": -1.2,
+        "gf": 58.1
+      },
+      {
+        "team": "Valencia",
+        "points": 54.1,
+        "gd": -0.6,
+        "gf": 53.5
+      },
+      {
+        "team": "Celta",
+        "points": 52.3,
+        "gd": -2.8,
+        "gf": 55.4
+      },
+      {
+        "team": "Getafe",
+        "points": 50.8,
+        "gd": -1.8,
+        "gf": 41.3
+      },
+      {
+        "team": "Eibar",
+        "points": 49.1,
+        "gd": -4.5,
+        "gf": 47.3
+      },
+      {
+        "team": "Levante",
+        "points": 47.9,
+        "gd": -6.8,
+        "gf": 53.5
+      },
+      {
+        "team": "Espanol",
+        "points": 47.3,
+        "gd": -6.0,
+        "gf": 46.1
+      },
+      {
+        "team": "Osasuna",
+        "points": 46.5,
+        "gd": -6.9,
+        "gf": 46.2
+      },
+      {
+        "team": "Vallecano",
+        "points": 46.3,
+        "gd": -6.6,
+        "gf": 43.1
+      },
+      {
+        "team": "Mallorca",
+        "points": 45.2,
+        "gd": -7.4,
+        "gf": 41.8
+      },
+      {
+        "team": "Alaves",
+        "points": 44.9,
+        "gd": -7.7,
+        "gf": 41.6
+      },
+      {
+        "team": "Leganes",
+        "points": 44.0,
+        "gd": -8.0,
+        "gf": 38.9
+      }
+    ]
   },
   "Serie A": {
     "global_avg": 1.3718832891246684,
@@ -222,7 +1315,573 @@
       "Verona": 1.1357668303386752
     },
     "match_count": 3770,
-    "latest_match_date": "2026-05-04"
+    "latest_match_date": "2026-05-04",
+    "team_stats": {
+      "Atalanta": {
+        "home_gs": 1.9523809523809523,
+        "home_gc": 1.1322751322751323,
+        "away_gs": 1.824468085106383,
+        "away_gc": 1.1382978723404256,
+        "home_win_rate": 0.5291005291005291,
+        "away_win_rate": 0.5053191489361702,
+        "form_points": 13.0,
+        "goals_last5": 6.0,
+        "home_cs_rate": 0.31746031746031744,
+        "away_cs_rate": 0.31382978723404253,
+        "matches_played": 377
+      },
+      "Benevento": {
+        "home_gs": 1.105263157894737,
+        "home_gc": 2.0789473684210527,
+        "away_gs": 0.8157894736842105,
+        "away_gc": 2.1052631578947367,
+        "home_win_rate": 0.18421052631578946,
+        "away_win_rate": 0.15789473684210525,
+        "form_points": 4.0,
+        "goals_last5": 3.0,
+        "home_cs_rate": 0.15789473684210525,
+        "away_cs_rate": 0.13157894736842105,
+        "matches_played": 76
+      },
+      "Bologna": {
+        "home_gs": 1.4074074074074074,
+        "home_gc": 1.17989417989418,
+        "away_gs": 1.1436170212765957,
+        "away_gc": 1.5797872340425532,
+        "home_win_rate": 0.4126984126984127,
+        "away_win_rate": 0.2712765957446808,
+        "form_points": 16.0,
+        "goals_last5": 4.0,
+        "home_cs_rate": 0.30687830687830686,
+        "away_cs_rate": 0.19680851063829788,
+        "matches_played": 377
+      },
+      "Brescia": {
+        "home_gs": 1.105263157894737,
+        "home_gc": 1.7894736842105263,
+        "away_gs": 0.7368421052631579,
+        "away_gc": 2.3684210526315788,
+        "home_win_rate": 0.15789473684210525,
+        "away_win_rate": 0.15789473684210525,
+        "form_points": 7.0,
+        "goals_last5": 5.0,
+        "home_cs_rate": 0.15789473684210525,
+        "away_cs_rate": 0.15789473684210525,
+        "matches_played": 38
+      },
+      "Cagliari": {
+        "home_gs": 1.331360946745562,
+        "home_gc": 1.5207100591715976,
+        "away_gs": 0.8588235294117647,
+        "away_gc": 1.7058823529411764,
+        "home_win_rate": 0.3431952662721893,
+        "away_win_rate": 0.17058823529411765,
+        "form_points": 9.0,
+        "goals_last5": 5.0,
+        "home_cs_rate": 0.1893491124260355,
+        "away_cs_rate": 0.1411764705882353,
+        "matches_played": 339
+      },
+      "Chievo": {
+        "home_gs": 1.0701754385964912,
+        "home_gc": 1.5964912280701755,
+        "away_gs": 0.7543859649122807,
+        "away_gc": 1.8245614035087718,
+        "home_win_rate": 0.24561403508771928,
+        "away_win_rate": 0.17543859649122806,
+        "form_points": 6.0,
+        "goals_last5": 1.0,
+        "home_cs_rate": 0.24561403508771928,
+        "away_cs_rate": 0.17543859649122806,
+        "matches_played": 114
+      },
+      "Como": {
+        "home_gs": 1.6756756756756757,
+        "home_gc": 1.1081081081081081,
+        "away_gs": 1.2777777777777777,
+        "away_gc": 1.0833333333333333,
+        "home_win_rate": 0.4594594594594595,
+        "away_win_rate": 0.3611111111111111,
+        "form_points": 20.0,
+        "goals_last5": 6.0,
+        "home_cs_rate": 0.35135135135135137,
+        "away_cs_rate": 0.3055555555555556,
+        "matches_played": 73
+      },
+      "Cremonese": {
+        "home_gs": 0.8055555555555556,
+        "home_gc": 1.5555555555555556,
+        "away_gs": 0.918918918918919,
+        "away_gc": 1.7837837837837838,
+        "home_win_rate": 0.16666666666666666,
+        "away_win_rate": 0.13513513513513514,
+        "form_points": 4.0,
+        "goals_last5": 2.0,
+        "home_cs_rate": 0.3055555555555556,
+        "away_cs_rate": 0.10810810810810811,
+        "matches_played": 73
+      },
+      "Crotone": {
+        "home_gs": 1.1754385964912282,
+        "home_gc": 1.4912280701754386,
+        "away_gs": 0.9122807017543859,
+        "away_gc": 2.2982456140350878,
+        "home_win_rate": 0.2982456140350877,
+        "away_win_rate": 0.12280701754385964,
+        "form_points": 8.0,
+        "goals_last5": 3.0,
+        "home_cs_rate": 0.14035087719298245,
+        "away_cs_rate": 0.07017543859649122,
+        "matches_played": 114
+      },
+      "Empoli": {
+        "home_gs": 1.087719298245614,
+        "home_gc": 1.5350877192982457,
+        "away_gs": 0.9210526315789473,
+        "away_gc": 1.6491228070175439,
+        "home_win_rate": 0.2894736842105263,
+        "away_win_rate": 0.17543859649122806,
+        "form_points": 9.0,
+        "goals_last5": 7.0,
+        "home_cs_rate": 0.22807017543859648,
+        "away_cs_rate": 0.17543859649122806,
+        "matches_played": 228
+      },
+      "Fiorentina": {
+        "home_gs": 1.5425531914893618,
+        "home_gc": 1.1329787234042554,
+        "away_gs": 1.2857142857142858,
+        "away_gc": 1.439153439153439,
+        "home_win_rate": 0.43617021276595747,
+        "away_win_rate": 0.30158730158730157,
+        "form_points": 16.0,
+        "goals_last5": 3.0,
+        "home_cs_rate": 0.3404255319148936,
+        "away_cs_rate": 0.21164021164021163,
+        "matches_played": 377
+      },
+      "Frosinone": {
+        "home_gs": 1.105263157894737,
+        "home_gc": 1.8421052631578947,
+        "away_gs": 0.8157894736842105,
+        "away_gc": 1.7894736842105263,
+        "home_win_rate": 0.21052631578947367,
+        "away_win_rate": 0.13157894736842105,
+        "form_points": 11.0,
+        "goals_last5": 4.0,
+        "home_cs_rate": 0.15789473684210525,
+        "away_cs_rate": 0.2631578947368421,
+        "matches_played": 76
+      },
+      "Genoa": {
+        "home_gs": 1.2,
+        "home_gc": 1.3529411764705883,
+        "away_gs": 0.8816568047337278,
+        "away_gc": 1.5798816568047338,
+        "home_win_rate": 0.3058823529411765,
+        "away_win_rate": 0.1893491124260355,
+        "form_points": 16.0,
+        "goals_last5": 4.0,
+        "home_cs_rate": 0.2529411764705882,
+        "away_cs_rate": 0.22485207100591717,
+        "matches_played": 339
+      },
+      "Inter": {
+        "home_gs": 2.2169312169312168,
+        "home_gc": 0.8465608465608465,
+        "away_gs": 1.8670212765957446,
+        "away_gc": 0.9840425531914894,
+        "home_win_rate": 0.6878306878306878,
+        "away_win_rate": 0.574468085106383,
+        "form_points": 21.0,
+        "goals_last5": 16.0,
+        "home_cs_rate": 0.42857142857142855,
+        "away_cs_rate": 0.3829787234042553,
+        "matches_played": 377
+      },
+      "Juventus": {
+        "home_gs": 1.9735449735449735,
+        "home_gc": 0.708994708994709,
+        "away_gs": 1.574468085106383,
+        "away_gc": 1.0319148936170213,
+        "home_win_rate": 0.708994708994709,
+        "away_win_rate": 0.526595744680851,
+        "form_points": 19.0,
+        "goals_last5": 6.0,
+        "home_cs_rate": 0.48148148148148145,
+        "away_cs_rate": 0.35638297872340424,
+        "matches_played": 377
+      },
+      "Lazio": {
+        "home_gs": 1.9042553191489362,
+        "home_gc": 1.1329787234042554,
+        "away_gs": 1.5185185185185186,
+        "away_gc": 1.2698412698412698,
+        "home_win_rate": 0.5425531914893617,
+        "away_win_rate": 0.48148148148148145,
+        "form_points": 18.0,
+        "goals_last5": 8.0,
+        "home_cs_rate": 0.32978723404255317,
+        "away_cs_rate": 0.30158730158730157,
+        "matches_played": 377
+      },
+      "Lecce": {
+        "home_gs": 0.967741935483871,
+        "home_gc": 1.5698924731182795,
+        "away_gs": 0.8297872340425532,
+        "away_gc": 1.5319148936170213,
+        "home_win_rate": 0.22580645161290322,
+        "away_win_rate": 0.2127659574468085,
+        "form_points": 8.0,
+        "goals_last5": 3.0,
+        "home_cs_rate": 0.17204301075268819,
+        "away_cs_rate": 0.19148936170212766,
+        "matches_played": 187
+      },
+      "Milan": {
+        "home_gs": 1.6436170212765957,
+        "home_gc": 0.9468085106382979,
+        "away_gs": 1.6613756613756614,
+        "away_gc": 1.2010582010582012,
+        "home_win_rate": 0.5638297872340425,
+        "away_win_rate": 0.5132275132275133,
+        "form_points": 13.0,
+        "goals_last5": 1.0,
+        "home_cs_rate": 0.4095744680851064,
+        "away_cs_rate": 0.2962962962962963,
+        "matches_played": 377
+      },
+      "Monza": {
+        "home_gs": 1.0701754385964912,
+        "home_gc": 1.3859649122807018,
+        "away_gs": 0.9473684210526315,
+        "away_gc": 1.631578947368421,
+        "home_win_rate": 0.24561403508771928,
+        "away_win_rate": 0.24561403508771928,
+        "form_points": 4.0,
+        "goals_last5": 3.0,
+        "home_cs_rate": 0.22807017543859648,
+        "away_cs_rate": 0.21052631578947367,
+        "matches_played": 114
+      },
+      "Napoli": {
+        "home_gs": 1.9787234042553192,
+        "home_gc": 0.973404255319149,
+        "away_gs": 1.783068783068783,
+        "away_gc": 0.9470899470899471,
+        "home_win_rate": 0.6329787234042553,
+        "away_win_rate": 0.5873015873015873,
+        "form_points": 20.0,
+        "goals_last5": 6.0,
+        "home_cs_rate": 0.34574468085106386,
+        "away_cs_rate": 0.3915343915343915,
+        "matches_played": 377
+      },
+      "Palermo": {
+        "home_gs": 0.6842105263157895,
+        "home_gc": 1.5789473684210527,
+        "away_gs": 1.0526315789473684,
+        "away_gc": 2.473684210526316,
+        "home_win_rate": 0.21052631578947367,
+        "away_win_rate": 0.10526315789473684,
+        "form_points": 11.0,
+        "goals_last5": 6.0,
+        "home_cs_rate": 0.21052631578947367,
+        "away_cs_rate": 0.05263157894736842,
+        "matches_played": 38
+      },
+      "Parma": {
+        "home_gs": 1.053763440860215,
+        "home_gc": 1.4838709677419355,
+        "away_gs": 1.1382978723404256,
+        "away_gc": 1.7340425531914894,
+        "home_win_rate": 0.24731182795698925,
+        "away_win_rate": 0.22340425531914893,
+        "form_points": 13.0,
+        "goals_last5": 4.0,
+        "home_cs_rate": 0.24731182795698925,
+        "away_cs_rate": 0.18085106382978725,
+        "matches_played": 187
+      },
+      "Pescara": {
+        "home_gs": 1.0,
+        "home_gc": 2.0,
+        "away_gs": 0.9473684210526315,
+        "away_gc": 2.263157894736842,
+        "home_win_rate": 0.10526315789473684,
+        "away_win_rate": 0.05263157894736842,
+        "form_points": 6.0,
+        "goals_last5": 5.0,
+        "home_cs_rate": 0.15789473684210525,
+        "away_cs_rate": 0.05263157894736842,
+        "matches_played": 38
+      },
+      "Pisa": {
+        "home_gs": 0.5,
+        "home_gc": 1.2777777777777777,
+        "away_gs": 0.9411764705882353,
+        "away_gc": 2.3529411764705883,
+        "home_win_rate": 0.1111111111111111,
+        "away_win_rate": 0.0,
+        "form_points": 3.0,
+        "goals_last5": 2.0,
+        "home_cs_rate": 0.2222222222222222,
+        "away_cs_rate": 0.058823529411764705,
+        "matches_played": 35
+      },
+      "Roma": {
+        "home_gs": 1.9153439153439153,
+        "home_gc": 0.9682539682539683,
+        "away_gs": 1.5,
+        "away_gc": 1.2127659574468086,
+        "home_win_rate": 0.6349206349206349,
+        "away_win_rate": 0.43617021276595747,
+        "form_points": 17.0,
+        "goals_last5": 12.0,
+        "home_cs_rate": 0.3862433862433862,
+        "away_cs_rate": 0.3191489361702128,
+        "matches_played": 377
+      },
+      "Salernitana": {
+        "home_gs": 1.1228070175438596,
+        "home_gc": 1.8070175438596492,
+        "away_gs": 0.8596491228070176,
+        "away_gc": 2.0701754385964914,
+        "home_win_rate": 0.19298245614035087,
+        "away_win_rate": 0.12280701754385964,
+        "form_points": 3.0,
+        "goals_last5": 6.0,
+        "home_cs_rate": 0.10526315789473684,
+        "away_cs_rate": 0.08771929824561403,
+        "matches_played": 114
+      },
+      "Sampdoria": {
+        "home_gs": 1.4285714285714286,
+        "home_gc": 1.3157894736842106,
+        "away_gs": 1.0902255639097744,
+        "away_gc": 1.8345864661654134,
+        "home_win_rate": 0.39097744360902253,
+        "away_win_rate": 0.23308270676691728,
+        "form_points": 4.0,
+        "goals_last5": 4.0,
+        "home_cs_rate": 0.2631578947368421,
+        "away_cs_rate": 0.15789473684210525,
+        "matches_played": 266
+      },
+      "Sassuolo": {
+        "home_gs": 1.4294117647058824,
+        "home_gc": 1.488235294117647,
+        "away_gs": 1.3431952662721893,
+        "away_gc": 1.7396449704142012,
+        "home_win_rate": 0.34705882352941175,
+        "away_win_rate": 0.30177514792899407,
+        "form_points": 17.0,
+        "goals_last5": 7.0,
+        "home_cs_rate": 0.2235294117647059,
+        "away_cs_rate": 0.17159763313609466,
+        "matches_played": 339
+      },
+      "Spal": {
+        "home_gs": 1.0175438596491229,
+        "home_gc": 1.6666666666666667,
+        "away_gs": 0.9122807017543859,
+        "away_gc": 1.7017543859649122,
+        "home_win_rate": 0.21052631578947367,
+        "away_win_rate": 0.21052631578947367,
+        "form_points": 2.0,
+        "goals_last5": 4.0,
+        "home_cs_rate": 0.21052631578947367,
+        "away_cs_rate": 0.14035087719298245,
+        "matches_played": 114
+      },
+      "Spezia": {
+        "home_gs": 1.1754385964912282,
+        "home_gc": 1.631578947368421,
+        "away_gs": 1.0,
+        "away_gc": 1.9649122807017543,
+        "home_win_rate": 0.24561403508771928,
+        "away_win_rate": 0.19298245614035087,
+        "form_points": 6.0,
+        "goals_last5": 3.0,
+        "home_cs_rate": 0.17543859649122806,
+        "away_cs_rate": 0.14035087719298245,
+        "matches_played": 114
+      },
+      "Torino": {
+        "home_gs": 1.351063829787234,
+        "home_gc": 1.2074468085106382,
+        "away_gs": 1.1693121693121693,
+        "away_gc": 1.4814814814814814,
+        "home_win_rate": 0.3882978723404255,
+        "away_win_rate": 0.25396825396825395,
+        "form_points": 14.0,
+        "goals_last5": 5.0,
+        "home_cs_rate": 0.30319148936170215,
+        "away_cs_rate": 0.25396825396825395,
+        "matches_played": 377
+      },
+      "Udinese": {
+        "home_gs": 1.216931216931217,
+        "home_gc": 1.2804232804232805,
+        "away_gs": 1.127659574468085,
+        "away_gc": 1.5957446808510638,
+        "home_win_rate": 0.31216931216931215,
+        "away_win_rate": 0.2712765957446808,
+        "form_points": 15.0,
+        "goals_last5": 8.0,
+        "home_cs_rate": 0.2804232804232804,
+        "away_cs_rate": 0.2127659574468085,
+        "matches_played": 377
+      },
+      "Venezia": {
+        "home_gs": 1.0,
+        "home_gc": 1.5789473684210527,
+        "away_gs": 0.7368421052631579,
+        "away_gc": 1.7105263157894737,
+        "home_win_rate": 0.21052631578947367,
+        "away_win_rate": 0.07894736842105263,
+        "form_points": 10.0,
+        "goals_last5": 5.0,
+        "home_cs_rate": 0.15789473684210525,
+        "away_cs_rate": 0.10526315789473684,
+        "matches_played": 76
+      },
+      "Verona": {
+        "home_gs": 1.1133333333333333,
+        "home_gc": 1.5133333333333334,
+        "away_gs": 0.9602649006622517,
+        "away_gc": 1.6026490066225165,
+        "home_win_rate": 0.3,
+        "away_win_rate": 0.17880794701986755,
+        "form_points": 5.0,
+        "goals_last5": 2.0,
+        "home_cs_rate": 0.21333333333333335,
+        "away_cs_rate": 0.15894039735099338,
+        "matches_played": 301
+      }
+    },
+    "standings": [
+      {
+        "team": "Inter",
+        "points": 80.4,
+        "gd": 20.5,
+        "gf": 81.9
+      },
+      {
+        "team": "Napoli",
+        "points": 75.5,
+        "gd": 16.8,
+        "gf": 75.4
+      },
+      {
+        "team": "Juventus",
+        "points": 74.4,
+        "gd": 16.5,
+        "gf": 71.1
+      },
+      {
+        "team": "Atalanta",
+        "points": 72.5,
+        "gd": 13.7,
+        "gf": 75.7
+      },
+      {
+        "team": "Roma",
+        "points": 68.7,
+        "gd": 11.3,
+        "gf": 68.5
+      },
+      {
+        "team": "Milan",
+        "points": 67.6,
+        "gd": 10.5,
+        "gf": 66.3
+      },
+      {
+        "team": "Lazio",
+        "points": 66.8,
+        "gd": 9.3,
+        "gf": 68.6
+      },
+      {
+        "team": "Como",
+        "points": 62.8,
+        "gd": 7.0,
+        "gf": 59.3
+      },
+      {
+        "team": "Fiorentina",
+        "points": 57.6,
+        "gd": 2.3,
+        "gf": 56.7
+      },
+      {
+        "team": "Torino",
+        "points": 52.6,
+        "gd": -1.5,
+        "gf": 50.5
+      },
+      {
+        "team": "Bologna",
+        "points": 52.4,
+        "gd": -1.9,
+        "gf": 51.2
+      },
+      {
+        "team": "Sassuolo",
+        "points": 51.0,
+        "gd": -4.1,
+        "gf": 55.6
+      },
+      {
+        "team": "Udinese",
+        "points": 48.7,
+        "gd": -4.8,
+        "gf": 47.0
+      },
+      {
+        "team": "Sampdoria",
+        "points": 48.4,
+        "gd": -5.8,
+        "gf": 50.5
+      },
+      {
+        "team": "Genoa",
+        "points": 44.8,
+        "gd": -7.7,
+        "gf": 41.7
+      },
+      {
+        "team": "Parma",
+        "points": 43.6,
+        "gd": -9.4,
+        "gf": 43.9
+      },
+      {
+        "team": "Cagliari",
+        "points": 43.5,
+        "gd": -9.5,
+        "gf": 43.9
+      },
+      {
+        "team": "Monza",
+        "points": 43.2,
+        "gd": -9.1,
+        "gf": 40.4
+      },
+      {
+        "team": "Verona",
+        "points": 43.1,
+        "gd": -9.5,
+        "gf": 41.6
+      },
+      {
+        "team": "Empoli",
+        "points": 41.6,
+        "gd": -10.7,
+        "gf": 40.3
+      }
+    ]
   },
   "Bundesliga": {
     "global_avg": 1.5466798159105852,
@@ -291,7 +1950,521 @@
       "Wolfsburg": 0.9793836344314558
     },
     "match_count": 3042,
-    "latest_match_date": "2026-05-03"
+    "latest_match_date": "2026-05-03",
+    "team_stats": {
+      "Augsburg": {
+        "home_gs": 1.3964497041420119,
+        "home_gc": 1.532544378698225,
+        "away_gs": 1.0769230769230769,
+        "away_gc": 1.8461538461538463,
+        "home_win_rate": 0.3431952662721893,
+        "away_win_rate": 0.23076923076923078,
+        "form_points": 15.0,
+        "goals_last5": 9.0,
+        "home_cs_rate": 0.23076923076923078,
+        "away_cs_rate": 0.1834319526627219,
+        "matches_played": 338
+      },
+      "Bayern Munich": {
+        "home_gs": 3.2366863905325443,
+        "home_gc": 0.8994082840236687,
+        "away_gs": 2.4792899408284024,
+        "away_gc": 1.1420118343195267,
+        "home_win_rate": 0.7751479289940828,
+        "away_win_rate": 0.6745562130177515,
+        "form_points": 26.0,
+        "goals_last5": 19.0,
+        "home_cs_rate": 0.4260355029585799,
+        "away_cs_rate": 0.33727810650887574,
+        "matches_played": 338
+      },
+      "Bielefeld": {
+        "home_gs": 0.8235294117647058,
+        "home_gc": 1.3529411764705883,
+        "away_gs": 0.7352941176470589,
+        "away_gc": 1.7352941176470589,
+        "home_win_rate": 0.23529411764705882,
+        "away_win_rate": 0.17647058823529413,
+        "form_points": 3.0,
+        "goals_last5": 4.0,
+        "home_cs_rate": 0.29411764705882354,
+        "away_cs_rate": 0.23529411764705882,
+        "matches_played": 68
+      },
+      "Bochum": {
+        "home_gs": 1.338235294117647,
+        "home_gc": 1.6323529411764706,
+        "away_gs": 0.9117647058823529,
+        "away_gc": 2.264705882352941,
+        "home_win_rate": 0.35294117647058826,
+        "away_win_rate": 0.16176470588235295,
+        "form_points": 8.0,
+        "goals_last5": 4.0,
+        "home_cs_rate": 0.20588235294117646,
+        "away_cs_rate": 0.11764705882352941,
+        "matches_played": 136
+      },
+      "Darmstadt": {
+        "home_gs": 0.9705882352941176,
+        "home_gc": 2.0294117647058822,
+        "away_gs": 0.7352941176470589,
+        "away_gc": 2.3529411764705883,
+        "home_win_rate": 0.20588235294117646,
+        "away_win_rate": 0.08823529411764706,
+        "form_points": 4.0,
+        "goals_last5": 2.0,
+        "home_cs_rate": 0.11764705882352941,
+        "away_cs_rate": 0.058823529411764705,
+        "matches_played": 68
+      },
+      "Dortmund": {
+        "home_gs": 2.6272189349112427,
+        "home_gc": 1.1538461538461537,
+        "away_gs": 1.7988165680473374,
+        "away_gc": 1.4497041420118344,
+        "home_win_rate": 0.6982248520710059,
+        "away_win_rate": 0.46153846153846156,
+        "form_points": 16.0,
+        "goals_last5": 7.0,
+        "home_cs_rate": 0.378698224852071,
+        "away_cs_rate": 0.25443786982248523,
+        "matches_played": 338
+      },
+      "Ein Frankfurt": {
+        "home_gs": 1.816568047337278,
+        "home_gc": 1.2603550295857988,
+        "away_gs": 1.4260355029585798,
+        "away_gc": 1.7337278106508875,
+        "home_win_rate": 0.46153846153846156,
+        "away_win_rate": 0.3136094674556213,
+        "form_points": 12.0,
+        "goals_last5": 7.0,
+        "home_cs_rate": 0.2781065088757396,
+        "away_cs_rate": 0.13609467455621302,
+        "matches_played": 338
+      },
+      "FC Koln": {
+        "home_gs": 1.451851851851852,
+        "home_gc": 1.488888888888889,
+        "away_gs": 1.1185185185185185,
+        "away_gc": 1.9111111111111112,
+        "home_win_rate": 0.3333333333333333,
+        "away_win_rate": 0.1925925925925926,
+        "form_points": 9.0,
+        "goals_last5": 9.0,
+        "home_cs_rate": 0.2074074074074074,
+        "away_cs_rate": 0.1111111111111111,
+        "matches_played": 270
+      },
+      "Fortuna Dusseldorf": {
+        "home_gs": 1.3235294117647058,
+        "home_gc": 1.6470588235294117,
+        "away_gs": 1.1764705882352942,
+        "away_gc": 2.235294117647059,
+        "home_win_rate": 0.38235294117647056,
+        "away_win_rate": 0.17647058823529413,
+        "form_points": 9.0,
+        "goals_last5": 5.0,
+        "home_cs_rate": 0.14705882352941177,
+        "away_cs_rate": 0.11764705882352941,
+        "matches_played": 68
+      },
+      "Freiburg": {
+        "home_gs": 1.6390532544378698,
+        "home_gc": 1.319526627218935,
+        "away_gs": 1.1301775147928994,
+        "away_gc": 1.816568047337278,
+        "home_win_rate": 0.46745562130177515,
+        "away_win_rate": 0.2781065088757396,
+        "form_points": 14.0,
+        "goals_last5": 6.0,
+        "home_cs_rate": 0.26627218934911245,
+        "away_cs_rate": 0.22485207100591717,
+        "matches_played": 338
+      },
+      "Greuther Furth": {
+        "home_gs": 0.8823529411764706,
+        "home_gc": 1.9411764705882353,
+        "away_gs": 0.7647058823529411,
+        "away_gc": 2.8823529411764706,
+        "home_win_rate": 0.17647058823529413,
+        "away_win_rate": 0.0,
+        "form_points": 4.0,
+        "goals_last5": 4.0,
+        "home_cs_rate": 0.23529411764705882,
+        "away_cs_rate": 0.11764705882352941,
+        "matches_played": 34
+      },
+      "Hamburg": {
+        "home_gs": 1.2,
+        "home_gc": 1.28,
+        "away_gs": 0.76,
+        "away_gc": 2.02,
+        "home_win_rate": 0.38,
+        "away_win_rate": 0.14,
+        "form_points": 8.0,
+        "goals_last5": 5.0,
+        "home_cs_rate": 0.24,
+        "away_cs_rate": 0.18,
+        "matches_played": 100
+      },
+      "Hannover": {
+        "home_gs": 1.2647058823529411,
+        "home_gc": 1.5,
+        "away_gs": 0.9411764705882353,
+        "away_gc": 2.176470588235294,
+        "home_win_rate": 0.38235294117647056,
+        "away_win_rate": 0.058823529411764705,
+        "form_points": 7.0,
+        "goals_last5": 6.0,
+        "home_cs_rate": 0.23529411764705882,
+        "away_cs_rate": 0.058823529411764705,
+        "matches_played": 68
+      },
+      "Heidenheim": {
+        "home_gs": 1.32,
+        "home_gc": 1.88,
+        "away_gs": 1.18,
+        "away_gc": 1.88,
+        "home_win_rate": 0.28,
+        "away_win_rate": 0.18,
+        "form_points": 10.0,
+        "goals_last5": 11.0,
+        "home_cs_rate": 0.18,
+        "away_cs_rate": 0.14,
+        "matches_played": 100
+      },
+      "Hertha": {
+        "home_gs": 1.4201680672268908,
+        "home_gc": 1.6050420168067228,
+        "away_gs": 1.1260504201680672,
+        "away_gc": 1.7647058823529411,
+        "home_win_rate": 0.37815126050420167,
+        "away_win_rate": 0.2184873949579832,
+        "form_points": 8.0,
+        "goals_last5": 7.0,
+        "home_cs_rate": 0.2773109243697479,
+        "away_cs_rate": 0.18487394957983194,
+        "matches_played": 238
+      },
+      "Hoffenheim": {
+        "home_gs": 1.8402366863905326,
+        "home_gc": 1.4911242603550297,
+        "away_gs": 1.6331360946745561,
+        "away_gc": 1.7218934911242603,
+        "home_win_rate": 0.46153846153846156,
+        "away_win_rate": 0.3076923076923077,
+        "form_points": 13.0,
+        "goals_last5": 10.0,
+        "home_cs_rate": 0.23668639053254437,
+        "away_cs_rate": 0.15384615384615385,
+        "matches_played": 338
+      },
+      "Holstein Kiel": {
+        "home_gs": 1.411764705882353,
+        "home_gc": 2.411764705882353,
+        "away_gs": 1.4705882352941178,
+        "away_gc": 2.2941176470588234,
+        "home_win_rate": 0.23529411764705882,
+        "away_win_rate": 0.11764705882352941,
+        "form_points": 9.0,
+        "goals_last5": 9.0,
+        "home_cs_rate": 0.058823529411764705,
+        "away_cs_rate": 0.058823529411764705,
+        "matches_played": 34
+      },
+      "Ingolstadt": {
+        "home_gs": 1.2352941176470589,
+        "home_gc": 1.7647058823529411,
+        "away_gs": 0.8823529411764706,
+        "away_gc": 1.588235294117647,
+        "home_win_rate": 0.23529411764705882,
+        "away_win_rate": 0.23529411764705882,
+        "form_points": 13.0,
+        "goals_last5": 5.0,
+        "home_cs_rate": 0.058823529411764705,
+        "away_cs_rate": 0.17647058823529413,
+        "matches_played": 34
+      },
+      "Leverkusen": {
+        "home_gs": 2.059171597633136,
+        "home_gc": 1.2603550295857988,
+        "away_gs": 1.834319526627219,
+        "away_gc": 1.3431952662721893,
+        "home_win_rate": 0.5325443786982249,
+        "away_win_rate": 0.4970414201183432,
+        "form_points": 19.0,
+        "goals_last5": 14.0,
+        "home_cs_rate": 0.3136094674556213,
+        "away_cs_rate": 0.24260355029585798,
+        "matches_played": 338
+      },
+      "M'gladbach": {
+        "home_gs": 1.7692307692307692,
+        "home_gc": 1.3076923076923077,
+        "away_gs": 1.3727810650887573,
+        "away_gc": 1.8224852071005917,
+        "home_win_rate": 0.47337278106508873,
+        "away_win_rate": 0.26627218934911245,
+        "form_points": 13.0,
+        "goals_last5": 4.0,
+        "home_cs_rate": 0.2781065088757396,
+        "away_cs_rate": 0.20118343195266272,
+        "matches_played": 338
+      },
+      "Mainz": {
+        "home_gs": 1.467455621301775,
+        "home_gc": 1.2899408284023668,
+        "away_gs": 1.1952662721893492,
+        "away_gc": 1.8402366863905326,
+        "home_win_rate": 0.3727810650887574,
+        "away_win_rate": 0.2603550295857988,
+        "form_points": 16.0,
+        "goals_last5": 8.0,
+        "home_cs_rate": 0.25443786982248523,
+        "away_cs_rate": 0.14792899408284024,
+        "matches_played": 338
+      },
+      "Nurnberg": {
+        "home_gs": 0.9411764705882353,
+        "home_gc": 1.2941176470588236,
+        "away_gs": 0.5882352941176471,
+        "away_gc": 2.7058823529411766,
+        "home_win_rate": 0.17647058823529413,
+        "away_win_rate": 0.0,
+        "form_points": 6.0,
+        "goals_last5": 2.0,
+        "home_cs_rate": 0.23529411764705882,
+        "away_cs_rate": 0.0,
+        "matches_played": 34
+      },
+      "Paderborn": {
+        "home_gs": 1.2352941176470589,
+        "home_gc": 2.7058823529411766,
+        "away_gs": 0.9411764705882353,
+        "away_gc": 1.6470588235294117,
+        "home_win_rate": 0.11764705882352941,
+        "away_win_rate": 0.11764705882352941,
+        "form_points": 4.0,
+        "goals_last5": 5.0,
+        "home_cs_rate": 0.058823529411764705,
+        "away_cs_rate": 0.23529411764705882,
+        "matches_played": 34
+      },
+      "RB Leipzig": {
+        "home_gs": 2.1420118343195265,
+        "home_gc": 1.029585798816568,
+        "away_gs": 1.7396449704142012,
+        "away_gc": 1.319526627218935,
+        "home_win_rate": 0.6094674556213018,
+        "away_win_rate": 0.44970414201183434,
+        "form_points": 22.0,
+        "goals_last5": 10.0,
+        "home_cs_rate": 0.3727810650887574,
+        "away_cs_rate": 0.28994082840236685,
+        "matches_played": 338
+      },
+      "Schalke 04": {
+        "home_gs": 1.2647058823529411,
+        "home_gc": 1.5196078431372548,
+        "away_gs": 1.0196078431372548,
+        "away_gc": 1.8823529411764706,
+        "home_win_rate": 0.3431372549019608,
+        "away_win_rate": 0.20588235294117646,
+        "form_points": 11.0,
+        "goals_last5": 9.0,
+        "home_cs_rate": 0.2549019607843137,
+        "away_cs_rate": 0.19607843137254902,
+        "matches_played": 204
+      },
+      "St Pauli": {
+        "home_gs": 0.7878787878787878,
+        "home_gc": 1.4242424242424243,
+        "away_gs": 0.8787878787878788,
+        "away_gc": 1.4848484848484849,
+        "home_win_rate": 0.21212121212121213,
+        "away_win_rate": 0.21212121212121213,
+        "form_points": 9.0,
+        "goals_last5": 3.0,
+        "home_cs_rate": 0.18181818181818182,
+        "away_cs_rate": 0.24242424242424243,
+        "matches_played": 66
+      },
+      "Stuttgart": {
+        "home_gs": 1.7037037037037037,
+        "home_gc": 1.2814814814814814,
+        "away_gs": 1.3925925925925926,
+        "away_gc": 1.7925925925925925,
+        "home_win_rate": 0.4666666666666667,
+        "away_win_rate": 0.28888888888888886,
+        "form_points": 16.0,
+        "goals_last5": 10.0,
+        "home_cs_rate": 0.26666666666666666,
+        "away_cs_rate": 0.17037037037037037,
+        "matches_played": 270
+      },
+      "Union Berlin": {
+        "home_gs": 1.4661016949152543,
+        "home_gc": 1.228813559322034,
+        "away_gs": 1.0508474576271187,
+        "away_gc": 1.728813559322034,
+        "home_win_rate": 0.4491525423728814,
+        "away_win_rate": 0.2711864406779661,
+        "form_points": 8.0,
+        "goals_last5": 6.0,
+        "home_cs_rate": 0.3050847457627119,
+        "away_cs_rate": 0.17796610169491525,
+        "matches_played": 236
+      },
+      "Werder Bremen": {
+        "home_gs": 1.375,
+        "home_gc": 1.5789473684210527,
+        "away_gs": 1.4144736842105263,
+        "away_gc": 1.7828947368421053,
+        "home_win_rate": 0.3223684210526316,
+        "away_win_rate": 0.3026315789473684,
+        "form_points": 13.0,
+        "goals_last5": 7.0,
+        "home_cs_rate": 0.20394736842105263,
+        "away_cs_rate": 0.16447368421052633,
+        "matches_played": 304
+      },
+      "Wolfsburg": {
+        "home_gs": 1.5207100591715976,
+        "home_gc": 1.4437869822485208,
+        "away_gs": 1.319526627218935,
+        "away_gc": 1.5857988165680474,
+        "home_win_rate": 0.31952662721893493,
+        "away_win_rate": 0.35502958579881655,
+        "form_points": 6.0,
+        "goals_last5": 7.0,
+        "home_cs_rate": 0.26627218934911245,
+        "away_cs_rate": 0.2485207100591716,
+        "matches_played": 338
+      }
+    },
+    "standings": [
+      {
+        "team": "Bayern Munich",
+        "points": 93.2,
+        "gd": 29.7,
+        "gf": 101.6
+      },
+      {
+        "team": "Dortmund",
+        "points": 74.0,
+        "gd": 14.7,
+        "gf": 78.7
+      },
+      {
+        "team": "RB Leipzig",
+        "points": 69.9,
+        "gd": 12.4,
+        "gf": 69.0
+      },
+      {
+        "team": "Leverkusen",
+        "points": 68.0,
+        "gd": 10.4,
+        "gf": 69.2
+      },
+      {
+        "team": "Hoffenheim",
+        "points": 58.3,
+        "gd": 2.1,
+        "gf": 61.8
+      },
+      {
+        "team": "Ein Frankfurt",
+        "points": 57.5,
+        "gd": 2.0,
+        "gf": 57.7
+      },
+      {
+        "team": "M'gladbach",
+        "points": 55.3,
+        "gd": 0.1,
+        "gf": 55.9
+      },
+      {
+        "team": "Stuttgart",
+        "points": 55.2,
+        "gd": 0.2,
+        "gf": 55.1
+      },
+      {
+        "team": "Wolfsburg",
+        "points": 52.7,
+        "gd": -1.5,
+        "gf": 50.5
+      },
+      {
+        "team": "Freiburg",
+        "points": 51.0,
+        "gd": -3.0,
+        "gf": 49.2
+      },
+      {
+        "team": "Mainz",
+        "points": 49.8,
+        "gd": -3.8,
+        "gf": 47.3
+      },
+      {
+        "team": "Union Berlin",
+        "points": 49.6,
+        "gd": -3.6,
+        "gf": 44.8
+      },
+      {
+        "team": "Werder Bremen",
+        "points": 49.4,
+        "gd": -4.6,
+        "gf": 49.6
+      },
+      {
+        "team": "FC Koln",
+        "points": 46.6,
+        "gd": -6.7,
+        "gf": 45.7
+      },
+      {
+        "team": "Hertha",
+        "points": 46.6,
+        "gd": -6.7,
+        "gf": 45.3
+      },
+      {
+        "team": "Augsburg",
+        "points": 45.7,
+        "gd": -7.3,
+        "gf": 44.0
+      },
+      {
+        "team": "Schalke 04",
+        "points": 43.4,
+        "gd": -9.0,
+        "gf": 40.6
+      },
+      {
+        "team": "Heidenheim",
+        "points": 42.9,
+        "gd": -10.2,
+        "gf": 44.5
+      },
+      {
+        "team": "Ingolstadt",
+        "points": 41.9,
+        "gd": -10.0,
+        "gf": 37.7
+      },
+      {
+        "team": "Fortuna Dusseldorf",
+        "points": 41.9,
+        "gd": -11.2,
+        "gf": 44.5
+      }
+    ]
   },
   "Ligue 1": {
     "global_avg": 1.364767139137981,
@@ -364,6 +2537,546 @@
       "Troyes": 1.2404918081554033
     },
     "match_count": 3457,
-    "latest_match_date": "2026-05-03"
+    "latest_match_date": "2026-05-03",
+    "team_stats": {
+      "Ajaccio": {
+        "home_gs": 0.5263157894736842,
+        "home_gc": 1.5789473684210527,
+        "away_gs": 0.6842105263157895,
+        "away_gc": 2.3157894736842106,
+        "home_win_rate": 0.21052631578947367,
+        "away_win_rate": 0.15789473684210525,
+        "form_points": 5.0,
+        "goals_last5": 1.0,
+        "home_cs_rate": 0.2631578947368421,
+        "away_cs_rate": 0.05263157894736842,
+        "matches_played": 38
+      },
+      "Amiens": {
+        "home_gs": 1.2115384615384615,
+        "home_gc": 1.2307692307692308,
+        "away_gs": 0.6923076923076923,
+        "away_gc": 1.5384615384615385,
+        "home_win_rate": 0.34615384615384615,
+        "away_win_rate": 0.1346153846153846,
+        "form_points": 6.0,
+        "goals_last5": 7.0,
+        "home_cs_rate": 0.3076923076923077,
+        "away_cs_rate": 0.21153846153846154,
+        "matches_played": 104
+      },
+      "Angers": {
+        "home_gs": 1.1604938271604939,
+        "home_gc": 1.345679012345679,
+        "away_gs": 0.8875,
+        "away_gc": 1.6125,
+        "home_win_rate": 0.3333333333333333,
+        "away_win_rate": 0.2125,
+        "form_points": 5.0,
+        "goals_last5": 3.0,
+        "home_cs_rate": 0.2716049382716049,
+        "away_cs_rate": 0.2125,
+        "matches_played": 322
+      },
+      "Auxerre": {
+        "home_gs": 1.1153846153846154,
+        "home_gc": 1.1730769230769231,
+        "away_gs": 1.0576923076923077,
+        "away_gc": 1.8461538461538463,
+        "home_win_rate": 0.3269230769230769,
+        "away_win_rate": 0.15384615384615385,
+        "form_points": 11.0,
+        "goals_last5": 8.0,
+        "home_cs_rate": 0.36538461538461536,
+        "away_cs_rate": 0.11538461538461539,
+        "matches_played": 104
+      },
+      "Bastia": {
+        "home_gs": 0.8947368421052632,
+        "home_gc": 0.8947368421052632,
+        "away_gs": 0.631578947368421,
+        "away_gc": 2.1052631578947367,
+        "home_win_rate": 0.2631578947368421,
+        "away_win_rate": 0.15789473684210525,
+        "form_points": 9.0,
+        "goals_last5": 3.0,
+        "home_cs_rate": 0.3684210526315789,
+        "away_cs_rate": 0.05263157894736842,
+        "matches_played": 38
+      },
+      "Bordeaux": {
+        "home_gs": 1.3055555555555556,
+        "home_gc": 1.1944444444444444,
+        "away_gs": 1.209090909090909,
+        "away_gc": 1.6818181818181819,
+        "home_win_rate": 0.3611111111111111,
+        "away_win_rate": 0.2727272727272727,
+        "form_points": 9.0,
+        "goals_last5": 8.0,
+        "home_cs_rate": 0.28703703703703703,
+        "away_cs_rate": 0.21818181818181817,
+        "matches_played": 218
+      },
+      "Brest": {
+        "home_gs": 1.5583333333333333,
+        "home_gc": 1.2833333333333334,
+        "away_gs": 1.1239669421487604,
+        "away_gc": 1.6859504132231404,
+        "home_win_rate": 0.44166666666666665,
+        "away_win_rate": 0.2644628099173554,
+        "form_points": 12.0,
+        "goals_last5": 7.0,
+        "home_cs_rate": 0.35833333333333334,
+        "away_cs_rate": 0.18181818181818182,
+        "matches_played": 241
+      },
+      "Caen": {
+        "home_gs": 0.9473684210526315,
+        "home_gc": 1.456140350877193,
+        "away_gs": 0.6666666666666666,
+        "away_gc": 1.543859649122807,
+        "home_win_rate": 0.3157894736842105,
+        "away_win_rate": 0.15789473684210525,
+        "form_points": 13.0,
+        "goals_last5": 4.0,
+        "home_cs_rate": 0.2982456140350877,
+        "away_cs_rate": 0.24561403508771928,
+        "matches_played": 114
+      },
+      "Clermont": {
+        "home_gs": 1.018181818181818,
+        "home_gc": 1.6,
+        "away_gs": 0.9636363636363636,
+        "away_gc": 1.6363636363636365,
+        "home_win_rate": 0.2909090909090909,
+        "away_win_rate": 0.2727272727272727,
+        "form_points": 8.0,
+        "goals_last5": 5.0,
+        "home_cs_rate": 0.2,
+        "away_cs_rate": 0.21818181818181817,
+        "matches_played": 110
+      },
+      "Dijon": {
+        "home_gs": 1.2,
+        "home_gc": 1.3777777777777778,
+        "away_gs": 0.8444444444444444,
+        "away_gc": 1.9666666666666666,
+        "home_win_rate": 0.34444444444444444,
+        "away_win_rate": 0.1111111111111111,
+        "form_points": 6.0,
+        "goals_last5": 3.0,
+        "home_cs_rate": 0.26666666666666666,
+        "away_cs_rate": 0.1,
+        "matches_played": 180
+      },
+      "Guingamp": {
+        "home_gs": 1.2982456140350878,
+        "home_gc": 1.1228070175438596,
+        "away_gs": 0.8421052631578947,
+        "away_gc": 2.0350877192982457,
+        "home_win_rate": 0.40350877192982454,
+        "away_win_rate": 0.14035087719298245,
+        "form_points": 8.0,
+        "goals_last5": 4.0,
+        "home_cs_rate": 0.3508771929824561,
+        "away_cs_rate": 0.17543859649122806,
+        "matches_played": 114
+      },
+      "Le Havre": {
+        "home_gs": 1.06,
+        "home_gc": 1.54,
+        "away_gs": 1.02,
+        "away_gc": 1.64,
+        "home_win_rate": 0.28,
+        "away_win_rate": 0.18,
+        "form_points": 6.0,
+        "goals_last5": 8.0,
+        "home_cs_rate": 0.18,
+        "away_cs_rate": 0.18,
+        "matches_played": 100
+      },
+      "Lens": {
+        "home_gs": 1.7358490566037736,
+        "home_gc": 1.0377358490566038,
+        "away_gs": 1.3925233644859814,
+        "away_gc": 1.2149532710280373,
+        "home_win_rate": 0.5849056603773585,
+        "away_win_rate": 0.411214953271028,
+        "form_points": 15.0,
+        "goals_last5": 12.0,
+        "home_cs_rate": 0.36792452830188677,
+        "away_cs_rate": 0.27102803738317754,
+        "matches_played": 213
+      },
+      "Lille": {
+        "home_gs": 1.6480446927374302,
+        "home_gc": 0.9832402234636871,
+        "away_gs": 1.2485875706214689,
+        "away_gc": 1.231638418079096,
+        "home_win_rate": 0.5418994413407822,
+        "away_win_rate": 0.3954802259887006,
+        "form_points": 24.0,
+        "goals_last5": 9.0,
+        "home_cs_rate": 0.37988826815642457,
+        "away_cs_rate": 0.3050847457627119,
+        "matches_played": 356
+      },
+      "Lorient": {
+        "home_gs": 1.4587155963302751,
+        "home_gc": 1.4128440366972477,
+        "away_gs": 1.0,
+        "away_gc": 1.9724770642201834,
+        "home_win_rate": 0.4036697247706422,
+        "away_win_rate": 0.1559633027522936,
+        "form_points": 11.0,
+        "goals_last5": 7.0,
+        "home_cs_rate": 0.22935779816513763,
+        "away_cs_rate": 0.11926605504587157,
+        "matches_played": 218
+      },
+      "Lyon": {
+        "home_gs": 1.9774011299435028,
+        "home_gc": 1.1355932203389831,
+        "away_gs": 1.7150837988826815,
+        "away_gc": 1.3407821229050279,
+        "home_win_rate": 0.5819209039548022,
+        "away_win_rate": 0.45251396648044695,
+        "form_points": 15.0,
+        "goals_last5": 11.0,
+        "home_cs_rate": 0.3446327683615819,
+        "away_cs_rate": 0.2737430167597765,
+        "matches_played": 356
+      },
+      "Marseille": {
+        "home_gs": 1.904494382022472,
+        "home_gc": 1.050561797752809,
+        "away_gs": 1.5056179775280898,
+        "away_gc": 1.3426966292134832,
+        "home_win_rate": 0.5786516853932584,
+        "away_win_rate": 0.43820224719101125,
+        "form_points": 13.0,
+        "goals_last5": 5.0,
+        "home_cs_rate": 0.33146067415730335,
+        "away_cs_rate": 0.2752808988764045,
+        "matches_played": 356
+      },
+      "Metz": {
+        "home_gs": 1.08130081300813,
+        "home_gc": 1.6260162601626016,
+        "away_gs": 0.9186991869918699,
+        "away_gc": 1.8699186991869918,
+        "home_win_rate": 0.22764227642276422,
+        "away_win_rate": 0.21138211382113822,
+        "form_points": 3.0,
+        "goals_last5": 7.0,
+        "home_cs_rate": 0.18699186991869918,
+        "away_cs_rate": 0.21951219512195122,
+        "matches_played": 246
+      },
+      "Monaco": {
+        "home_gs": 2.1179775280898876,
+        "home_gc": 1.1404494382022472,
+        "away_gs": 1.6573033707865168,
+        "away_gc": 1.3764044943820224,
+        "home_win_rate": 0.6123595505617978,
+        "away_win_rate": 0.4550561797752809,
+        "form_points": 23.0,
+        "goals_last5": 9.0,
+        "home_cs_rate": 0.3595505617977528,
+        "away_cs_rate": 0.2640449438202247,
+        "matches_played": 356
+      },
+      "Montpellier": {
+        "home_gs": 1.4320987654320987,
+        "home_gc": 1.3888888888888888,
+        "away_gs": 1.1111111111111112,
+        "away_gc": 1.617283950617284,
+        "home_win_rate": 0.35802469135802467,
+        "away_win_rate": 0.2716049382716049,
+        "form_points": 1.0,
+        "goals_last5": 2.0,
+        "home_cs_rate": 0.2654320987654321,
+        "away_cs_rate": 0.21604938271604937,
+        "matches_played": 324
+      },
+      "Nancy": {
+        "home_gs": 1.105263157894737,
+        "home_gc": 1.2105263157894737,
+        "away_gs": 0.42105263157894735,
+        "away_gc": 1.5263157894736843,
+        "home_win_rate": 0.3684210526315789,
+        "away_win_rate": 0.10526315789473684,
+        "form_points": 7.0,
+        "goals_last5": 4.0,
+        "home_cs_rate": 0.42105263157894735,
+        "away_cs_rate": 0.2631578947368421,
+        "matches_played": 38
+      },
+      "Nantes": {
+        "home_gs": 1.1685393258426966,
+        "home_gc": 1.2696629213483146,
+        "away_gs": 1.0168539325842696,
+        "away_gc": 1.4831460674157304,
+        "home_win_rate": 0.34269662921348315,
+        "away_win_rate": 0.24719101123595505,
+        "form_points": 9.0,
+        "goals_last5": 5.0,
+        "home_cs_rate": 0.2752808988764045,
+        "away_cs_rate": 0.20224719101123595,
+        "matches_played": 356
+      },
+      "Nice": {
+        "home_gs": 1.5027932960893855,
+        "home_gc": 1.089385474860335,
+        "away_gs": 1.1864406779661016,
+        "away_gc": 1.2429378531073447,
+        "home_win_rate": 0.5027932960893855,
+        "away_win_rate": 0.3502824858757062,
+        "form_points": 8.0,
+        "goals_last5": 4.0,
+        "home_cs_rate": 0.329608938547486,
+        "away_cs_rate": 0.2711864406779661,
+        "matches_played": 356
+      },
+      "Nimes": {
+        "home_gs": 1.3269230769230769,
+        "home_gc": 1.4230769230769231,
+        "away_gs": 1.0961538461538463,
+        "away_gc": 1.9038461538461537,
+        "home_win_rate": 0.34615384615384615,
+        "away_win_rate": 0.25,
+        "form_points": 10.0,
+        "goals_last5": 8.0,
+        "home_cs_rate": 0.28846153846153844,
+        "away_cs_rate": 0.19230769230769232,
+        "matches_played": 104
+      },
+      "Paris FC": {
+        "home_gs": 1.625,
+        "home_gc": 1.625,
+        "away_gs": 1.125,
+        "away_gc": 1.3125,
+        "home_win_rate": 0.375,
+        "away_win_rate": 0.25,
+        "form_points": 19.0,
+        "goals_last5": 12.0,
+        "home_cs_rate": 0.25,
+        "away_cs_rate": 0.25,
+        "matches_played": 32
+      },
+      "Paris SG": {
+        "home_gs": 2.7191011235955056,
+        "home_gc": 0.8089887640449438,
+        "away_gs": 2.2443181818181817,
+        "away_gc": 0.9659090909090909,
+        "home_win_rate": 0.7640449438202247,
+        "away_win_rate": 0.6818181818181818,
+        "form_points": 19.0,
+        "goals_last5": 12.0,
+        "home_cs_rate": 0.4606741573033708,
+        "away_cs_rate": 0.38636363636363635,
+        "matches_played": 354
+      },
+      "Reims": {
+        "home_gs": 1.1129032258064515,
+        "home_gc": 1.0887096774193548,
+        "away_gs": 1.064516129032258,
+        "away_gc": 1.2983870967741935,
+        "home_win_rate": 0.3387096774193548,
+        "away_win_rate": 0.27419354838709675,
+        "form_points": 11.0,
+        "goals_last5": 2.0,
+        "home_cs_rate": 0.3387096774193548,
+        "away_cs_rate": 0.27419354838709675,
+        "matches_played": 248
+      },
+      "Rennes": {
+        "home_gs": 1.7134831460674158,
+        "home_gc": 0.9887640449438202,
+        "away_gs": 1.3314606741573034,
+        "away_gc": 1.3876404494382022,
+        "home_win_rate": 0.550561797752809,
+        "away_win_rate": 0.3146067415730337,
+        "form_points": 22.0,
+        "goals_last5": 13.0,
+        "home_cs_rate": 0.3539325842696629,
+        "away_cs_rate": 0.25280898876404495,
+        "matches_played": 356
+      },
+      "St Etienne": {
+        "home_gs": 1.373015873015873,
+        "home_gc": 1.4047619047619047,
+        "away_gs": 1.0,
+        "away_gc": 1.6587301587301588,
+        "home_win_rate": 0.373015873015873,
+        "away_win_rate": 0.2698412698412698,
+        "form_points": 11.0,
+        "goals_last5": 8.0,
+        "home_cs_rate": 0.25396825396825395,
+        "away_cs_rate": 0.2698412698412698,
+        "matches_played": 252
+      },
+      "Strasbourg": {
+        "home_gs": 1.5316455696202531,
+        "home_gc": 1.2468354430379747,
+        "away_gs": 1.240506329113924,
+        "away_gc": 1.5506329113924051,
+        "home_win_rate": 0.41139240506329117,
+        "away_win_rate": 0.26582278481012656,
+        "form_points": 16.0,
+        "goals_last5": 10.0,
+        "home_cs_rate": 0.25949367088607594,
+        "away_cs_rate": 0.21518987341772153,
+        "matches_played": 316
+      },
+      "Toulouse": {
+        "home_gs": 1.2446043165467626,
+        "home_gc": 1.3381294964028776,
+        "away_gs": 1.0,
+        "away_gc": 1.524822695035461,
+        "home_win_rate": 0.2949640287769784,
+        "away_win_rate": 0.24822695035460993,
+        "form_points": 11.0,
+        "goals_last5": 7.0,
+        "home_cs_rate": 0.2589928057553957,
+        "away_cs_rate": 0.24113475177304963,
+        "matches_played": 280
+      },
+      "Troyes": {
+        "home_gs": 0.9649122807017544,
+        "home_gc": 1.2456140350877194,
+        "away_gs": 1.0350877192982457,
+        "away_gc": 2.1403508771929824,
+        "home_win_rate": 0.22807017543859648,
+        "away_win_rate": 0.15789473684210525,
+        "form_points": 3.0,
+        "goals_last5": 4.0,
+        "home_cs_rate": 0.24561403508771928,
+        "away_cs_rate": 0.07017543859649122,
+        "matches_played": 114
+      }
+    },
+    "standings": [
+      {
+        "team": "Paris SG",
+        "points": 92.4,
+        "gd": 29.2,
+        "gf": 100.1
+      },
+      {
+        "team": "Monaco",
+        "points": 70.4,
+        "gd": 11.5,
+        "gf": 76.1
+      },
+      {
+        "team": "Lyon",
+        "points": 69.6,
+        "gd": 11.1,
+        "gf": 74.4
+      },
+      {
+        "team": "Marseille",
+        "points": 66.8,
+        "gd": 9.3,
+        "gf": 68.7
+      },
+      {
+        "team": "Lens",
+        "points": 64.5,
+        "gd": 8.0,
+        "gf": 63.0
+      },
+      {
+        "team": "Rennes",
+        "points": 62.3,
+        "gd": 6.1,
+        "gf": 61.4
+      },
+      {
+        "team": "Lille",
+        "points": 61.9,
+        "gd": 6.3,
+        "gf": 58.4
+      },
+      {
+        "team": "Nice",
+        "points": 58.2,
+        "gd": 3.3,
+        "gf": 54.2
+      },
+      {
+        "team": "Strasbourg",
+        "points": 54.9,
+        "gd": -0.2,
+        "gf": 55.9
+      },
+      {
+        "team": "Paris FC",
+        "points": 53.4,
+        "gd": -1.7,
+        "gf": 55.4
+      },
+      {
+        "team": "Brest",
+        "points": 52.2,
+        "gd": -2.7,
+        "gf": 54.0
+      },
+      {
+        "team": "Reims",
+        "points": 51.1,
+        "gd": -1.9,
+        "gf": 43.9
+      },
+      {
+        "team": "Bordeaux",
+        "points": 50.8,
+        "gd": -3.4,
+        "gf": 50.7
+      },
+      {
+        "team": "Montpellier",
+        "points": 50.1,
+        "gd": -4.2,
+        "gf": 51.2
+      },
+      {
+        "team": "Nantes",
+        "points": 47.8,
+        "gd": -5.2,
+        "gf": 44.0
+      },
+      {
+        "team": "Toulouse",
+        "points": 47.5,
+        "gd": -5.7,
+        "gf": 45.2
+      },
+      {
+        "team": "St Etienne",
+        "points": 47.4,
+        "gd": -6.3,
+        "gf": 47.8
+      },
+      {
+        "team": "Nimes",
+        "points": 45.6,
+        "gd": -8.3,
+        "gf": 48.8
+      },
+      {
+        "team": "Lorient",
+        "points": 45.5,
+        "gd": -8.5,
+        "gf": 49.5
+      },
+      {
+        "team": "Auxerre",
+        "points": 45.2,
+        "gd": -7.7,
+        "gf": 43.8
+      }
+    ]
   }
 }
