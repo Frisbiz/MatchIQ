@@ -278,9 +278,6 @@
         }
         .toggle-label:hover { color: var(--text); }
         .toggle-label input { width: 15px; height: 15px; accent-color: var(--accent); }
-        .confidence-slider { display: flex; align-items: center; gap: 8px; font-size: 0.84em; color: var(--text-sub); }
-        .confidence-slider input[type="range"] { width: 90px; accent-color: var(--accent); }
-        .confidence-value { font-weight: 600; color: var(--accent-bright); min-width: 34px; }
         .predict-btn {
             width: 100%; padding: 14px;
             font-size: 0.9em; font-family: 'Syne', sans-serif; font-weight: 700;
@@ -503,7 +500,6 @@
             .vs { margin: 0 auto; }
             .team-badge { width: 50px; height: 50px; }
             .options-row { flex-direction: column; align-items: center; gap: 10px; }
-            .confidence-slider input[type="range"] { width: 110px; }
             .score-display { padding: 16px 8px; gap: 8px; border-radius: 12px; }
             .score-number { font-size: 3.5em; }
             .team-box h3 { font-size: 0.82em; }
@@ -582,11 +578,6 @@
                     <input type="checkbox" id="excludeDraw">
                     <span>Exclude 1-1 draw</span>
                 </label>
-                <div class="confidence-slider">
-                    <span>Min confidence:</span>
-                    <input type="range" id="minConfidence" min="0" max="80" value="0" oninput="updateConfidenceLabel()">
-                    <span class="confidence-value" id="confidenceLabel">0%</span>
-                </div>
             </div>
 
             <button class="predict-btn" onclick="predictMatch()" id="predictBtn">
@@ -979,11 +970,6 @@
             }
         }
 
-        function updateConfidenceLabel() {
-            const value = document.getElementById('minConfidence').value;
-            document.getElementById('confidenceLabel').textContent = value + '%';
-        }
-
         // Team select listeners
         document.getElementById('homeTeam').addEventListener('change', updateBadges);
         document.getElementById('awayTeam').addEventListener('change', updateBadges);
@@ -1077,7 +1063,6 @@
 
             try {
                 const excludeDraw = document.getElementById('excludeDraw').checked;
-                const minConfidence = document.getElementById('minConfidence').value / 100;
                 
                 const response = await fetch('/api/predict', {
                     method: 'POST',
@@ -1086,8 +1071,7 @@
                         home_team: homeTeam,
                         away_team: awayTeam,
                         league: currentLeague,
-                        exclude_draw: excludeDraw,
-                        min_confidence: minConfidence
+                        exclude_draw: excludeDraw
                     })
                 });
 

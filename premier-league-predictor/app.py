@@ -16,7 +16,7 @@ from io import BytesIO
 warnings.filterwarnings('ignore')
 
 app = Flask(__name__)
-APP_VERSION = 'bg-refresh-v26'
+APP_VERSION = 'bg-refresh-v27'
 DEFAULT_HOME_ADVANTAGE = 0.25
 RECENT_SEASON_WEIGHTS = [0.60, 0.25, 0.10]
 OLDER_SEASONS_WEIGHT = 0.05
@@ -1316,7 +1316,6 @@ def predict():
     away = data.get('away_team')
     league = data.get('league', 'Premier League')
     exclude_draw = data.get('exclude_draw', False)
-    min_confidence = float(data.get('min_confidence', 0))
     
     if not home or not away:
         return jsonify({'error': 'Please select both teams'}), 400
@@ -1361,9 +1360,6 @@ def predict():
             winner, result_type = away, "Away Win"
         else:
             winner, result_type = "Draw", "Draw"
-        
-        if result['confidence'] < min_confidence:
-            return jsonify({'error': f'Confidence {result["confidence"]*100:.0f}% below {min_confidence*100:.0f}%'}), 400
         
         return jsonify({
             'home_team': home, 'away_team': away,
