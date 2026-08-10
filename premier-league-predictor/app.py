@@ -94,7 +94,7 @@ class EnhancedPoissonModel:
         # Estimate rho (correlation for low scores)
         self.rho = 0.03  # Small positive correlation
         
-        print(f"✓ Enhanced Poisson model fitted for {len(teams)} teams")
+        print(f"OK Enhanced Poisson model fitted for {len(teams)} teams")
         print(f"  Global avg: {self.global_avg:.3f}, Home adv: {self.home_advantage:.3f}")
     
     def predict(self, home_team, away_team, exclude_draw=False, strength_profile=None):
@@ -102,20 +102,22 @@ class EnhancedPoissonModel:
         if home_team not in self.team_attack or away_team not in self.team_attack:
             return None
         
-        team_attack = self.team_attack
-        team_defense = self.team_defense
-        global_avg = self.global_avg
-        if strength_profile:
-            team_attack = strength_profile.get('attack', team_attack)
-            team_defense = strength_profile.get('defense', team_defense)
-            global_avg = strength_profile.get('global_avg', global_avg)
+        profile_attack = strength_profile.get('attack', {}) if strength_profile else {}
+        profile_defense = strength_profile.get('defense', {}) if strength_profile else {}
+        global_avg = strength_profile.get('global_avg', self.global_avg) if strength_profile else self.global_avg
+        home_attack = profile_attack.get(home_team, self.team_attack.get(home_team))
+        away_attack = profile_attack.get(away_team, self.team_attack.get(away_team))
+        home_defense = profile_defense.get(home_team, self.team_defense.get(home_team))
+        away_defense = profile_defense.get(away_team, self.team_defense.get(away_team))
+        if None in (home_attack, away_attack, home_defense, away_defense):
+            return None
 
         # Expected goals with team strengths.
         # Defense is stored as goals-conceded relative to the league average:
         # lower than 1.0 means a strong defense, higher than 1.0 means leaky.
         # Multiplying by opponent defense lowers xG against strong defenses.
-        lam = float(global_avg * team_attack[home_team] * team_defense[away_team] * np.exp(self.home_advantage))
-        mu = float(global_avg * team_attack[away_team] * team_defense[home_team])
+        lam = float(global_avg * home_attack * away_defense * np.exp(self.home_advantage))
+        mu = float(global_avg * away_attack * home_defense)
         
         # Bound
         lam = max(0.3, min(lam, 4.0))
@@ -176,54 +178,81 @@ class EnhancedPoissonModel:
         }
 
 
+# 2026-27 season config
+CURRENT_SEASON_CODE = "2627"
+CURRENT_SEASON_KEY = CURRENT_SEASON_CODE[-2:]
+CURRENT_SEASON_NAME = "2026-27"
+
 # Team colors
 TEAM_COLORS = {
-    "Arsenal": "#EF0107", "Aston Villa": "#95BWE5", "Bournemouth": "#B50127",
+    "Arsenal": "#EF0107", "Aston Villa": "#670E36", "Bournemouth": "#B50127",
     "Brentford": "#E30613", "Brighton": "#0057B8", "Chelsea": "#034694",
-    "Crystal Palace": "#1B458F", "Everton": "#003399", "Fulham": "#CC0000",
-    "Ipswich": "#00A650", "Leicester": "#00308F", "Liverpool": "#C8102E",
-    "Man City": "#6CABDD", "Man United": "#DA291C", "Newcastle": "#241F20",
-    "Nottingham Forest": "#DD0000", "Southampton": "#D70027", "Tottenham": "#132257",
-    "West Ham": "#7A263A", "Wolves": "#FDB912",
-    "Barcelona": "#A50044", "Real Madrid": "#FFFFFF", "Atletico Madrid": "#CB3524",
-    "Bayern Munich": "#DC052D", "Dortmund": "#FDE100", "PSG": "#004170",
-    "Juventus": "#000000", "Milan": "#FB090B", "Inter Milan": "#010E80",
-    "Roma": "#9d0000", "Napoli": "#0073CF", "Lyon": "#DA291C", "Marseille": "#0099CB"
+    "Coventry": "#77BBFF", "Crystal Palace": "#1B458F", "Everton": "#003399",
+    "Fulham": "#CC0000", "Hull": "#F5A623", "Ipswich": "#0057B8",
+    "Leeds": "#FFCD00", "Liverpool": "#C8102E", "Man City": "#6CABDD",
+    "Man United": "#DA291C", "Newcastle": "#241F20", "Nottingham Forest": "#DD0000",
+    "Sunderland": "#DA291C", "Tottenham": "#132257",
+    "Alaves": "#005CA9", "Athletic Bilbao": "#EE2523", "Atletico Madrid": "#CB3524",
+    "Barcelona": "#A50044", "Betis": "#009150", "Celta Vigo": "#87CEEB",
+    "Deportivo La Coruna": "#005BBB", "Elche": "#00843D", "Espanyol": "#0070B8",
+    "Getafe": "#005999", "Levante": "#AA1F2E", "Malaga": "#5DADE2",
+    "Osasuna": "#D91A21", "Racing Santander": "#007A3D", "Rayo Vallecano": "#E53027",
+    "Real Madrid": "#FFFFFF", "Real Sociedad": "#0067B1", "Sevilla": "#D71920",
+    "Valencia": "#F18E00", "Villarreal": "#FFE667",
+    "Atalanta": "#010E80", "Bologna": "#9E1B32", "Cagliari": "#003882",
+    "Como": "#0047AB", "Fiorentina": "#5526B9", "Frosinone": "#00529F",
+    "Genoa": "#AD1919", "Inter Milan": "#010E80", "Juventus": "#000000",
+    "Lazio": "#87D8F7", "Lecce": "#E31E24", "Milan": "#FB090B",
+    "Monza": "#E30613", "Napoli": "#0073CF", "Parma": "#0033A0",
+    "Roma": "#9d0000", "Sassuolo": "#00A651", "Torino": "#8B0000",
+    "Udinese": "#000000", "Venezia": "#FF6F00",
+    "Augsburg": "#BA0C2F", "Union Berlin": "#E30613", "Werder Bremen": "#00853F",
+    "Dortmund": "#FDE100", "Eintracht Frankfurt": "#D40421", "Freiburg": "#D50032",
+    "Hamburg": "#005CA9", "Hoffenheim": "#00549F", "Koln": "#D7141A",
+    "RB Leipzig": "#DD0741", "Leverkusen": "#FF0000", "Mainz": "#C4122E",
+    "Monchengladbach": "#000000", "Bayern Munich": "#DC052D", "Schalke": "#004D9E",
+    "Stuttgart": "#D30515", "Elversberg": "#000000", "Paderborn": "#005CA9",
+    "Angers": "#000000", "Auxerre": "#0047AB", "Brest": "#D71920",
+    "Le Havre": "#6CB4EE", "Le Mans": "#F58220", "Lens": "#D71920",
+    "Lille": "#E01E26", "Lorient": "#F58220", "Lyon": "#DA291C",
+    "Marseille": "#0099CB", "Monaco": "#E30613", "Nice": "#000000",
+    "Paris FC": "#1E5AA8", "Paris SG": "#004170", "Rennes": "#D71920",
+    "Strasbourg": "#009FE3", "Toulouse": "#5A2D81", "Troyes": "#005BAA",
 }
 
 # Current teams by league
 premier_league_teams = [
     "Arsenal", "Aston Villa", "Bournemouth", "Brentford", "Brighton",
-    "Burnley", "Chelsea", "Crystal Palace", "Everton", "Fulham",
-    "Leeds", "Liverpool", "Man City", "Man United", "Newcastle",
-    "Nottingham Forest", "Sunderland", "Tottenham", "West Ham", "Wolves"
+    "Chelsea", "Coventry", "Crystal Palace", "Everton", "Fulham",
+    "Hull", "Ipswich", "Leeds", "Liverpool", "Man City",
+    "Man United", "Newcastle", "Nottingham Forest", "Sunderland", "Tottenham"
 ]
 
 la_liga_teams = [
     "Alaves", "Athletic Bilbao", "Atletico Madrid", "Barcelona", "Celta Vigo",
-    "Elche", "Espanyol", "Getafe", "Girona", "Levante",
-    "Mallorca", "Osasuna", "Oviedo", "Rayo Vallecano", "Betis",
+    "Deportivo La Coruna", "Elche", "Espanyol", "Getafe", "Levante",
+    "Malaga", "Osasuna", "Racing Santander", "Rayo Vallecano", "Betis",
     "Real Madrid", "Real Sociedad", "Sevilla", "Valencia", "Villarreal"
 ]
 
 serie_a_teams = [
-    "Atalanta", "Bologna", "Cagliari", "Como", "Cremonese",
-    "Fiorentina", "Genoa", "Verona", "Inter Milan", "Juventus",
-    "Lazio", "Lecce", "Milan", "Napoli", "Parma",
-    "Pisa", "Roma", "Sassuolo", "Torino", "Udinese"
+    "Atalanta", "Bologna", "Cagliari", "Como", "Fiorentina",
+    "Frosinone", "Genoa", "Inter Milan", "Juventus", "Lazio",
+    "Lecce", "Milan", "Monza", "Napoli", "Parma",
+    "Roma", "Sassuolo", "Torino", "Udinese", "Venezia"
 ]
 
 bundesliga_teams = [
     "Augsburg", "Union Berlin", "Werder Bremen", "Dortmund", "Eintracht Frankfurt",
-    "Freiburg", "Hamburg", "Heidenheim", "Hoffenheim", "Koln",
-    "RB Leipzig", "Leverkusen", "Mainz", "Monchengladbach", "Bayern Munich",
-    "St Pauli", "Stuttgart", "Wolfsburg"
+    "Freiburg", "Hamburg", "Hoffenheim", "Koln", "RB Leipzig",
+    "Leverkusen", "Mainz", "Monchengladbach", "Bayern Munich", "Schalke",
+    "Stuttgart", "Elversberg", "Paderborn"
 ]
 
 ligue_1_teams = [
-    "Angers", "Auxerre", "Brest", "Le Havre", "Lens", "Lille",
-    "Lorient", "Lyon", "Marseille", "Metz", "Monaco", "Nantes",
-    "Nice", "Paris FC", "Paris SG", "Rennes", "Strasbourg", "Toulouse"
+    "Angers", "Auxerre", "Brest", "Le Havre", "Le Mans", "Lens",
+    "Lille", "Lorient", "Lyon", "Marseille", "Monaco", "Nice",
+    "Paris FC", "Paris SG", "Rennes", "Strasbourg", "Toulouse", "Troyes"
 ]
 
 # Leagues
@@ -235,10 +264,19 @@ LEAGUE_DATA = {
     "Ligue 1": {"country": "France", "code": "F1", "teams": ligue_1_teams, "yahoo_code": None},
 }
 
-# Season weights
+# Season weights, keyed by football-data season code. The current season is
+# highest-weighted when its CSV becomes available.
+SEASONS = [
+    ("1617", "2016-17"), ("1718", "2017-18"), ("1819", "2018-19"),
+    ("1920", "2019-20"), ("2021", "2020-21"), ("2122", "2021-22"),
+    ("2223", "2022-23"), ("2324", "2023-24"), ("2425", "2024-25"),
+    ("2526", "2025-26"), (CURRENT_SEASON_CODE, CURRENT_SEASON_NAME),
+]
+
 SEASON_WEIGHTS = {
-    "2425": 2.5, "2324": 2.0, "2223": 1.5, "2122": 1.2, "2021": 1.0,
-    "1920": 0.9, "1819": 0.8, "1718": 0.7, "1617": 0.6, "1516": 0.5, "1415": 0.4
+    "2627": 3.0, "2526": 2.5, "2425": 2.0, "2324": 1.6,
+    "2223": 1.3, "2122": 1.1, "2021": 1.0, "1920": 0.9,
+    "1819": 0.8, "1718": 0.7, "1617": 0.6,
 }
 
 def fetch_yahoo_scoreboard(league, week):
@@ -263,7 +301,7 @@ def fetch_yahoo_scoreboard(league, week):
         with urlopen(url, timeout=5) as resp:
             return json.loads(resp.read().decode('utf-8'))
     except Exception as e:
-        print(f"⚠️ Yahoo fetch failed for {league} week {week}: {e}")
+        print(f"Warning: Yahoo fetch failed for {league} week {week}: {e}")
         return None
 
 
@@ -464,12 +502,18 @@ YAHOO_TEAM_NAME_MAP = {
     'Bournemouth': 'Bournemouth',
     'Brentford': 'Brentford',
     'Brighton & Hove Albion': 'Brighton',
-    'Burnley': 'Burnley',
     'Chelsea': 'Chelsea',
+    'Coventry City': 'Coventry',
+    'Coventry': 'Coventry',
     'Crystal Palace': 'Crystal Palace',
     'Everton': 'Everton',
     'Fulham': 'Fulham',
+    'Hull City': 'Hull',
+    'Hull': 'Hull',
+    'Ipswich Town': 'Ipswich',
+    'Ipswich': 'Ipswich',
     'Leeds United': 'Leeds',
+    'Leeds': 'Leeds',
     'Liverpool': 'Liverpool',
     'Manchester City': 'Man City',
     'Manchester United': 'Man United',
@@ -477,8 +521,6 @@ YAHOO_TEAM_NAME_MAP = {
     'Nottingham Forest': 'Nottingham Forest',
     'Sunderland': 'Sunderland',
     'Tottenham Hotspur': 'Tottenham',
-    'West Ham United': 'West Ham',
-    'Wolverhampton Wanderers': 'Wolves',
 }
 
 
@@ -492,7 +534,7 @@ def fetch_yahoo_current_results(league, max_weeks=38):
     deadline = time.time() + 30  # bail out after 30 seconds total
     for week in range(1, max_weeks + 1):
         if time.time() > deadline:
-            print(f"⚠️ Yahoo fetch budget exceeded for {league}, stopping at week {week}")
+            print(f"Warning: Yahoo fetch budget exceeded for {league}, stopping at week {week}")
             break
         payload = fetch_yahoo_scoreboard(league, week)
         if not payload:
@@ -533,10 +575,98 @@ def fetch_yahoo_current_results(league, max_weeks=38):
     return pd.DataFrame(rows).drop_duplicates(subset=['HomeTeam', 'AwayTeam'], keep='last')
 
 
+FOOTBALL_DATA_NAME_MAP = {
+    # England
+    "Coventry City": "Coventry",
+    "Hull City": "Hull",
+    "Ipswich Town": "Ipswich",
+    "Leeds United": "Leeds",
+    "Nott'm Forest": "Nottingham Forest",
+    "Nottingham": "Nottingham Forest",
+    "Brighton & Hove Albion": "Brighton",
+    "Manchester City": "Man City",
+    "Manchester United": "Man United",
+    "Newcastle United": "Newcastle",
+    "Tottenham Hotspur": "Tottenham",
+    "West Ham United": "West Ham",
+    "Wolverhampton Wanderers": "Wolves",
+
+    # Spain
+    "Ath Bilbao": "Athletic Bilbao",
+    "Ath Madrid": "Atletico Madrid",
+    "Atlético Madrid": "Atletico Madrid",
+    "Celta": "Celta Vigo",
+    "Deportivo Alavés": "Alaves",
+    "La Coruna": "Deportivo La Coruna",
+    "Deportivo La Coruña": "Deportivo La Coruna",
+    "Espanol": "Espanyol",
+    "Real Betis": "Betis",
+    "Santander": "Racing Santander",
+    "Sociedad": "Real Sociedad",
+    "Vallecano": "Rayo Vallecano",
+
+    # Italy
+    "AC Milan": "Milan",
+    "Inter": "Inter Milan",
+    "Hellas Verona": "Verona",
+
+    # Germany
+    "Ein Frankfurt": "Eintracht Frankfurt",
+    "1. FC Heidenheim": "Heidenheim",
+    "FC Heidenheim": "Heidenheim",
+    "FC Koln": "Koln",
+    "1. FC Köln": "Koln",
+    "1. FC KÃ¶ln": "Koln",
+    "M'gladbach": "Monchengladbach",
+    "Borussia Mönchengladbach": "Monchengladbach",
+    "Borussia MÃ¶nchengladbach": "Monchengladbach",
+    "FC Augsburg": "Augsburg",
+    "FC St. Pauli": "St Pauli",
+    "Hamburger SV": "Hamburg",
+    "SC Freiburg": "Freiburg",
+    "TSG Hoffenheim": "Hoffenheim",
+    "VfB Stuttgart": "Stuttgart",
+    "VfL Wolfsburg": "Wolfsburg",
+    "Bayer Leverkusen": "Leverkusen",
+    "Borussia Dortmund": "Dortmund",
+    "Schalke 04": "Schalke",
+    "FC Schalke 04": "Schalke",
+    "SV Elversberg": "Elversberg",
+    "SC Paderborn": "Paderborn",
+    "SC Paderborn 07": "Paderborn",
+
+    # France
+    "Paris Saint-Germain": "Paris SG",
+    "Paris St-G": "Paris SG",
+    "Le Mans FC": "Le Mans",
+    "ESTAC Troyes": "Troyes",
+}
+
+
+def normalize_team_names(df):
+    """Return a copy using MatchIQ display names for football-data teams."""
+    normalized = df.copy()
+    normalized['HomeTeam'] = normalized['HomeTeam'].replace(FOOTBALL_DATA_NAME_MAP)
+    normalized['AwayTeam'] = normalized['AwayTeam'].replace(FOOTBALL_DATA_NAME_MAP)
+    return normalized
+
+
+def is_expected_league_data(df, teams, min_overlap=3):
+    """Reject missing/misrouted CSVs before they enter the training data."""
+    required_columns = {'HomeTeam', 'AwayTeam', 'FTHG', 'FTAG', 'FTR'}
+    if df is None or df.empty or not required_columns.issubset(df.columns):
+        return False
+
+    match_teams = set(df['HomeTeam'].dropna()).union(df['AwayTeam'].dropna())
+    overlap = match_teams.intersection(teams)
+    return len(overlap) >= min_overlap
+
+
 def fetch_data(league="Premier League"):
     """Fetch league data"""
     league_info = LEAGUE_DATA.get(league, LEAGUE_DATA["Premier League"])
     code = league_info["code"]
+    teams = set(league_info["teams"])
     slug = re.sub(r'[^a-z0-9]+', '-', league.lower()).strip('-')
     snapshot_paths = [
         os.path.join(os.path.dirname(__file__), 'data', f'{slug}.csv'),
@@ -545,40 +675,42 @@ def fetch_data(league="Premier League"):
     ]
     for snapshot_path in snapshot_paths:
         if os.path.exists(snapshot_path):
-            print(f"✓ {league} local training snapshot: {snapshot_path}")
+            print(f"Loaded {league} local training snapshot: {snapshot_path}")
             try:
                 mark_refresh_state(league, refresh_stage='loading local training snapshot')
             except NameError:
                 pass
             return read_local_training_snapshot(snapshot_path)
-    print(f"⚠️ {league} no local snapshot found; falling back to network")
+    print(f"Warning: {league} no local snapshot found; falling back to network")
     try:
         mark_refresh_state(league, refresh_stage='fetching training data from network')
     except NameError:
         pass
-    
-    seasons = [
-        # Last 9 seasons including current
-        ("1617", "2016-17", "16"), ("1718", "2017-18", "17"), ("1819", "2018-19", "18"), ("1920", "2019-20", "19"),
-        ("2021", "2020-21", "20"), ("2122", "2021-22", "21"), 
-        ("2223", "2022-23", "22"), ("2324", "2023-24", "23"), ("2425", "2024-25", "24"), ("2526", "2025-26", "25"),
-    ]
-    
-    def fetch_season(season_code, season_name, season_key):
+
+    def fetch_season(season_code, season_name):
         url = f"https://www.football-data.co.uk/mmz4281/{season_code}/{code}.csv"
         df = read_csv_with_timeout(url, timeout=5)
+        df = normalize_team_names(df)
+        min_overlap = 2 if season_code == CURRENT_SEASON_CODE else 3
+        if not is_expected_league_data(df, teams, min_overlap=min_overlap):
+            return season_name, None, 'CSV did not match expected teams'
+
+        df = df[df['FTR'].notna() & df['FTHG'].notna() & df['FTAG'].notna()].copy()
+        if df.empty:
+            return season_name, None, 'no completed matches yet'
+
         df['Season'] = season_name
-        df['SeasonKey'] = season_key
-        df['Weight'] = SEASON_WEIGHTS.get(season_key, 1.0)
-        return season_name, df
+        df['SeasonKey'] = season_code[-2:]
+        df['Weight'] = SEASON_WEIGHTS.get(season_code, 1.0)
+        return season_name, df, None
 
     all_data = []
-    for season in seasons:
+    for season in SEASONS:
         result = {}
 
         def run_fetch():
             try:
-                result['season_name'], result['df'] = fetch_season(*season)
+                result['season_name'], result['df'], result['skip_reason'] = fetch_season(*season)
             except Exception as e:
                 result['error'] = e
 
@@ -586,13 +718,15 @@ def fetch_data(league="Premier League"):
         thread.start()
         thread.join(6)
         if thread.is_alive():
-            print(f"✗ {league} {season[1]}: timed out")
+            print(f"Could not load {league} {season[1]}: timed out")
             continue
-        if 'df' in result:
+        if result.get('df') is not None:
             all_data.append(result['df'])
-            print(f"✓ {league} {result['season_name']}")
+            print(f"Loaded {league} {result['season_name']}")
+        elif result.get('skip_reason'):
+            print(f"Skipping {league} {result['season_name']}: {result['skip_reason']}")
         else:
-            print(f"✗ {league} {season[1]}: {result.get('error')}")
+            print(f"Could not load {league} {season[1]}: {result.get('error')}")
     
     if all_data:
         combined = pd.concat(all_data, ignore_index=True)
@@ -727,6 +861,9 @@ def normalize_team_name(name):
         'Nott\'m Forest': 'Nottingham Forest',
         'Nottingham': 'Nottingham Forest',
         'Brighton & Hove Albion': 'Brighton',
+        'Coventry City': 'Coventry',
+        'Hull City': 'Hull',
+        'Ipswich Town': 'Ipswich',
         'Leeds United': 'Leeds',
         'Sunderland AFC': 'Sunderland',
         'Burnley FC': 'Burnley',
@@ -735,6 +872,12 @@ def normalize_team_name(name):
         'Ath Madrid': 'Atletico Madrid',
         'Atlético Madrid': 'Atletico Madrid',
         'Celta': 'Celta Vigo',
+        'La Coruna': 'Deportivo La Coruna',
+        'Deportivo La Coruña': 'Deportivo La Coruna',
+        'Malaga CF': 'Malaga',
+        'Málaga CF': 'Malaga',
+        'Santander': 'Racing Santander',
+        'Racing': 'Racing Santander',
         'Espanol': 'Espanyol',
         'Sociedad': 'Real Sociedad',
         'Vallecano': 'Rayo Vallecano',
@@ -747,7 +890,16 @@ def normalize_team_name(name):
         "M'gladbach": 'Monchengladbach',
         'Ein Frankfurt': 'Eintracht Frankfurt',
         'FC Koln': 'Koln',
+        '1. FC Köln': 'Koln',
+        'Schalke 04': 'Schalke',
+        'FC Schalke 04': 'Schalke',
+        'SV Elversberg': 'Elversberg',
+        'SC Paderborn': 'Paderborn',
+        'SC Paderborn 07': 'Paderborn',
         'Paris Saint-Germain': 'Paris SG',
+        'Paris St-G': 'Paris SG',
+        'Le Mans FC': 'Le Mans',
+        'ESTAC Troyes': 'Troyes',
     }
     return aliases.get(cleaned, cleaned)
 
@@ -820,7 +972,7 @@ def get_head_to_head_from_snapshot(league, team1, team2, limit=5):
         if df is not None:
             return get_head_to_head(df, team1, team2, limit=limit)
     except Exception as e:
-        print(f"⚠️ H2H snapshot read failed for {league}: {e}")
+        print(f"Warning: H2H snapshot read failed for {league}: {e}")
     return {'team1_wins': 0, 'team2_wins': 0, 'draws': 0, 'avg_goals': 0, 'matches': []}
 
 
@@ -961,7 +1113,7 @@ def refresh_worker(league, force_refresh=True):
             raise RuntimeError('Could not load data')
         mark_refresh_state(league, refreshing=False, refresh_error=None)
     except Exception as e:
-        print(f"❌ Refresh failed for {league}: {e}")
+        print(f"Refresh failed for {league}: {e}")
         mark_refresh_state(league, refreshing=False, refresh_error=str(e))
 
 
@@ -995,7 +1147,7 @@ def warm_leagues_sequentially(leagues=None, force_refresh=False, only_if_needed=
             if only_if_needed and not _needs_refresh(datetime.now(), league):
                 continue
 
-            print(f"🔄 {reason}: warming {league}")
+            print(f"{reason}: warming {league}")
             refresh_worker(league, force_refresh=force_refresh)
             threading.Event().wait(LEAGUE_REFRESH_PAUSE_SECONDS)
         return True
@@ -1027,7 +1179,7 @@ def _daily_refresh_loop():
         try:
             warm_leagues_sequentially(force_refresh=True, only_if_needed=True, reason='daily refresh')
         except Exception as e:
-            print(f"❌ Daily refresh loop failed: {e}")
+            print(f"Daily refresh loop failed: {e}")
         threading.Event().wait(REFRESH_CHECK_INTERVAL_SECONDS)
 
 
@@ -1042,15 +1194,9 @@ def _current_season_df(df):
     if completed.empty:
         return completed
 
-    if 'Date' in completed.columns:
-        completed['_parsed_date'] = pd.to_datetime(completed['Date'], dayfirst=True, errors='coerce')
-        season_order = completed.groupby('Season')['_parsed_date'].max().sort_values().index.tolist()
-    else:
-        season_order = sorted(completed['Season'].dropna().unique().tolist())
-
-    if not season_order:
-        return pd.DataFrame()
-    return completed[completed['Season'] == season_order[-1]].copy()
+    if 'SeasonKey' in completed.columns:
+        return completed[completed['SeasonKey'].astype(str) == CURRENT_SEASON_KEY].copy()
+    return completed[completed['Season'] == CURRENT_SEASON_NAME].copy()
 
 
 def build_current_table_and_remaining(current_df, teams):
@@ -1122,9 +1268,6 @@ def validate_projected_standings(standings, current_table, remaining):
 
 def simulate_remaining_season_standings(model, current_df, teams, league='Premier League', n_sim=STANDINGS_SIMULATIONS, strength_profile=None):
     current_season = _current_season_df(current_df)
-    if current_season.empty:
-        return []
-
     current_table, remaining, active_teams = build_current_table_and_remaining(current_season, teams)
     remaining_counts = defaultdict(int)
     for home, away in remaining:
